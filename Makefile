@@ -1,7 +1,7 @@
-CC = gcc
+CC = g++
 TARGET = auri
 
-SRC = $(shell find . -type f \( -name '*.c' -o -name '*.h' \))
+SRC = $(shell find . -type f \( -name '*.cpp' -o -name '*.hpp' \))
 OUT_DIR = out
 BIN = $(OUT_DIR)/$(TARGET)
 
