@@ -7,6 +7,7 @@ FLAGS += -pedantic
 FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
+FLAGS += -std=c++14
 
 SRC = $(shell find . -type f \( -name '*.cpp' -o -name '*.hpp' \))
 OUT_DIR = out
@@ -25,8 +26,9 @@ clean:
 	rm -rf $(OUT_DIR)
 
 format:
-	@echo "Applying Format"
+	@echo "Applying Format..."
 	@find . -type f \( -name "*.cpp" \) -exec clang-format -i {} \;
 	@find . -type f \( -name "*.h" -o -name "*.hpp" \) -exec clang-format -i {} \;
+	@echo "Done! "
 
 .PHONY: all clean
