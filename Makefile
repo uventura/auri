@@ -16,8 +16,7 @@ BIN = $(OUT_DIR)/$(TARGET)
 all: $(OUT_DIR) $(BIN)
 
 $(BIN): $(SRC)
-	echo $(SRC)
-	$(CC) $(SRC) -o $(BIN) $(FLAGS)
+	$(CC) $(SRC) -o $(BIN) $(FLAGS) -I .
 
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
