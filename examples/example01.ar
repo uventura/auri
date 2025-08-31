@@ -1,0 +1,18 @@
+import("module/path/file.ar", "element", "second_element");
+
+alias("module.scope.function", "module");
+alias("module.scope.function", "module");
+
+run testing_scope_execution {
+    var testing_var;
+    module.scope.function;
+
+    print(1+1);
+}
+
+run testing_another_execution {
+    fun my_function(element_a, element_b) {
+        return 42;
+    }
+}
+

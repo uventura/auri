@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include <cstdint>
 #include <string>
 
@@ -17,7 +17,7 @@ struct File {
 namespace Auri {
 struct Cli {
  private:
-  std::array<std::string, MAX_FILES> files_;
+     std::vector<std::string> files_;
 
  public:
   Cli(uint32_t argc, char** argv);
@@ -32,7 +32,7 @@ uint32_t Cli::num_files() { return files_.size(); }
 Cli::Cli(uint32_t argc, char** argv) {
   for (uint32_t i = 1; i < argc; ++i) {
     std::string file(argv[i]);
-    files_[i - 1] = file;
+    files_.push_back(file);
   }
 }
 }  // namespace Auri
