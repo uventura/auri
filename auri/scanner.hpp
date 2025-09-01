@@ -2,6 +2,7 @@
 
 #include "auri/token.hpp"
 #include <fstream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -14,12 +15,15 @@ class Scanner {
 
     void tokenize();
     char peek();
+    char peekNext();
     char advance();
     bool match(char symbol);
+
+    static std::map<std::string, TokenType> keywords_;
 
    public:
     Scanner(std::string file);
 
-    inline const std::vector<Token>& tokens() {return tokens_;};
+    inline const std::vector<Token>& tokens() { return tokens_; };
 };
 }    // namespace Auri

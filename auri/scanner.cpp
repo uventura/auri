@@ -1,11 +1,35 @@
 #include "auri/scanner.hpp"
 
+#include <cctype>
 #include <cstdint>
+#include <iostream>
 #include <stdexcept>
 #include <string>
-#include <iostream>
 
 namespace Auri {
+std::map<std::string, TokenType> Scanner::keywords_ = {
+    {"var", TokenType::GENERIC_VAR},
+    {"numeric", TokenType::NUMERIC_VAR},
+    {"string", TokenType::STRING_VAR},
+    {"bool", TokenType::BOOL_VAR},
+    {"if", TokenType::IF},
+    {"else", TokenType::ELSE},
+    {"elseif", TokenType::ELSE_IF},
+    {"for", TokenType::FOR},
+    {"while", TokenType::WHILE},
+    {"return", TokenType::RETURN},
+    {"true", TokenType::TRUE},
+    {"false", TokenType::FALSE},
+    {"or", TokenType::OR},
+    {"and", TokenType::AND},
+    {"alias", TokenType::ALIAS},
+    {"as", TokenType::AS},
+    {"import", TokenType::IMPORT},
+    {"setup", TokenType::SETUP},
+    {"prerun", TokenType::PRE_RUN},
+    {"run", TokenType::RUN},
+    {"postrun", TokenType::POST_RUN}};
+
 Scanner::Scanner(std::string filePath) {
     file_.open(filePath);
     filePath_ = filePath;
@@ -96,23 +120,70 @@ void Scanner::tokenize() {
             case '"': {
                 type = TokenType::STRING;
                 char current = advance();
-                while(!file_.eof() && current != '"') {
+                while (!file_.eof() && current != '"') {
                     lexeme += peek();
                     current = advance();
+
+                    if (peek() == '\n') line++;
                 }
 
-                if(file_.eof()) {
-                    throw std::invalid_argument("In file '" + filePath_ +
-                                    "' there is an unclosed string on line " + std::to_string(line) + " called '" + lexeme + "'");
+                if (file_.eof()) {
+                    throw std::invalid_argument(
+                        "In file '" + filePath_ +
+                        "' there is an unclosed string on line " +
+                        std::to_string(line) + " called '" + lexeme + "'");
                 }
 
                 lexeme += '"';
-                literal = lexeme.substr(1,lexeme.size() - 2);
+                literal = lexeme.substr(1, lexeme.size() - 2);
             }
+            case ' ':
+            case '\r':
+            case '\t':
+                break;
             case '\n':
                 line++;
-            default:
                 break;
+            default: {
+                if (std::isdigit(fileChar)) {
+                    type = TokenType::NUMBER;
+                    char current = advance();
+                    while (!file_.eof() && std::isdigit(current)) {
+                        lexeme += peek();
+                        current = advance();
+                    }
+
+                    if (peek() == '.' && std::isdigit(peekNext())) {
+                        advance();    // consume dot.
+                        lexeme += ".";
+
+                        char current = advance();
+                        while (std::isdigit(current)) {
+                            lexeme += current;
+                            current = advance();
+                        }
+                    }
+                    literal = std::stod(lexeme);
+                } else if (std::isalpha(fileChar)) {
+                    char current = advance();
+                    while (std::isalpha(current) || std::isdigit(current) ||
+                           current == '_') {
+                        lexeme += current;
+                        current = advance();
+                    }
+                    file_.unget();
+
+                    if (Scanner::keywords_.find(lexeme) !=
+                        Scanner::keywords_.end()) {
+                        type = Scanner::keywords_[lexeme];
+                    } else {
+                        type = TokenType::IDENTIFIER;
+                    }
+
+                    literal = lexeme;
+                }
+                break;
+            }
         }
 
         if (type != TokenType::NONE) {
@@ -124,13 +195,21 @@ void Scanner::tokenize() {
 }
 
 char Scanner::peek() {
-    if(file_.eof()) return 0;
+    if (file_.eof()) return 0;
 
     char current = 0;
     file_.unget();
     file_.get(current);
 
     return current;
+}
+
+char Scanner::peekNext() {
+    char nextSymbol = 0;
+    file_.get(nextSymbol);
+    file_.unget();
+
+    return nextSymbol;
 }
 
 char Scanner::advance() {

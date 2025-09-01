@@ -73,6 +73,22 @@ std::string Token::typeToString() {
             return "FOR";
         case TokenType::WHILE:
             return "WHILE";
+        case TokenType::RETURN:
+            return "RETURN";
+        case TokenType::TRUE:
+            return "TRUE";
+        case TokenType::FALSE:
+            return "FALSE";
+        case TokenType::OR:
+            return "OR";
+        case TokenType::AND:
+            return "AND";
+        case TokenType::ALIAS:
+            return "ALIAS";
+        case TokenType::AS:
+            return "AS";
+        case TokenType::IMPORT:
+            return "IMPORT";
         case TokenType::SETUP:
             return "SETUP";
         case TokenType::PRE_RUN:
@@ -90,19 +106,19 @@ std::string Token::typeToString() {
     return "<<NOT_DEFINED>>";
 }
 
-std::string Token::lexeme() {
-    return lexeme_;
-}
+std::string Token::lexeme() { return lexeme_; }
 
 std::string Token::literal() {
-    if(auto pval = std::get_if<std::string>(&literal_)) {
+    if (auto pval = std::get_if<std::string>(&literal_)) {
         return *pval;
+    }
+    if (auto pval = std::get_if<double>(&literal_)) {
+        double val = *pval;
+        return std::to_string(val);
     }
 
     return "";
 }
 
-std::string Token::line() {
-    return std::to_string(line_);
-}
+std::string Token::line() { return std::to_string(line_); }
 }    // namespace Auri
