@@ -1,20 +1,19 @@
 #pragma once
 
 #include "auri/token.hpp"
-
 #include <fstream>
 #include <string>
 #include <vector>
 
 namespace Auri {
 class Scanner {
- private:
+   private:
     std::vector<Token> tokens_;
-  std::ifstream file_;
+    std::ifstream file_;
 
-  char peek();
+    char peek();
 
- public:
-  Scanner(std::string file);
+   public:
+    Scanner(std::string file);
 };
-}  // namespace Auri
+}    // namespace Auri

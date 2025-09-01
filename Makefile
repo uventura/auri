@@ -7,9 +7,9 @@ FLAGS += -pedantic
 FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
-FLAGS += -std=c++14
+FLAGS += -std=c++17
 
-SRC = $(shell find . -type f \( -name '*.cpp' -o -name '*.hpp' \))
+SRC = $(shell find . -type f \( -name '*.cpp' \))
 OUT_DIR = out
 BIN = $(OUT_DIR)/$(TARGET)
 

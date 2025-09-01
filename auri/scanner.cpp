@@ -1,14 +1,14 @@
 #include "auri/scanner.hpp"
 
-#include <stdexceptions>
+#include <stdexcept>
 
 namespace Auri {
 Scanner::Scanner(std::string file_path) {
-  file_.open(file_path);
+    file_.open(file_path);
 
-  if (!file.is_open()) {
-    throw std::invalid_argument("The file '" + cli.file(i) +
-                                "' can't be found.");
-  }
+    if (!file_.is_open()) {
+        throw std::invalid_argument("The file '" + file_path +
+                                    "' can't be found.");
+    }
 }
-}  // namespace Auri
+}    // namespace Auri
