@@ -4,7 +4,7 @@
 #include <string>
 
 #include "auri/cli.hpp"
-#include "auri/tokens.hpp"
+#include "auri/token.hpp"
 
 int main(int argc, char** argv) {
   Auri::Cli cli(argc, argv);
