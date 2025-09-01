@@ -1,7 +1,7 @@
 import("module/path/file.ar", "element", "second_element");
 
-alias("module.scope.function", "module");
-alias("module.scope.function", "module");
+alias module.scope.function as module;
+alias module.scope.function as module02;
 
 run testing_scope_execution {
     var testing_var;

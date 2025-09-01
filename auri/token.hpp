@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <string>
 #include <variant>
 
@@ -44,10 +45,12 @@ enum class TokenType {
     RUN,
     POST_RUN,
     // EOF
-    AURI_EOF,
+    AR_EOF,
+    // NONE
+    NONE
 };
 
-using TokenLiteral = std::variant<std::string, bool, int, char>;
+using TokenLiteral = std::variant<std::string, bool, double, char>;
 
 class Token {
    private:
@@ -57,6 +60,12 @@ class Token {
     int line_;
 
    public:
-    Token(TokenType type, std::string lexeme, TokenLiteral literal, int line);
+    Token(TokenType type, std::string lexeme, TokenLiteral literal,
+          uint32_t line);
+
+    std::string typeToString();
+    std::string lexeme();
+    std::string literal();
+    std::string line();
 };
 }    // namespace Auri
