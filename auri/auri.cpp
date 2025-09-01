@@ -20,7 +20,47 @@ int main(int argc, char** argv) {
     char file_char;
     while (file.get(file_char)) {
       switch (file_char) {
-        //          case '(': addToken()
+        case '(':
+          LEFT_PAREN;
+          break;
+        case ')':
+          RIGHT_PAREN;
+          break;
+        case '{':
+          LEFT_BRACE;
+          break;
+        case '}':
+          RIGHT_BRACE;
+        case '"':
+          COMMA;
+        case '.':
+          DOT;
+        case '-':
+          MINUS;
+        case '+':
+          PLUS;
+        case ';':
+          SEMICOLON;
+        case '/':
+          SLASH;
+        case '*':
+          STAR;
+        case '!':
+          BANG;
+        case '':
+          BANG_EQUAL;
+        case '':
+          EQUAL;
+        case '':
+          EQUAL_EQUAL;
+        case '>':
+          GREATER;
+        case '':
+          GREATER_EQUAL;
+        case '':
+          LESS;
+        case '':
+          LESS_EQUAL;
       }
     }
   }
