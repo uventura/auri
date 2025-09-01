@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #define MAX_FILES 100
 
@@ -17,7 +17,7 @@ struct File {
 namespace Auri {
 struct Cli {
  private:
-     std::vector<std::string> files_;
+  std::vector<std::string> files_;
 
  public:
   Cli(uint32_t argc, char** argv);
