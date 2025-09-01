@@ -89,6 +89,8 @@ std::string Token::typeToString() {
             return "AS";
         case TokenType::IMPORT:
             return "IMPORT";
+        case TokenType::FUN:
+            return "FUN";
         case TokenType::SETUP:
             return "SETUP";
         case TokenType::PRE_RUN:

@@ -25,6 +25,7 @@ std::map<std::string, TokenType> Scanner::keywords_ = {
     {"alias", TokenType::ALIAS},
     {"as", TokenType::AS},
     {"import", TokenType::IMPORT},
+    {"fun", TokenType::FUN},
     {"setup", TokenType::SETUP},
     {"prerun", TokenType::PRE_RUN},
     {"run", TokenType::RUN},

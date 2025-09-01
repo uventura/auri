@@ -47,6 +47,7 @@ enum class TokenType {
     ALIAS,
     AS,
     IMPORT,
+    FUN,
     // Execution Control
     SETUP,
     PRE_RUN,
