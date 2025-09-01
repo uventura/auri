@@ -4,7 +4,6 @@
 #include <string>
 
 #include "auri/cli.hpp"
-#include "auri/token.hpp"
 
 int main(int argc, char** argv) {
   Auri::Cli cli(argc, argv);
@@ -12,10 +11,6 @@ int main(int argc, char** argv) {
   for (uint32_t i = 0; i < cli.num_files(); ++i) {
     std::ifstream file;
     file.open(cli.file(i));
-    if (!file.is_open()) {
-      throw std::invalid_argument("The file '" + cli.file(i) +
-                                  "' can't be found.");
-    }
 
     char file_char;
     while (file.get(file_char)) {
