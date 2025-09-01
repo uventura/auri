@@ -42,6 +42,19 @@ Scanner::Scanner(std::string filePath) {
     tokenize();
 }
 
+void Scanner::debugPrint() {
+    std::cout << "*------------------------------------------*" << std::endl;
+    std::cout << "|                  Scanner                 |" << std::endl;
+    std::cout << "*------------------------------------------*" << std::endl;
+    for (auto i : tokens()) {
+        std::cout << "|  Line " << i.line() << ": [" << i.typeToString()
+                  << "] .... Lexeme: " << i.lexeme()
+                  << " .... Literal: " << i.literal() << "\n";
+    }
+    std::cout << "*------------------------------------------*" << std::endl;
+    std::cout << "*------------------------------------------*" << std::endl;
+}
+
 void Scanner::tokenize() {
     char fileChar = advance();
     uint32_t line = 0;
@@ -181,6 +194,11 @@ void Scanner::tokenize() {
                     }
 
                     literal = lexeme;
+                } else {
+                    throw std::invalid_argument(
+                        "In the file '" + filePath_ +
+                        "' there is an unexpected element '" + lexeme +
+                        "' on line " + std::to_string(line));
                 }
                 break;
             }

@@ -23,6 +23,7 @@ class Scanner {
 
    public:
     Scanner(std::string file);
+    void debugPrint();
 
     inline const std::vector<Token>& tokens() { return tokens_; };
 };
