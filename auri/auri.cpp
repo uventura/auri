@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         std::cout << "|                  Scanner                 |" << std::endl;
         std::cout << "*------------------------------------------*" << std::endl;
         for(auto i: scanner.tokens()) {
-            std::cout << "|  Line " << i.line() << ": [" << i.typeToString() << "] .... " << i.lexeme() << "   " << i.literal() << "\n";
+            std::cout << "|  Line " << i.line() << ": [" << i.typeToString() << "] .... Lexeme: " << i.lexeme() << " .... Literal: " << i.literal() << "\n";
         }
         std::cout << "*------------------------------------------*" << std::endl;
         std::cout << "*------------------------------------------*" << std::endl;

@@ -19,13 +19,13 @@ Scanner::Scanner(std::string filePath) {
 }
 
 void Scanner::tokenize() {
-    char file_char = advance();
+    char fileChar = advance();
     uint32_t line = 0;
 
-    while (file_char) {
-        std::string lexeme(1, file_char);
+    while (fileChar) {
+        std::string lexeme(1, fileChar);
         TokenType type = TokenType::NONE;
-        TokenLiteral literal = file_char;
+        TokenLiteral literal = lexeme;
 
         switch (peek()) {
             case '(':
@@ -107,6 +107,7 @@ void Scanner::tokenize() {
                 }
 
                 lexeme += '"';
+                literal = lexeme.substr(1,lexeme.size() - 2);
             }
             case '\n':
                 line++;
@@ -118,7 +119,7 @@ void Scanner::tokenize() {
             tokens_.push_back(Token(type, lexeme, literal, line));
         }
 
-        file_char = advance();
+        fileChar = advance();
     }
 }
 
