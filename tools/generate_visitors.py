@@ -34,7 +34,7 @@ EXPRESSION_VISITOR_TEMPLATE = Template("""
             $attributes
         public:
             $expr_class($arguments): $initialization{}
-            void accept(ExpressionVisitor& visitor){return;};
+            void accept(ExpressionVisitor& visitor){return visitor.visit(*this);};
     };
 """)
 
