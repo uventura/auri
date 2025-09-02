@@ -63,6 +63,8 @@ std::string Token::typeToString() {
             return "STRING_VAR";
         case TokenType::BOOL_VAR:
             return "BOOL_VAR";
+        case TokenType::AR_NULL:
+            return "NULL";
         case TokenType::IF:
             return "IF";
         case TokenType::ELSE:

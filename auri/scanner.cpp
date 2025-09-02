@@ -12,6 +12,7 @@ std::map<std::string, TokenType> Scanner::keywords_ = {
     {"numeric", TokenType::NUMERIC_VAR},
     {"string", TokenType::STRING_VAR},
     {"bool", TokenType::BOOL_VAR},
+    {"null", TokenType::AR_NULL},
     {"if", TokenType::IF},
     {"else", TokenType::ELSE},
     {"elseif", TokenType::ELSE_IF},
