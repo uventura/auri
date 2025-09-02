@@ -212,6 +212,8 @@ void Scanner::tokenize() {
 
         fileChar = advance();
     }
+
+    tokens_.push_back(Token(TokenType::AR_EOF, "", "", line));
 }
 
 char Scanner::peek() {

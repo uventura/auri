@@ -4,7 +4,7 @@ alias module.scope.function as module;
 alias module.scope.function as module02;
 
 run testing_scope_execution {
-    var testing_var;
+    var testing_var = 2;
     module.scope.function;
 
     print(1+1);
@@ -15,4 +15,3 @@ run testing_another_execution {
         return 42;
     }
 }
-

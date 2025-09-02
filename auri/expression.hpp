@@ -33,6 +33,7 @@ class LiteralExpr : public Expression {
    public:
     LiteralExpr(TokenLiteral literal) : literal_(literal) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    TokenLiteral literal() { return literal_; };
 };
 
 class GroupingExpr : public Expression {
@@ -42,6 +43,7 @@ class GroupingExpr : public Expression {
    public:
     GroupingExpr(ExpressionPtr expr) : expr_(std::move(expr)) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    Expression& expr() { return *expr_.get(); };
 };
 
 class UnaryExpr : public Expression {
@@ -52,6 +54,8 @@ class UnaryExpr : public Expression {
    public:
     UnaryExpr(Token op, ExpressionPtr term) : op_(op), term_(std::move(term)) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    Token op() { return op_; };
+    Expression& term() { return *term_.get(); };
 };
 
 class BinaryExpr : public Expression {
@@ -64,6 +68,9 @@ class BinaryExpr : public Expression {
     BinaryExpr(ExpressionPtr left, Token op, ExpressionPtr right)
         : left_(std::move(left)), op_(op), right_(std::move(right)) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    Expression& left() { return *left_.get(); };
+    Token op() { return op_; };
+    Expression& right() { return *right_.get(); };
 };
 
 }    // namespace AST

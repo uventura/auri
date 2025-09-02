@@ -11,7 +11,7 @@ class Parser {
    private:
     ExpressionPtr expr_;
     uint64_t currentPos_ = 0;
-    std::vector<Token>&
+    std::vector<Token>
         tokens_;    // No need to keep this data after the tree generated.
 
     ExpressionPtr expression();
@@ -25,10 +25,13 @@ class Parser {
     Token peek();
     Token previous();
     Token advance();
+    void consume(TokenType expectedToken, std::string errorMessage);
     bool match(std::vector<TokenType> possibleMatches);
 
    public:
-    Parser(std::vector<Token>& tokens);
+    Parser(const std::vector<Token>& tokens);
+
+    Expression& ast();
 };
 }    // namespace AST
 }    // namespace Auri
