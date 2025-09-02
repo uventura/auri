@@ -51,7 +51,7 @@ void Scanner::debugPrint() {
     for (auto i : tokens()) {
         std::cout << "|  Line " << i.line() << ": [" << i.typeToString()
                   << "] .... Lexeme: " << i.lexeme()
-                  << " .... Literal: " << i.literal() << "\n";
+                  << " .... Literal: " << i.literalToStr() << "\n";
     }
     std::cout << "*------------------------------------------*" << std::endl;
     std::cout << "*------------------------------------------*" << std::endl;

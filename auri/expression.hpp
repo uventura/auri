@@ -1,14 +1,22 @@
+#pragma once
 #include "auri/token.hpp"
 #include <memory>
 
 namespace Auri {
+namespace AST {
+class Expression;
+class LiteralExpr;
+class GroupingExpr;
+class UnaryExpr;
+class BinaryExpr;
+using ExpressionPtr = std::unique_ptr<Expression>;
+
 class ExpressionVisitor {
    public:
     virtual void visit(LiteralExpr& expr) = 0;
     virtual void visit(GroupingExpr& expr) = 0;
     virtual void visit(UnaryExpr& expr) = 0;
     virtual void visit(BinaryExpr& expr) = 0;
-    ;
     virtual ~ExpressionVisitor() = default;
 };
 
@@ -24,40 +32,39 @@ class LiteralExpr : public Expression {
 
    public:
     LiteralExpr(TokenLiteral literal) : literal_(literal) {}
-    void accept(ExpressionVisitor& visitor);
+    void accept(ExpressionVisitor& visitor) { return; };
 };
 
 class GroupingExpr : public Expression {
    private:
-    std::unique_ptr<Expression> expr_;
+    ExpressionPtr expr_;
 
    public:
-    GroupingExpr(std::unique_ptr<Expression> expr) : expr_(std::move(expr)) {}
-    void accept(ExpressionVisitor& visitor);
+    GroupingExpr(ExpressionPtr expr) : expr_(std::move(expr)) {}
+    void accept(ExpressionVisitor& visitor) { return; };
 };
 
 class UnaryExpr : public Expression {
    private:
     Token op_;
-    std::unique_ptr<Expression> term_;
+    ExpressionPtr term_;
 
    public:
-    UnaryExpr(Token op, std::unique_ptr<Expression> term)
-        : op_(op), term_(std::move(term)) {}
-    void accept(ExpressionVisitor& visitor);
+    UnaryExpr(Token op, ExpressionPtr term) : op_(op), term_(std::move(term)) {}
+    void accept(ExpressionVisitor& visitor) { return; };
 };
 
 class BinaryExpr : public Expression {
    private:
-    std::unique_ptr<Expression> left_;
+    ExpressionPtr left_;
     Token op_;
-    std::unique_ptr<Expression> right_;
+    ExpressionPtr right_;
 
    public:
-    BinaryExpr(std::unique_ptr<Expression> left, Token op,
-               std::unique_ptr<Expression> right)
+    BinaryExpr(ExpressionPtr left, Token op, ExpressionPtr right)
         : left_(std::move(left)), op_(op), right_(std::move(right)) {}
-    void accept(ExpressionVisitor& visitor);
+    void accept(ExpressionVisitor& visitor) { return; };
 };
 
+}    // namespace AST
 }    // namespace Auri

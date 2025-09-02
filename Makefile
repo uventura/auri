@@ -1,7 +1,8 @@
-CC = g++
+CC = clang++
 TARGET = auri
 FLAGS = -W
 FLAGS += -Wall
+FLAGS += -Werror
 FLAGS += -ansi
 FLAGS += -pedantic
 FLAGS += -g

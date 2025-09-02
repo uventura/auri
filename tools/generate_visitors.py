@@ -1,14 +1,20 @@
 from argparse import ArgumentParser
 from string import Template
 
-EXPRESSION_TEMPLATE = Template("""#include "auri/token.hpp"
+EXPRESSION_TEMPLATE = Template("""#pragma once
+#include "auri/token.hpp"
 
 #include <memory>
 
 namespace Auri{
+namespace AST{
+    class Expression;
+$forward_expression_signatures
+    using ExpressionPtr = std::unique_ptr<Expression>;
+
     class ExpressionVisitor{
         public:
-$expression_signatures;
+$expression_signatures
             virtual ~ExpressionVisitor() = default;
     };
 
@@ -19,6 +25,7 @@ $expression_signatures;
     };
 $expression_classes
 }
+}
 """)
 
 EXPRESSION_VISITOR_TEMPLATE = Template("""
@@ -27,7 +34,7 @@ EXPRESSION_VISITOR_TEMPLATE = Template("""
             $attributes
         public:
             $expr_class($arguments): $initialization{}
-            void accept(ExpressionVisitor& visitor);
+            void accept(ExpressionVisitor& visitor){return;};
     };
 """)
 
@@ -40,9 +47,9 @@ def arguments():
 def expression_visitor(args):
     grammar = {
         "LiteralExpr": ["TokenLiteral literal"],
-        "GroupingExpr": ["std::unique_ptr<Expression> expr"],
-        "UnaryExpr": ["Token op", "std::unique_ptr<Expression> term"],
-        "BinaryExpr": ["std::unique_ptr<Expression> left", "Token op", "std::unique_ptr<Expression> right"],
+        "GroupingExpr": ["ExpressionPtr expr"],
+        "UnaryExpr": ["Token op", "ExpressionPtr term"],
+        "BinaryExpr": ["ExpressionPtr left", "Token op", "ExpressionPtr right"],
     }
 
     classes = ""
@@ -52,7 +59,7 @@ def expression_visitor(args):
         for index, attribute in enumerate(attributes):
             attribute_name = attribute.split()[-1]
             argument_name = arguments[index].split()[-1]
-            if attribute.startswith("std::unique_ptr<Expression>"):
+            if attribute.startswith("ExpressionPtr"):
                 initialization = f"{attribute_name}(std::move({argument_name}))"
             else:
                 initialization = f"{attribute_name}({argument_name})"
@@ -66,8 +73,10 @@ def expression_visitor(args):
 
         classes += visitor_class
 
+    forward_expression_signatures = [f"\tclass {expr};" for expr in grammar]
     expression_signatures = [f"\t\t\tvirtual void visit({expr}& expr) = 0;" for expr in grammar]
     expression_content = EXPRESSION_TEMPLATE.substitute(
+        forward_expression_signatures="\n".join(forward_expression_signatures),
         expression_signatures="\n".join(expression_signatures),
         expression_classes = classes
     )

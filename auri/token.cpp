@@ -9,6 +9,10 @@ Token::Token(TokenType type, std::string lexeme, TokenLiteral literal,
     line_ = line;
 }
 
+TokenType Token::type() { return type_; }
+
+TokenLiteral Token::literal() { return literal_; }
+
 std::string Token::typeToString() {
     switch (type_) {
         case TokenType::LEFT_PAREN:
@@ -112,7 +116,7 @@ std::string Token::typeToString() {
 
 std::string Token::lexeme() { return lexeme_; }
 
-std::string Token::literal() {
+std::string Token::literalToStr() {
     if (auto pval = std::get_if<std::string>(&literal_)) {
         return *pval;
     }
