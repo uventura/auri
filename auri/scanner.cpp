@@ -151,6 +151,7 @@ void Scanner::tokenize() {
 
                 lexeme += '"';
                 literal = lexeme.substr(1, lexeme.size() - 2);
+                break;
             }
             case ' ':
             case '\r':
@@ -162,7 +163,7 @@ void Scanner::tokenize() {
             default: {
                 if (std::isdigit(fileChar)) {
                     type = TokenType::NUMBER;
-                    char current = advance();
+                    char current = peekNext();
                     while (!file_.eof() && std::isdigit(current)) {
                         lexeme += peek();
                         current = advance();
