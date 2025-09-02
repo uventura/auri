@@ -48,6 +48,7 @@ enum class TokenType {
     AS,
     IMPORT,
     FUN,
+    AR_NULL,
     // Execution Control
     SETUP,
     PRE_RUN,
