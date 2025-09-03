@@ -1,9 +1,9 @@
 #include "auri/parser.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include <string>
-#include <iostream>
 
 namespace Auri {
 namespace AST {
@@ -11,9 +11,7 @@ Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) {
     expr_ = expression();
 }
 
-Expression& Parser::ast() {
-    return *expr_;
-}
+Expression& Parser::ast() { return *expr_; }
 
 ExpressionPtr Parser::expression() { return equality(); }
 
@@ -69,18 +67,20 @@ ExpressionPtr Parser::unary() {
 }
 
 ExpressionPtr Parser::primary() {
-    if(match({TokenType::TRUE})) {
+    if (match({TokenType::TRUE})) {
         return std::make_unique<LiteralExpr>(true);
-    } else if(match({TokenType::FALSE})) {
+    } else if (match({TokenType::FALSE})) {
         return std::make_unique<LiteralExpr>(false);
-    } else if(match({TokenType::AR_NULL, TokenType::NUMBER, TokenType::STRING})) {
+    } else if (match({TokenType::AR_NULL, TokenType::NUMBER,
+                      TokenType::STRING})) {
         return std::make_unique<LiteralExpr>(previous().literal());
-    } else if(match({TokenType::AR_EOF})) {
+    } else if (match({TokenType::AR_EOF})) {
         return nullptr;
     }
-    if(match({TokenType::LEFT_PAREN})) {
+    if (match({TokenType::LEFT_PAREN})) {
         ExpressionPtr expr = expression();
-        consume(TokenType::RIGHT_PAREN, "Missing right parenthesized expression.");
+        consume(TokenType::RIGHT_PAREN,
+                "Missing right parenthesized expression.");
 
         return expr;
     }
@@ -91,14 +91,14 @@ ExpressionPtr Parser::primary() {
 Token Parser::peek() { return tokens_[currentPos_]; }
 
 Token Parser::previous() {
-    if (currentPos_ < 0) {
+    if (currentPos_ == 0) {
         throw std::runtime_error("No previous token");
     }
     return tokens_[currentPos_ - 1];
 }
 
 Token Parser::advance() {
-    if(tokens_.size() <= currentPos_) {
+    if (tokens_.size() <= currentPos_) {
         std::runtime_error("Can't advance to next token");
     }
 
@@ -114,7 +114,7 @@ void Parser::consume(TokenType expectedToken, std::string errorMessage) {
 }
 
 bool Parser::match(std::vector<TokenType> possibleMatches) {
-    if(tokens_.size() - 1 < currentPos_) return false;
+    if (tokens_.size() - 1 < currentPos_) return false;
 
     if (std::find(possibleMatches.begin(), possibleMatches.end(),
                   peek().type()) != possibleMatches.end()) {

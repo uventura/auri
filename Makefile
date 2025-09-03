@@ -1,4 +1,4 @@
-CC = clang++
+CC = g++
 TARGET = auri
 FLAGS = -W
 FLAGS += -Wall

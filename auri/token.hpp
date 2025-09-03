@@ -62,8 +62,7 @@ enum class TokenType {
     NONE
 };
 
-using TokenLiteral =
-    std::variant<std::string, bool, double, char>;
+using TokenLiteral = std::variant<std::string, bool, double, char>;
 
 class Token {
    private:
