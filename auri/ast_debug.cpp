@@ -10,8 +10,15 @@ namespace AST {
 AstDebug::AstDebug(Expression& expr) : expr_(expr) {}
 
 void AstDebug::print() {
+    std::cout << "+===============================+\n";
+    std::cout << "|            Auri AST           |\n";
+    std::cout << "+===============================+\n";
+
     expr_.accept(*this);
-    std::cout << "\n";
+
+    std::cout << "+===============================+\n";
+    std::cout << "|             End AST           |\n";
+    std::cout << "+===============================+\n";
 }
 
 void AstDebug::visit(LiteralExpr& expr) {
@@ -54,11 +61,11 @@ void AstDebug::visit(BinaryExpr& expr) {
 
     spaceCounter_++;
     spacement();
-    std::cout << "|\n";
+    std::cout << " \\\n";
     spacement();
-    std::cout << "[" << expr.op().lexeme() << "]\n";
+    std::cout << " [" << expr.op().lexeme() << "]\n";
     spacement();
-    std::cout << "|\n";
+    std::cout << " /\n";
     spaceCounter_--;
 
     spaceCounter_++;
@@ -71,7 +78,7 @@ void AstDebug::visit(BinaryExpr& expr) {
 
 void AstDebug::spacement() {
     for (int i = 0; i < spaceCounter_; ++i) {
-        std::cout << "    ";
+        std::cout << "|   ";
     }
 }
 }    // namespace AST
