@@ -41,7 +41,15 @@ void AstDebug::visit(GroupingExpr& expr) {
 void AstDebug::visit(UnaryExpr& expr) {
     spacement();
     std::cout << "[Unary] <<\n";
-    std::cout << expr.op().lexeme() << " ";
+
+    spaceCounter_++;
+    spacement();
+    std::cout << " \\\n";
+    spacement();
+    std::cout << " [" << expr.op().lexeme() << "]\n";
+    spacement();
+    std::cout << " /\n";
+    spaceCounter_--;
 
     spaceCounter_++;
     expr.term().accept(*this);
