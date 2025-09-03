@@ -165,8 +165,8 @@ void Scanner::tokenize() {
                     type = TokenType::NUMBER;
                     char current = peekNext();
                     while (!file_.eof() && std::isdigit(current)) {
-                        lexeme += peek();
                         current = advance();
+                        lexeme += current;
                     }
 
                     if (peek() == '.' && std::isdigit(peekNext())) {
