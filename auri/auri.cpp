@@ -12,10 +12,15 @@ int main(int argc, char** argv) {
 
     for (uint32_t i = 0; i < cli.num_files(); ++i) {
         Auri::Scanner scanner(cli.file(i));
-        scanner.debugPrint();
-
         Auri::AST::Parser parser(scanner.tokens());
-        Auri::AST::AstDebug debug(parser.ast());
-        debug.print();
+
+        if (cli.enableTokenPrint()) {
+            scanner.debugPrint();
+        }
+        if (cli.enableAstPrint())
+        {
+            Auri::AST::AstDebug debug(parser.ast());
+            debug.print();
+        }
     }
 }
