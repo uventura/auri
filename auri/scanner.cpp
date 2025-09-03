@@ -134,21 +134,7 @@ void Scanner::tokenize() {
             }
             case '"': {
                 type = TokenType::STRING;
-                char current = advance();
-                while (!file_.eof() && current != '"') {
-                    lexeme += peek();
-                    current = advance();
-
-                    if (peek() == '\n') line++;
-                }
-
-                if (file_.eof()) {
-                    throw std::invalid_argument(
-                        "In file '" + filePath_ +
-                        "' there is an unclosed string on line " +
-                        std::to_string(line) + " called '" + lexeme + "'");
-                }
-
+                text(lexeme, line);
                 lexeme += '"';
                 literal = lexeme.substr(1, lexeme.size() - 2);
                 break;
@@ -163,10 +149,10 @@ void Scanner::tokenize() {
             default: {
                 if (std::isdigit(fileChar)) {
                     type = TokenType::NUMBER;
-                    lexeme = digit();
+                    digit(lexeme);
                     literal = std::stod(lexeme);
                 } else if (std::isalpha(fileChar)) {
-                    lexeme = identifier(type);
+                    identifier(lexeme, type);
                     literal = lexeme;
                 } else {
                     throw std::invalid_argument(
@@ -188,9 +174,7 @@ void Scanner::tokenize() {
     tokens_.push_back(Token(TokenType::AR_EOF, "", "", line));
 }
 
-std::string Scanner::digit() {
-    std::string lexeme(1, peek());
-
+void Scanner::digit(std::string& lexeme) {
     char current = advance();
     while (!file_.eof() && std::isdigit(current)) {
         lexeme += current;
@@ -209,11 +193,26 @@ std::string Scanner::digit() {
     }
 
     file_.unget();
-    return lexeme;
 }
 
-std::string Scanner::identifier(TokenType& type) {
-    std::string lexeme(1, peek());
+void Scanner::text(std::string& lexeme, uint32_t& line) {
+    char current = advance();
+
+    while (!file_.eof() && current != '"') {
+        lexeme += peek();
+        current = advance();
+
+        if (peek() == '\n') line++;
+    }
+
+    if (file_.eof()) {
+        throw std::invalid_argument(
+            "In file '" + filePath_ + "' there is an unclosed string on line " +
+            std::to_string(line) + " called '" + lexeme + "'");
+    }
+}
+
+void Scanner::identifier(std::string& lexeme, TokenType& type) {
     char current = advance();
 
     while (std::isalpha(current) || std::isdigit(current) || current == '_') {
@@ -227,8 +226,6 @@ std::string Scanner::identifier(TokenType& type) {
     } else {
         type = TokenType::IDENTIFIER;
     }
-
-    return lexeme;
 }
 
 char Scanner::peek() {

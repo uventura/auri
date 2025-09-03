@@ -15,8 +15,10 @@ class Scanner {
 
     void tokenize();
 
-    std::string digit();
-    std::string identifier(TokenType& type);
+    void digit(std::string& lexeme);
+    void text(std::string& lexeme, uint32_t& line);
+    void identifier(std::string& lexeme, TokenType& type);
+
     char peek();
     char peekNext();
     char advance();
