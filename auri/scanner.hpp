@@ -14,6 +14,9 @@ class Scanner {
     std::string filePath_;
 
     void tokenize();
+
+    std::string digit();
+    std::string identifier(TokenType& type);
     char peek();
     char peekNext();
     char advance();

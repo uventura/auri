@@ -163,39 +163,10 @@ void Scanner::tokenize() {
             default: {
                 if (std::isdigit(fileChar)) {
                     type = TokenType::NUMBER;
-                    char current = peekNext();
-                    while (!file_.eof() && std::isdigit(current)) {
-                        current = advance();
-                        lexeme += current;
-                    }
-
-                    if (peek() == '.' && std::isdigit(peekNext())) {
-                        advance();    // consume dot.
-                        lexeme += ".";
-
-                        char current = advance();
-                        while (std::isdigit(current)) {
-                            lexeme += current;
-                            current = advance();
-                        }
-                    }
+                    lexeme = digit();
                     literal = std::stod(lexeme);
                 } else if (std::isalpha(fileChar)) {
-                    char current = advance();
-                    while (std::isalpha(current) || std::isdigit(current) ||
-                           current == '_') {
-                        lexeme += current;
-                        current = advance();
-                    }
-                    file_.unget();
-
-                    if (Scanner::keywords_.find(lexeme) !=
-                        Scanner::keywords_.end()) {
-                        type = Scanner::keywords_[lexeme];
-                    } else {
-                        type = TokenType::IDENTIFIER;
-                    }
-
+                    lexeme = identifier(type);
                     literal = lexeme;
                 } else {
                     throw std::invalid_argument(
@@ -215,6 +186,49 @@ void Scanner::tokenize() {
     }
 
     tokens_.push_back(Token(TokenType::AR_EOF, "", "", line));
+}
+
+std::string Scanner::digit() {
+    std::string lexeme(1, peek());
+
+    char current = advance();
+    while (!file_.eof() && std::isdigit(current)) {
+        lexeme += current;
+        current = advance();
+    }
+
+    if (peek() == '.' && std::isdigit(peekNext())) {
+        lexeme += ".";
+        lexeme += advance();
+
+        char current = advance();
+        while (std::isdigit(current)) {
+            lexeme += current;
+            current = advance();
+        }
+    }
+
+    file_.unget();
+    return lexeme;
+}
+
+std::string Scanner::identifier(TokenType& type) {
+    std::string lexeme(1, peek());
+    char current = advance();
+
+    while (std::isalpha(current) || std::isdigit(current) || current == '_') {
+        lexeme += current;
+        current = advance();
+    }
+    file_.unget();
+
+    if (Scanner::keywords_.find(lexeme) != Scanner::keywords_.end()) {
+        type = Scanner::keywords_[lexeme];
+    } else {
+        type = TokenType::IDENTIFIER;
+    }
+
+    return lexeme;
 }
 
 char Scanner::peek() {
