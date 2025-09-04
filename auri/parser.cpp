@@ -94,20 +94,25 @@ StatementPtr Parser::ifStmt() {
     ExpressionPtr condition = expression();
     consume(TokenType::RIGHT_PAREN, "If statement expects ')'");
 
-    std::vector<StatementPtr> thenBranch;
+    std::vector<StatementPtr> thenBranch = blockStmt();
+    return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
+}
+
+std::vector<StatementPtr> Parser::blockStmt() {
+    std::vector<StatementPtr> block;
     if (match({TokenType::LEFT_BRACE})) {
         while (!match({TokenType::RIGHT_BRACE, TokenType::AR_EOF})) {
-            thenBranch.push_back(defaultStmt());
+            block.push_back(defaultStmt());
         }
 
         if (previous().type() == TokenType::AR_EOF) {
             throw std::runtime_error("If statement missing '}'");
         }
     } else {
-        thenBranch.push_back(defaultStmt());
+        block.push_back(defaultStmt());
     }
 
-    return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
+    return block;
 }
 
 ExpressionPtr Parser::expression() { return equality(); }

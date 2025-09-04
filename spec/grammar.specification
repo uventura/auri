@@ -3,14 +3,16 @@ program         → statement* EOF;
 statement       → defaultStmt
                 | runStmt;
 
-defaultStmt     → exprStmt;
-                | importStmt;
-                | ifStmt;
+defaultStmt     → exprStmt
+                | importStmt
+                | ifStmt
+                | whileStmt;
 
 runStmt         → run IDENTIFIER "{" defaultStmt* "}";
 exprStmt        → expression ";"
 importStmt      → import "(" STRING ("," STRING)*  ")" ";"
 ifStmt          → "if" "(" expression ")" blockStmt
+whileStmt       → "while" "(" expression ")" blockStmt
 blockStmt       → defaultStmt ";" | "{" defaultStmt* "}"
 
 expression      → literal

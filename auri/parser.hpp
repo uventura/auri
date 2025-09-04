@@ -23,6 +23,7 @@ class Parser {
     StatementPtr expressionStmt();
     StatementPtr importStmt();
     StatementPtr ifStmt();
+    std::vector<StatementPtr> blockStmt();
 
     ExpressionPtr expression();
     ExpressionPtr equality();
@@ -36,6 +37,7 @@ class Parser {
     Token previous();
     Token advance();
     Token consume(TokenType expectedToken, std::string errorMessage);
+
     bool isAtEnd();
     bool match(std::vector<TokenType> possibleMatches);
 
