@@ -42,6 +42,8 @@ void AstDebug::visit(RunStmt& run) {
     std::cout << "{RunStatement} (" << run.identifier().literalToStr() << ") <<\n";
 
     for (uint64_t i = 0; i < run.stmt().size(); ++i) {
+        spacement();
+        std::cout<<"\n";
         (*(run.stmt()[i])).accept(*this);
     }
 
@@ -76,6 +78,16 @@ void AstDebug::visit(IfStmt& ifs) {
     spacement();
     std::cout << "Condition: \n";
     ifs.condition().accept(*this);
+
+    spacement();
+    std::cout << "[Block] << \n";
+    spaceCounter_++;
+    for(auto& stmt : ifs.thenBranch()) {
+        stmt->accept(*this);
+    }
+    spaceCounter_--;
+    spacement();
+    std::cout << "[Block] >> \n";
 
     spaceCounter_--;
     spacement();
