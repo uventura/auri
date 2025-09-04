@@ -152,12 +152,12 @@ ExpressionPtr Parser::primary() {
     if (match({TokenType::LEFT_PAREN})) {
         ExpressionPtr expr = expression();
         consume(TokenType::RIGHT_PAREN,
-                "Missing right parenthesized expression.");
+                "Missing right parenthesized expression -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
 
         return expr;
     }
 
-    throw std::runtime_error("Unrecognized expression.");
+    throw std::runtime_error("Unrecognized expression -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
 }
 
 Token Parser::peek() { return tokens_[currentPos_]; }
