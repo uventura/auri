@@ -11,6 +11,7 @@ class ExprStmt;
 class RunStmt;
 class ImportStmt;
 class IfStmt;
+class WhileStmt;
 using StatementPtr = std::unique_ptr<Statement>;
 
 class StatementVisitor {
@@ -19,6 +20,7 @@ class StatementVisitor {
     virtual void visit(RunStmt& stmt) = 0;
     virtual void visit(ImportStmt& stmt) = 0;
     virtual void visit(IfStmt& stmt) = 0;
+    virtual void visit(WhileStmt& stmt) = 0;
     virtual ~StatementVisitor() = default;
 };
 
@@ -80,6 +82,20 @@ class IfStmt : public Statement {
 
     Expression& condition() { return *condition_; }
     std::vector<StatementPtr>& thenBranch() { return thenBranch_; }
+};
+
+class WhileStmt : public Statement {
+   private:
+    ExpressionPtr condition_;
+    std::vector<StatementPtr> body_;
+
+   public:
+    WhileStmt(ExpressionPtr condition, std::vector<StatementPtr> body)
+        : condition_(std::move(condition)), body_(std::move(body)){};
+    void accept(StatementVisitor& statement) { statement.visit(*this); };
+
+    Expression& condition() { return *condition_; }
+    std::vector<StatementPtr>& body() { return body_; }
 };
 }    // namespace AST
 }    // namespace Auri

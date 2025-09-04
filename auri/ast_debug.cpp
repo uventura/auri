@@ -94,6 +94,30 @@ void AstDebug::visit(IfStmt& ifs) {
     std::cout << "{IfStatement} >> \n";
 }
 
+void AstDebug::visit(WhileStmt& whiles) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{WhileStatement} << \n";
+
+    spacement();
+    std::cout << "Condition: \n";
+    whiles.condition().accept(*this);
+
+    spacement();
+    std::cout << "[Block] << \n";
+    spaceCounter_++;
+    for(auto& stmt : whiles.body()) {
+        stmt->accept(*this);
+    }
+    spaceCounter_--;
+    spacement();
+    std::cout << "[Block] >> \n";
+
+    spaceCounter_--;
+    spacement();
+    std::cout << "{WhileStatement} >> \n";
+}
+
 void AstDebug::visit(LiteralExpr& expr) {
     spacement();
     spaceCounter_++;

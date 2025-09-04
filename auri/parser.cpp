@@ -30,6 +30,8 @@ StatementPtr Parser::defaultStmt() {
         return importStmt();
     } else if(match({TokenType::IF})) {
         return ifStmt();
+    } else if(match({TokenType::WHILE})) {
+        return whileStmt();
     }
 
     return expressionStmt();
@@ -96,6 +98,15 @@ StatementPtr Parser::ifStmt() {
 
     std::vector<StatementPtr> thenBranch = blockStmt();
     return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
+}
+
+StatementPtr Parser::whileStmt() {
+    consume(TokenType::LEFT_PAREN, "While statement expects '('");
+    ExpressionPtr condition = expression();
+    consume(TokenType::RIGHT_PAREN, "While statement expects ')'");
+
+    std::vector<StatementPtr> body = blockStmt();
+    return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
 }
 
 std::vector<StatementPtr> Parser::blockStmt() {

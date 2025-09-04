@@ -23,6 +23,7 @@ class Parser {
     StatementPtr expressionStmt();
     StatementPtr importStmt();
     StatementPtr ifStmt();
+    StatementPtr whileStmt();
     std::vector<StatementPtr> blockStmt();
 
     ExpressionPtr expression();
