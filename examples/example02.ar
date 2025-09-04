@@ -3,4 +3,6 @@ import("mymodule/path/subpath/...", "element1", "element2");
 run my_run_scope {
     (1 * (1 + 4 * 2) / (-2 + 87 * 2)) + 4982.52 * 9;
     (1 + 456) / 4;
+
+    import("my_module/stdio.ar");
 }

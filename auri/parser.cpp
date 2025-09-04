@@ -79,6 +79,8 @@ StatementPtr Parser::importStmt() {
         if (previous().type() == TokenType::AR_EOF) {
             throw std::runtime_error("Import module missing ')'");
         }
+    } else {
+        consume(TokenType::RIGHT_PAREN, "Import statement expects ')'");
     }
 
     consume(TokenType::SEMICOLON, "Import statements expects semicolons");

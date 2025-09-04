@@ -128,5 +128,5 @@ std::string Token::literalToStr() {
     return "";
 }
 
-std::string Token::line() { return std::to_string(line_); }
+std::string Token::line() { return std::to_string(line_ + 1); }
 }    // namespace Auri
