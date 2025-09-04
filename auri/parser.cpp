@@ -69,6 +69,11 @@ StatementPtr Parser::importStmt() {
             auto block =
                 consume(TokenType::STRING, "Import blocks expects strings");
             moduleBlocks.push_back(block);
+
+            if(peek().type() != TokenType::RIGHT_PAREN) {
+                consume(TokenType::COMMA,
+                        "Import blocks expects commas between strings");
+            }
         }
 
         if (previous().type() == TokenType::AR_EOF) {
@@ -176,7 +181,7 @@ bool Parser::isAtEnd() { return (bool)(peek().type() == TokenType::AR_EOF); }
 
 Token Parser::consume(TokenType expectedToken, std::string errorMessage) {
     if (peek().type() != expectedToken) {
-        throw std::runtime_error(errorMessage);
+        throw std::runtime_error(errorMessage + " -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
     }
 
     return advance();

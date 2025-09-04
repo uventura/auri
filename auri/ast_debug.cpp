@@ -31,15 +31,15 @@ void AstDebug::visit(ExprStmt& expr) {
 
     expr.expr().accept(*this);
 
+    spaceCounter_--;
     spacement();
     std::cout << "{ExpressionStatement} >>\n";
-    spaceCounter_--;
 }
 
 void AstDebug::visit(RunStmt& run) {
     spacement();
     spaceCounter_++;
-    std::cout << "{RunStatement}" << run.identifier().literalToStr() << " <<";
+    std::cout << "{RunStatement} (" << run.identifier().literalToStr() << ") <<\n";
 
     for (uint64_t i = 0; i < run.stmt().size(); ++i) {
         (*(run.stmt()[i])).accept(*this);
@@ -56,10 +56,15 @@ void AstDebug::visit(ImportStmt& import) {
     std::cout << "{ImportStatement} <<\n";
 
     spacement();
-    std::cout << import.importedModule().literalToStr() << "\n";
+    std::cout << "- Module: " << import.importedModule().literalToStr() << "\n";
 
-    spacement();
+    for(auto i: import.moduleBlocks()) {
+        spacement();
+        std::cout << "|-- " << i.literalToStr() << "\n";
+    }
+
     spaceCounter_--;
+    spacement();
     std::cout << "{ImportStatement} >>\n";
 }
 
