@@ -18,7 +18,10 @@ class Parser {
     void parse();
 
     StatementPtr statement();
+    StatementPtr defaultStmt();
+    StatementPtr runStmt();
     StatementPtr expressionStmt();
+    StatementPtr importStmt();
 
     ExpressionPtr expression();
     ExpressionPtr equality();
@@ -31,8 +34,8 @@ class Parser {
     Token peek();
     Token previous();
     Token advance();
+    Token consume(TokenType expectedToken, std::string errorMessage);
     bool isAtEnd();
-    void consume(TokenType expectedToken, std::string errorMessage);
     bool match(std::vector<TokenType> possibleMatches);
 
    public:

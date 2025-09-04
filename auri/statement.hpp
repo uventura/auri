@@ -9,12 +9,14 @@ namespace AST {
 class Statement;
 class ExprStmt;
 class RunStmt;
+class ImportStmt;
 using StatementPtr = std::unique_ptr<Statement>;
 
 class StatementVisitor {
    public:
     virtual void visit(ExprStmt& stmt) = 0;
     virtual void visit(RunStmt& stmt) = 0;
+    virtual void visit(ImportStmt& stmt) = 0;
     virtual ~StatementVisitor() = default;
 };
 
@@ -37,13 +39,31 @@ class ExprStmt : public Statement {
 
 class RunStmt : public Statement {
    private:
+    Token identifier_;
     std::vector<StatementPtr> stmt_;
 
    public:
-    RunStmt(std::vector<StatementPtr> stmt) : stmt_(std::move(stmt)){};
+    RunStmt(Token identifier, std::vector<StatementPtr> stmt)
+        : identifier_(identifier), stmt_(std::move(stmt)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
+    Token identifier() { return identifier_; }
     std::vector<StatementPtr>& stmt() { return stmt_; };
+};
+
+class ImportStmt : public Statement {
+   private:
+    Token importedModule_;
+    std::vector<Token> moduleBlocks_;
+
+   public:
+    ImportStmt(Token importedModule, std::vector<Token> moduleBlocks)
+        : importedModule_(importedModule),
+          moduleBlocks_(std::move(moduleBlocks)){};
+    void accept(StatementVisitor& statement) { statement.visit(*this); };
+
+    Token importedModule() { return importedModule_; }
+    const std::vector<Token>& moduleBlocks() { return moduleBlocks_; }
 };
 }    // namespace AST
 }    // namespace Auri

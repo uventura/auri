@@ -13,14 +13,71 @@ std::vector<StatementPtr>& Parser::ast() { return program_; }
 
 void Parser::parse() {
     while (!isAtEnd()) {
-        auto expr = expressionStmt();
-        consume({TokenType::SEMICOLON}, "Missing semicolon in expression");
-        program_.push_back(std::move(expr));
+        StatementPtr statement = nullptr;
+
+        if (match({TokenType::RUN})) {
+            statement = runStmt();
+        } else {
+            statement = defaultStmt();
+        }
+
+        program_.push_back(std::move(statement));
     }
 }
 
+StatementPtr Parser::defaultStmt() {
+    if (match({TokenType::IMPORT})) {
+        return importStmt();
+    }
+
+    return expressionStmt();
+}
+
+StatementPtr Parser::runStmt() {
+    Token identifier = consume(TokenType::IDENTIFIER,
+                               "The run statement expects an identifier");
+    consume(TokenType::LEFT_BRACE, "The run statement expects a left brace");
+
+    std::vector<StatementPtr> runStatements{};
+    while (!match({TokenType::RIGHT_BRACE, TokenType::AR_EOF})) {
+        runStatements.push_back(defaultStmt());
+    }
+
+    if (previous().type() == TokenType::AR_EOF) {
+        consume(TokenType::RIGHT_BRACE,
+                "The run statement expects a left brace");
+    }
+
+    return std::make_unique<RunStmt>(identifier, std::move(runStatements));
+}
+
 StatementPtr Parser::expressionStmt() {
-    return std::make_unique<ExprStmt>(expression());
+    auto expr = std::make_unique<ExprStmt>(expression());
+    consume({TokenType::SEMICOLON}, "Missing semicolon in expression");
+
+    return expr;
+}
+
+StatementPtr Parser::importStmt() {
+    consume(TokenType::LEFT_PAREN, "Import statement expects '('");
+    Token importModule =
+        consume(TokenType::STRING, "Expected string in import expression");
+
+    std::vector<Token> moduleBlocks;
+    if (match({TokenType::COMMA})) {
+        while (!match({TokenType::RIGHT_PAREN, TokenType::AR_EOF})) {
+            auto block =
+                consume(TokenType::STRING, "Import blocks expects strings");
+            moduleBlocks.push_back(block);
+        }
+
+        if (previous().type() == TokenType::AR_EOF) {
+            throw std::runtime_error("Import module missing ')'");
+        }
+    }
+
+    consume(TokenType::SEMICOLON, "Import statements expects semicolons");
+    return std::make_unique<ImportStmt>(importModule, moduleBlocks);
 }
 
 ExpressionPtr Parser::expression() { return equality(); }
@@ -95,7 +152,7 @@ ExpressionPtr Parser::primary() {
         return expr;
     }
 
-    return nullptr;
+    throw std::runtime_error("Unrecognized expression.");
 }
 
 Token Parser::peek() { return tokens_[currentPos_]; }
@@ -117,12 +174,12 @@ Token Parser::advance() {
 
 bool Parser::isAtEnd() { return (bool)(peek().type() == TokenType::AR_EOF); }
 
-void Parser::consume(TokenType expectedToken, std::string errorMessage) {
+Token Parser::consume(TokenType expectedToken, std::string errorMessage) {
     if (peek().type() != expectedToken) {
         throw std::runtime_error(errorMessage);
     }
 
-    advance();
+    return advance();
 }
 
 bool Parser::match(std::vector<TokenType> possibleMatches) {

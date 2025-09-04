@@ -1,10 +1,14 @@
 program         → statement* EOF;
 
-statement       → exprStmt
+statement       → defaultStmt
                 | runStmt;
 
-runStmt         → run IDENTIFIER "{" statement* "}";
-exprStmt        → expression ";";
+runStmt         → run IDENTIFIER "{" defaultStmt* "}";
+defaultStmt     → exprStmt;
+                | importStmt;
+
+exprStmt        → expression ";"
+importExpr      → import "(" STRING ("," STRING)*  ")" ";"
 
 expression      → literal
                 | unary

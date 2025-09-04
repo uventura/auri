@@ -19,6 +19,7 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     // Statement visitors
     void visit(ExprStmt& expr);
     void visit(RunStmt& run);
+    void visit(ImportStmt& import);
 
     // Expression vistors
     void visit(LiteralExpr& expr);
