@@ -15,8 +15,8 @@ void AstDebug::print() {
     std::cout << "+===============================+\n";
 
     for (uint64_t i = 0; i < program_.size(); ++i) {
+        std::cout << "\n--------------------------\n";
         (*program_[i]).accept(*this);
-        std::cout << "--------------------------\n";
     }
 
     std::cout << "+===============================+\n";
