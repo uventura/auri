@@ -1,20 +1,26 @@
 #pragma once
 
 #include "auri/expression.hpp"
+#include "auri/statement.hpp"
 
 namespace Auri {
 namespace AST {
-class AstDebug : public ExpressionVisitor {
+class AstDebug : public ExpressionVisitor, public StatementVisitor {
    private:
-    Expression& expr_;
+    std::vector<StatementPtr>& program_;
     int spaceCounter_ = 0;
 
     void spacement();
 
    public:
-    AstDebug(Expression& expr);
+    AstDebug(std::vector<StatementPtr>& program);
     void print();
 
+    // Statement visitors
+    void visit(ExprStmt& expr);
+    void visit(RunStmt& run);
+
+    // Expression vistors
     void visit(LiteralExpr& expr);
     void visit(GroupingExpr& expr);
     void visit(UnaryExpr& expr);

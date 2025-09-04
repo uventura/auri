@@ -1,11 +1,19 @@
-expression     → literal
-               | unary
-               | binary
-               | grouping ;
+program         → statement* EOF;
 
-literal        → NUMBER | STRING | "true" | "false" | "null" ;
-grouping       → "(" expression ")" ;
-unary          → ( "-" | "!" ) expression ;
-binary         → expression operator expression ;
-operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
-               | "+"  | "-"  | "*" | "/" ;
+statement       → exprStmt
+                | runStmt;
+
+runStmt         → run IDENTIFIER "{" statement* "}";
+exprStmt        → expression ";";
+
+expression      → literal
+                | unary
+                | binary
+                | grouping ;
+
+literal         → NUMBER | STRING | "true" | "false" | "null" ;
+grouping        → "(" expression ")" ;
+unary           → ( "-" | "!" ) expression ;
+binary          → expression operator expression ;
+operator        → "==" | "!=" | "<" | "<=" | ">" | ">="
+                | "+"  | "-"  | "*" | "/" ;

@@ -7,11 +7,21 @@
 
 namespace Auri {
 namespace AST {
-Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) {
-    expr_ = expression();
+Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) { parse(); }
+
+std::vector<StatementPtr>& Parser::ast() { return program_; }
+
+void Parser::parse() {
+    while (!isAtEnd()) {
+        auto expr = expressionStmt();
+        consume({TokenType::SEMICOLON}, "Missing semicolon in expression");
+        program_.push_back(std::move(expr));
+    }
 }
 
-Expression& Parser::ast() { return *expr_; }
+StatementPtr Parser::expressionStmt() {
+    return std::make_unique<ExprStmt>(expression());
+}
 
 ExpressionPtr Parser::expression() { return equality(); }
 
@@ -104,6 +114,8 @@ Token Parser::advance() {
 
     return tokens_[currentPos_++];
 }
+
+bool Parser::isAtEnd() { return (bool)(peek().type() == TokenType::AR_EOF); }
 
 void Parser::consume(TokenType expectedToken, std::string errorMessage) {
     if (peek().type() != expectedToken) {

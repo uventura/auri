@@ -7,18 +7,39 @@
 
 namespace Auri {
 namespace AST {
-AstDebug::AstDebug(Expression& expr) : expr_(expr) {}
+AstDebug::AstDebug(std::vector<StatementPtr>& program) : program_(program) {}
 
 void AstDebug::print() {
     std::cout << "+===============================+\n";
     std::cout << "|            Auri AST           |\n";
     std::cout << "+===============================+\n";
 
-    expr_.accept(*this);
+    for (uint64_t i = 0; i < program_.size(); ++i) {
+        (*program_[i]).accept(*this);
+        std::cout << "--------------------------\n";
+    }
 
     std::cout << "+===============================+\n";
     std::cout << "|             End AST           |\n";
     std::cout << "+===============================+\n";
+}
+
+void AstDebug::visit(ExprStmt& expr) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{ExpressionStatement} <<\n";
+
+    expr.expr().accept(*this);
+
+    std::cout << "{ExpressionStatement} >>\n";
+
+    spaceCounter_--;
+}
+
+void AstDebug::visit(RunStmt& run) {
+    for (uint64_t i = 0; i < run.stmt().size(); ++i) {
+        (*(run.stmt()[i])).accept(*this);
+    }
 }
 
 void AstDebug::visit(LiteralExpr& expr) {
