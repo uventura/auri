@@ -22,6 +22,7 @@ class Parser {
     StatementPtr runStmt();
     StatementPtr expressionStmt();
     StatementPtr importStmt();
+    StatementPtr ifStmt();
 
     ExpressionPtr expression();
     ExpressionPtr equality();

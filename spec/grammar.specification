@@ -3,12 +3,15 @@ program         → statement* EOF;
 statement       → defaultStmt
                 | runStmt;
 
-runStmt         → run IDENTIFIER "{" defaultStmt* "}";
 defaultStmt     → exprStmt;
                 | importStmt;
+                | ifStmt;
 
+runStmt         → run IDENTIFIER "{" defaultStmt* "}";
 exprStmt        → expression ";"
-importExpr      → import "(" STRING ("," STRING)*  ")" ";"
+importStmt      → import "(" STRING ("," STRING)*  ")" ";"
+ifStmt          → "if" "(" expression ")" blockStmt
+blockStmt       → defaultStmt ";" | "{" defaultStmt* "}"
 
 expression      → literal
                 | unary

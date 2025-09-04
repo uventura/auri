@@ -28,6 +28,8 @@ void Parser::parse() {
 StatementPtr Parser::defaultStmt() {
     if (match({TokenType::IMPORT})) {
         return importStmt();
+    } else if(match({TokenType::IF})) {
+        return ifStmt();
     }
 
     return expressionStmt();
@@ -85,6 +87,29 @@ StatementPtr Parser::importStmt() {
 
     consume(TokenType::SEMICOLON, "Import statements expects semicolons");
     return std::make_unique<ImportStmt>(importModule, moduleBlocks);
+}
+
+StatementPtr Parser::ifStmt() {
+    consume(TokenType::LEFT_PAREN, "If statement expects '('");
+    ExpressionPtr condition = expression();
+    consume(TokenType::RIGHT_PAREN, "If statement expects ')'");
+
+    std::vector<StatementPtr> thenBranch;
+    if (match({TokenType::LEFT_BRACE})) {
+        while (!match({TokenType::RIGHT_BRACE, TokenType::AR_EOF})) {
+            thenBranch.push_back(defaultStmt());
+        }
+
+        if (previous().type() == TokenType::AR_EOF) {
+            throw std::runtime_error("If statement missing '}'");
+        }
+    } else {
+        thenBranch.push_back(defaultStmt());
+        consume(TokenType::SEMICOLON,
+                "Missing semicolon after single line if statement");
+    }
+
+    return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
 }
 
 ExpressionPtr Parser::expression() { return equality(); }

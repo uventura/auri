@@ -20,6 +20,7 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     void visit(ExprStmt& expr);
     void visit(RunStmt& run);
     void visit(ImportStmt& import);
+    void visit(IfStmt& ifs);
 
     // Expression vistors
     void visit(LiteralExpr& expr);

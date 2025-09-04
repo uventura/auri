@@ -68,6 +68,20 @@ void AstDebug::visit(ImportStmt& import) {
     std::cout << "{ImportStatement} >>\n";
 }
 
+void AstDebug::visit(IfStmt& ifs) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{IfStatement} << \n";
+
+    spacement();
+    std::cout << "Condition: \n";
+    ifs.condition().accept(*this);
+
+    spaceCounter_--;
+    spacement();
+    std::cout << "{IfStatement} >> \n";
+}
+
 void AstDebug::visit(LiteralExpr& expr) {
     spacement();
     spaceCounter_++;
