@@ -105,8 +105,6 @@ StatementPtr Parser::ifStmt() {
         }
     } else {
         thenBranch.push_back(defaultStmt());
-        consume(TokenType::SEMICOLON,
-                "Missing semicolon after single line if statement");
     }
 
     return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
