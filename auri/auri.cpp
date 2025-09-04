@@ -17,8 +17,7 @@ int main(int argc, char** argv) {
         if (cli.enableTokenPrint()) {
             scanner.debugPrint();
         }
-        if (cli.enableAstPrint())
-        {
+        if (cli.enableAstPrint()) {
             Auri::AST::AstDebug debug(parser.ast());
             debug.print();
         }

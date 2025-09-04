@@ -11,8 +11,8 @@ Cli::Cli(uint32_t argc, char** argv) {
     for (uint32_t i = 1; i < argc; ++i) {
         std::string element(argv[i]);
 
-        if(element.size() > 2 && element[0] == '-' && element[1] == '-') {
-            if(element == "--ast") {
+        if (element.size() > 2 && element[0] == '-' && element[1] == '-') {
+            if (element == "--ast") {
                 enableAstPrint_ = true;
                 continue;
             }
@@ -27,11 +27,7 @@ Cli::Cli(uint32_t argc, char** argv) {
     }
 }
 
-bool Cli::enableAstPrint() {
-    return enableAstPrint_;
-}
+bool Cli::enableAstPrint() { return enableAstPrint_; }
 
-bool Cli::enableTokenPrint() {
-    return enableTokenPrint_;
-}
-}
+bool Cli::enableTokenPrint() { return enableTokenPrint_; }
+}    // namespace Auri
