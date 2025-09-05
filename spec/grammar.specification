@@ -6,7 +6,8 @@ statement       → defaultStmt
 defaultStmt     → exprStmt
                 | importStmt
                 | ifStmt
-                | whileStmt;
+                | whileStmt
+                | varStmt;
 
 runStmt         → run IDENTIFIER "{" defaultStmt* "}";
 exprStmt        → expression ";"
@@ -14,6 +15,7 @@ importStmt      → import "(" STRING ("," STRING)*  ")" ";"
 ifStmt          → "if" "(" expression ")" blockStmt
 whileStmt       → "while" "(" expression ")" blockStmt
 blockStmt       → defaultStmt ";" | "{" defaultStmt* "}"
+varStmt         → ("var" | "bool" | "numeric" | "string") IDENTIFIER ("=")? ";"
 
 expression      → literal
                 | unary
