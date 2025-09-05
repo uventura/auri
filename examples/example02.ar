@@ -1,5 +1,7 @@
 import("mymodule/path/subpath/...", "element1", "element2");
 
+var MyVariable = 42;
+
 run my_run_scope {
     var x = (42 + 2) / 2;
 

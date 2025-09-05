@@ -18,7 +18,7 @@ void Parser::parse() {
         if (match({TokenType::RUN})) {
             statement = runStmt();
         } else {
-            statement = defaultStmt();
+            statement = declaration();
         }
 
         program_.push_back(std::move(statement));
