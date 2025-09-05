@@ -18,7 +18,9 @@ class Parser {
     void parse();
 
     StatementPtr statement();
+    StatementPtr declaration();
     StatementPtr defaultStmt();
+    StatementPtr varStmt();
     StatementPtr runStmt();
     StatementPtr expressionStmt();
     StatementPtr importStmt();

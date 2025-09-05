@@ -1,6 +1,8 @@
 import("mymodule/path/subpath/...", "element1", "element2");
 
 run my_run_scope {
+    var x = (42 + 2) / 2;
+
     (1 * (1 + 4 * 2) / (-2 + 87 * 2)) + 4982.52 * 9;
     (1 + 456) / 4;
 
@@ -12,7 +14,7 @@ run my_run_scope {
 
     if(1 > 2) 2 + 9;
 
-    while(1 > 2) {
+    while(1 > 2.2346) {
         1 + 2;
         if(1 > 2) {
             (1 * 8) / (2 * 13 + 6);

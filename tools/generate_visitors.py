@@ -63,6 +63,9 @@ def expression_visitor(args):
         "GroupingExpr": ["ExpressionPtr expr"],
         "UnaryExpr": ["Token op", "ExpressionPtr term"],
         "BinaryExpr": ["ExpressionPtr left", "Token op", "ExpressionPtr right"],
+        # "LogicalExpr": ["ExpressionPtr left", "Token op", "ExpressionPtr right"],
+        "VariableExpr": ["Token name"],
+        # "AssignExpr": ["Token name", "ExpressionPtr value"],
     }
 
     classes = ""

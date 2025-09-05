@@ -22,12 +22,14 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     void visit(ImportStmt& import);
     void visit(IfStmt& ifs);
     void visit(WhileStmt& whiles);
+    void visit(VarStmt& stmt);
 
     // Expression vistors
     void visit(LiteralExpr& expr);
     void visit(GroupingExpr& expr);
     void visit(UnaryExpr& expr);
     void visit(BinaryExpr& expr);
+    void visit(VariableExpr& expr);
 };
 }    // namespace AST
 }    // namespace Auri

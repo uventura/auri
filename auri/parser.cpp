@@ -25,6 +25,19 @@ void Parser::parse() {
     }
 }
 
+StatementPtr Parser::declaration() {
+    if(match({
+        TokenType::GENERIC_VAR,
+        TokenType::NUMERIC_VAR,
+        TokenType::STRING_VAR,
+        TokenType::BOOL_VAR
+    })) {
+        return varStmt();
+    }
+
+    return defaultStmt();
+}
+
 StatementPtr Parser::defaultStmt() {
     if (match({TokenType::IMPORT})) {
         return importStmt();
@@ -37,6 +50,19 @@ StatementPtr Parser::defaultStmt() {
     return expressionStmt();
 }
 
+StatementPtr Parser::varStmt() {
+    Token identifier = consume(TokenType::IDENTIFIER, "Variable declaration expects an identifier");
+
+    if(match({TokenType::EQUAL})) {
+        ExpressionPtr initializer = expression();
+        consume(TokenType::SEMICOLON, "Variable declaration expects a semicolon");
+        return std::make_unique<VarStmt>(identifier, std::move(initializer));
+    } else {
+        consume(TokenType::SEMICOLON, "Variable declaration expects a semicolon");
+        return std::make_unique<VarStmt>(identifier, nullptr);
+    }
+}
+
 StatementPtr Parser::runStmt() {
     Token identifier = consume(TokenType::IDENTIFIER,
                                "The run statement expects an identifier");
@@ -44,7 +70,7 @@ StatementPtr Parser::runStmt() {
 
     std::vector<StatementPtr> runStatements{};
     while (!match({TokenType::RIGHT_BRACE, TokenType::AR_EOF})) {
-        runStatements.push_back(defaultStmt());
+        runStatements.push_back(declaration());
     }
 
     if (previous().type() == TokenType::AR_EOF) {

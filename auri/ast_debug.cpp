@@ -118,6 +118,27 @@ void AstDebug::visit(WhileStmt& whiles) {
     std::cout << "{WhileStatement} >> \n";
 }
 
+void AstDebug::visit(VarStmt& stmt) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{VariableStatement} (" << stmt.identifier().literalToStr() << ") <<\n";
+
+    if(&stmt.initializer() != nullptr) {
+        spacement();
+        std::cout << "Initializer: \n";
+        spaceCounter_++;
+        stmt.initializer().accept(*this);
+        spaceCounter_--;
+    } else {
+        spacement();
+        std::cout << "No Initializer\n";
+    }
+
+    spaceCounter_--;
+    spacement();
+    std::cout << "{VariableStatement} >>\n";
+}
+
 void AstDebug::visit(LiteralExpr& expr) {
     spacement();
     spaceCounter_++;
@@ -179,6 +200,11 @@ void AstDebug::visit(BinaryExpr& expr) {
 
     spacement();
     std::cout << ">>\n";
+}
+
+void AstDebug::visit(VariableExpr& expr) {
+    spacement();
+    std::cout << "[Variable] " << expr.name().literalToStr() << "\n";
 }
 
 void AstDebug::spacement() {
