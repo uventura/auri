@@ -152,7 +152,7 @@ StatementPtr Parser::functionStmt() {
         TokenType::STRING_VAR,
         TokenType::NUMERIC_VAR
     })) {
-        Token type = peek();
+        Token type = previous();
         Token name = consume(TokenType::IDENTIFIER, "Each parameter expect an identifier");
         TokenPair param = std::make_pair(name, type);
         params.push_back(param);

@@ -10,6 +10,8 @@ fun my_function(bool x, numeric y, string z, var w) {
     return 2;
 }
 
+fun newton_raphson(numeric value) return 1 + 2;
+
 run my_run_scope {
     var x = (42 + 2) / 2;
 
