@@ -3,6 +3,7 @@
 #include "auri/expression.hpp"
 #include <memory>
 #include <vector>
+#include <utility>
 
 namespace Auri {
 namespace AST {
@@ -13,6 +14,8 @@ class ImportStmt;
 class IfStmt;
 class WhileStmt;
 class VarStmt;
+class FunctionStmt;
+class ReturnStmt;
 using StatementPtr = std::unique_ptr<Statement>;
 
 class StatementVisitor {
@@ -23,6 +26,8 @@ class StatementVisitor {
     virtual void visit(IfStmt& stmt) = 0;
     virtual void visit(WhileStmt& stmt) = 0;
     virtual void visit(VarStmt& stmt) = 0;
+    virtual void visit(FunctionStmt& stmt) = 0;
+    virtual void visit(ReturnStmt& stmt) = 0;
     virtual ~StatementVisitor() = default;
 };
 
@@ -112,6 +117,34 @@ class VarStmt : public Statement {
 
     Token identifier() { return identifier_; }
     Expression& initializer() { return *initializer_; }
+};
+
+class FunctionStmt : public Statement {
+   private:
+    Token name_;
+    std::vector<TokenPair> params_;
+    std::vector<StatementPtr> body_;
+
+   public:
+    FunctionStmt(Token name, std::vector<TokenPair> params,
+                 std::vector<StatementPtr> body)
+        : name_(name), params_(std::move(params)), body_(std::move(body)){};
+    void accept(StatementVisitor& statement) { statement.visit(*this); };
+
+    Token name() { return name_; }
+    const std::vector<TokenPair>& params() { return params_; }
+    std::vector<StatementPtr>& body() { return body_; }
+};
+
+class ReturnStmt : public Statement {
+    private:
+     ExpressionPtr expr_;
+
+    public:
+     ReturnStmt(ExpressionPtr expr): expr_(std::move(expr)) {};
+     void accept(StatementVisitor& statement) {statement.visit(*this);};
+
+     Expression& expr() {return *expr_;}
 };
 }    // namespace AST
 }    // namespace Auri

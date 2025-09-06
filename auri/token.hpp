@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <variant>
+#include <utility>
 
 namespace Auri {
 enum class TokenType {
@@ -62,7 +63,10 @@ enum class TokenType {
     NONE
 };
 
+class Token;
+
 using TokenLiteral = std::variant<std::string, bool, double, char>;
+using TokenPair = std::pair<Token, Token>;
 
 class Token {
    private:

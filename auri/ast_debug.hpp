@@ -23,6 +23,8 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     void visit(IfStmt& ifs);
     void visit(WhileStmt& whiles);
     void visit(VarStmt& stmt);
+    void visit(FunctionStmt& stmt);
+    void visit(ReturnStmt& stmt);
 
     // Expression vistors
     void visit(LiteralExpr& expr);

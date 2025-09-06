@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <map>
+#include <utility>
 
 namespace Auri {
 namespace AST {
@@ -45,6 +47,10 @@ StatementPtr Parser::defaultStmt() {
         return ifStmt();
     } else if(match({TokenType::WHILE})) {
         return whileStmt();
+    } else if(match({TokenType::FUN})) {
+        return functionStmt();
+    } else if(match({TokenType::RETURN})) {
+        return returnStmt();
     }
 
     return expressionStmt();
@@ -133,6 +139,39 @@ StatementPtr Parser::whileStmt() {
 
     std::vector<StatementPtr> body = blockStmt();
     return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+}
+
+StatementPtr Parser::functionStmt() {
+    Token identifier = consume(TokenType::IDENTIFIER, "A function expects an identifier");
+    consume(TokenType::LEFT_PAREN, "Function statement expects '(' for parameters");
+
+    std::vector<TokenPair> params;
+    while(match({
+        TokenType::BOOL_VAR,
+        TokenType::GENERIC_VAR,
+        TokenType::STRING_VAR,
+        TokenType::NUMERIC_VAR
+    })) {
+        Token type = peek();
+        Token name = consume(TokenType::IDENTIFIER, "Each parameter expect an identifier");
+        TokenPair param = std::make_pair(name, type);
+        params.push_back(param);
+
+        if(!match({TokenType::COMMA})) {
+            break;
+        }
+    }
+
+    consume({TokenType::RIGHT_PAREN}, "Function statement expects ')' for paramenters");
+    std::vector<StatementPtr> block = blockStmt();
+
+    return std::make_unique<FunctionStmt>(identifier, std::move(params), std::move(block));
+}
+
+StatementPtr Parser::returnStmt() {
+    ExpressionPtr expr = expression();
+    consume(TokenType::SEMICOLON, "Return statement expects semicolon");
+    return std::make_unique<ReturnStmt>(std::move(expr));
 }
 
 std::vector<StatementPtr> Parser::blockStmt() {

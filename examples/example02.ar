@@ -2,6 +2,14 @@ import("mymodule/path/subpath/...", "element1", "element2");
 
 var MyVariable = 42;
 
+fun my_function(bool x, numeric y, string z, var w) {
+    if(1 == 2) {
+        return 4;
+    }
+
+    return 2;
+}
+
 run my_run_scope {
     var x = (42 + 2) / 2;
 

@@ -139,6 +139,39 @@ void AstDebug::visit(VarStmt& stmt) {
     std::cout << "{VariableStatement} >>\n";
 }
 
+void AstDebug::visit(FunctionStmt& stmt) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{FunctionStatement} (" << stmt.name().literalToStr() << ") <<\n";
+
+    spacement();
+    spaceCounter_++;
+    std::cout << "[Parameters]:\n";
+    for(auto param: stmt.params()) {
+        spacement();
+        Token name = param.first;
+        Token type = param.second;
+        std::cout << "- Name: " << name.literalToStr() << " ; Type: " << type.literalToStr() << "\n";
+    }
+    spaceCounter_--;
+
+    spaceCounter_--;
+    spacement();
+    std::cout << "{FunctionStatement} >>\n";
+}
+
+void AstDebug::visit(ReturnStmt& stmt) {
+    spacement();
+    spaceCounter_++;
+    std::cout << "{ReturnStatement} <<\n";
+
+    stmt.expr().accept(*this);
+
+    spacement();
+    spaceCounter_--;
+    std::cout << "{ReturnStatement} >>\n";
+}
+
 void AstDebug::visit(LiteralExpr& expr) {
     spacement();
     spaceCounter_++;
