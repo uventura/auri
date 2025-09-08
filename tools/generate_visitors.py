@@ -65,6 +65,7 @@ def expression_visitor(args):
         "BinaryExpr": ["ExpressionPtr left", "Token op", "ExpressionPtr right"],
         # "LogicalExpr": ["ExpressionPtr left", "Token op", "ExpressionPtr right"],
         "VariableExpr": ["Token name"],
+        "CallExpr": ["Token name", "std::vector<ExpressionPtr> arguments"]
         # "AssignExpr": ["Token name", "ExpressionPtr value"],
     }
 

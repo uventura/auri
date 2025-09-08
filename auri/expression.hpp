@@ -10,6 +10,7 @@ class GroupingExpr;
 class UnaryExpr;
 class BinaryExpr;
 class VariableExpr;
+class CallExpr;
 using ExpressionPtr = std::unique_ptr<Expression>;
 
 class ExpressionVisitor {
@@ -19,6 +20,7 @@ class ExpressionVisitor {
     virtual void visit(UnaryExpr& expr) = 0;
     virtual void visit(BinaryExpr& expr) = 0;
     virtual void visit(VariableExpr& expr) = 0;
+    virtual void visit(CallExpr& expr) = 0;
     virtual ~ExpressionVisitor() = default;
 };
 
@@ -83,6 +85,19 @@ class VariableExpr : public Expression {
     VariableExpr(Token name) : name_(name) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
     Token name() { return name_; };
+};
+
+class CallExpr : public Expression {
+   private:
+    Token name_;
+    std::vector<ExpressionPtr> arguments_;
+
+   public:
+    CallExpr(Token name, std::vector<ExpressionPtr> arguments)
+        : name_(name), arguments_(arguments) {}
+    void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    Token name() { return name_; };
+    std::vector<Expression&> arguments() { return *arguments_.get(); };
 };
 
 }    // namespace AST
