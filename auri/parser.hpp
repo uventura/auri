@@ -31,6 +31,7 @@ class Parser {
     std::vector<StatementPtr> blockStmt();
 
     ExpressionPtr expression();
+    ExpressionPtr variable();
     ExpressionPtr equality();
     ExpressionPtr comparison();
     ExpressionPtr term();

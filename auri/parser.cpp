@@ -192,7 +192,14 @@ std::vector<StatementPtr> Parser::blockStmt() {
     return block;
 }
 
-ExpressionPtr Parser::expression() { return equality(); }
+ExpressionPtr Parser::expression() {
+    if (match({TokenType::IDENTIFIER})) return variable();
+    return equality();
+}
+
+ExpressionPtr Parser::variable() {
+    return std::make_unique<VariableExpr>(previous());
+}
 
 ExpressionPtr Parser::equality() {
     ExpressionPtr left = comparison();

@@ -35,5 +35,5 @@ run my_run_scope {
 }
 
 run another_scope {
-    1+1;
+    return a;
 }

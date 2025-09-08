@@ -171,8 +171,8 @@ void AstDebug::visit(ReturnStmt& stmt) {
 
     stmt.expr().accept(*this);
 
-    spacement();
     spaceCounter_--;
+    spacement();
     std::cout << "{ReturnStatement} >>\n";
 }
 
