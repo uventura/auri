@@ -1,6 +1,7 @@
 #pragma once
 #include "auri/token.hpp"
 #include <memory>
+#include <vector>
 
 namespace Auri {
 namespace AST {
@@ -94,10 +95,10 @@ class CallExpr : public Expression {
 
    public:
     CallExpr(Token name, std::vector<ExpressionPtr> arguments)
-        : name_(name), arguments_(arguments) {}
+        : name_(name), arguments_(std::move(arguments)) {}
     void accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
     Token name() { return name_; };
-    std::vector<Expression&> arguments() { return *arguments_.get(); };
+    std::vector<ExpressionPtr>& arguments() { return arguments_; };
 };
 
 }    // namespace AST
