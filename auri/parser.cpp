@@ -2,9 +2,9 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 #include <string>
-#include <map>
 #include <utility>
 
 namespace Auri {
@@ -28,12 +28,8 @@ void Parser::parse() {
 }
 
 StatementPtr Parser::declaration() {
-    if(match({
-        TokenType::GENERIC_VAR,
-        TokenType::NUMERIC_VAR,
-        TokenType::STRING_VAR,
-        TokenType::BOOL_VAR
-    })) {
+    if (match({TokenType::GENERIC_VAR, TokenType::NUMERIC_VAR,
+               TokenType::STRING_VAR, TokenType::BOOL_VAR})) {
         return varStmt();
     }
 
@@ -43,13 +39,13 @@ StatementPtr Parser::declaration() {
 StatementPtr Parser::defaultStmt() {
     if (match({TokenType::IMPORT})) {
         return importStmt();
-    } else if(match({TokenType::IF})) {
+    } else if (match({TokenType::IF})) {
         return ifStmt();
-    } else if(match({TokenType::WHILE})) {
+    } else if (match({TokenType::WHILE})) {
         return whileStmt();
-    } else if(match({TokenType::FUN})) {
+    } else if (match({TokenType::FUN})) {
         return functionStmt();
-    } else if(match({TokenType::RETURN})) {
+    } else if (match({TokenType::RETURN})) {
         return returnStmt();
     }
 
@@ -57,14 +53,17 @@ StatementPtr Parser::defaultStmt() {
 }
 
 StatementPtr Parser::varStmt() {
-    Token identifier = consume(TokenType::IDENTIFIER, "Variable declaration expects an identifier");
+    Token identifier = consume(TokenType::IDENTIFIER,
+                               "Variable declaration expects an identifier");
 
-    if(match({TokenType::EQUAL})) {
+    if (match({TokenType::EQUAL})) {
         ExpressionPtr initializer = expression();
-        consume(TokenType::SEMICOLON, "Variable declaration expects a semicolon");
+        consume(TokenType::SEMICOLON,
+                "Variable declaration expects a semicolon");
         return std::make_unique<VarStmt>(identifier, std::move(initializer));
     } else {
-        consume(TokenType::SEMICOLON, "Variable declaration expects a semicolon");
+        consume(TokenType::SEMICOLON,
+                "Variable declaration expects a semicolon");
         return std::make_unique<VarStmt>(identifier, nullptr);
     }
 }
@@ -106,7 +105,7 @@ StatementPtr Parser::importStmt() {
                 consume(TokenType::STRING, "Import blocks expects strings");
             moduleBlocks.push_back(block);
 
-            if(peek().type() != TokenType::RIGHT_PAREN) {
+            if (peek().type() != TokenType::RIGHT_PAREN) {
                 consume(TokenType::COMMA,
                         "Import blocks expects commas between strings");
             }
@@ -129,7 +128,8 @@ StatementPtr Parser::ifStmt() {
     consume(TokenType::RIGHT_PAREN, "If statement expects ')'");
 
     std::vector<StatementPtr> thenBranch = blockStmt();
-    return std::make_unique<IfStmt>(std::move(condition), std::move(thenBranch));
+    return std::make_unique<IfStmt>(std::move(condition),
+                                    std::move(thenBranch));
 }
 
 StatementPtr Parser::whileStmt() {
@@ -142,30 +142,31 @@ StatementPtr Parser::whileStmt() {
 }
 
 StatementPtr Parser::functionStmt() {
-    Token identifier = consume(TokenType::IDENTIFIER, "A function expects an identifier");
-    consume(TokenType::LEFT_PAREN, "Function statement expects '(' for parameters");
+    Token identifier =
+        consume(TokenType::IDENTIFIER, "A function expects an identifier");
+    consume(TokenType::LEFT_PAREN,
+            "Function statement expects '(' for parameters");
 
     std::vector<TokenPair> params;
-    while(match({
-        TokenType::BOOL_VAR,
-        TokenType::GENERIC_VAR,
-        TokenType::STRING_VAR,
-        TokenType::NUMERIC_VAR
-    })) {
+    while (match({TokenType::BOOL_VAR, TokenType::GENERIC_VAR,
+                  TokenType::STRING_VAR, TokenType::NUMERIC_VAR})) {
         Token type = previous();
-        Token name = consume(TokenType::IDENTIFIER, "Each parameter expect an identifier");
+        Token name = consume(TokenType::IDENTIFIER,
+                             "Each parameter expect an identifier");
         TokenPair param = std::make_pair(name, type);
         params.push_back(param);
 
-        if(!match({TokenType::COMMA})) {
+        if (!match({TokenType::COMMA})) {
             break;
         }
     }
 
-    consume({TokenType::RIGHT_PAREN}, "Function statement expects ')' for paramenters");
+    consume({TokenType::RIGHT_PAREN},
+            "Function statement expects ')' for paramenters");
     std::vector<StatementPtr> block = blockStmt();
 
-    return std::make_unique<FunctionStmt>(identifier, std::move(params), std::move(block));
+    return std::make_unique<FunctionStmt>(identifier, std::move(params),
+                                          std::move(block));
 }
 
 StatementPtr Parser::returnStmt() {
@@ -258,12 +259,15 @@ ExpressionPtr Parser::primary() {
     if (match({TokenType::LEFT_PAREN})) {
         ExpressionPtr expr = expression();
         consume(TokenType::RIGHT_PAREN,
-                "Missing right parenthesized expression -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
+                "Missing right parenthesized expression -> Error in: '" +
+                    peek().lexeme() + "' at line [" + peek().line() + "]");
 
         return expr;
     }
 
-    throw std::runtime_error("Unrecognized expression -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
+    throw std::runtime_error("Unrecognized expression -> Error in: '" +
+                             peek().lexeme() + "' at line [" + peek().line() +
+                             "]");
 }
 
 Token Parser::peek() { return tokens_[currentPos_]; }
@@ -287,7 +291,9 @@ bool Parser::isAtEnd() { return (bool)(peek().type() == TokenType::AR_EOF); }
 
 Token Parser::consume(TokenType expectedToken, std::string errorMessage) {
     if (peek().type() != expectedToken) {
-        throw std::runtime_error(errorMessage + " -> Error in: '" + peek().lexeme() + "' at line [" + peek().line() + "]");
+        throw std::runtime_error(errorMessage + " -> Error in: '" +
+                                 peek().lexeme() + "' at line [" +
+                                 peek().line() + "]");
     }
 
     return advance();

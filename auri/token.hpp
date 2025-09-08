@@ -2,8 +2,8 @@
 
 #include <cstdint>
 #include <string>
-#include <variant>
 #include <utility>
+#include <variant>
 
 namespace Auri {
 enum class TokenType {

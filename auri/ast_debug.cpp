@@ -39,11 +39,12 @@ void AstDebug::visit(ExprStmt& expr) {
 void AstDebug::visit(RunStmt& run) {
     spacement();
     spaceCounter_++;
-    std::cout << "{RunStatement} (" << run.identifier().literalToStr() << ") <<\n";
+    std::cout << "{RunStatement} (" << run.identifier().literalToStr()
+              << ") <<\n";
 
     for (uint64_t i = 0; i < run.stmt().size(); ++i) {
         spacement();
-        std::cout<<"\n";
+        std::cout << "\n";
         (*(run.stmt()[i])).accept(*this);
     }
 
@@ -60,7 +61,7 @@ void AstDebug::visit(ImportStmt& import) {
     spacement();
     std::cout << "- Module: " << import.importedModule().literalToStr() << "\n";
 
-    for(auto i: import.moduleBlocks()) {
+    for (auto i : import.moduleBlocks()) {
         spacement();
         std::cout << "|-- " << i.literalToStr() << "\n";
     }
@@ -82,7 +83,7 @@ void AstDebug::visit(IfStmt& ifs) {
     spacement();
     std::cout << "[Block] << \n";
     spaceCounter_++;
-    for(auto& stmt : ifs.thenBranch()) {
+    for (auto& stmt : ifs.thenBranch()) {
         stmt->accept(*this);
     }
     spaceCounter_--;
@@ -106,7 +107,7 @@ void AstDebug::visit(WhileStmt& whiles) {
     spacement();
     std::cout << "[Block] << \n";
     spaceCounter_++;
-    for(auto& stmt : whiles.body()) {
+    for (auto& stmt : whiles.body()) {
         stmt->accept(*this);
     }
     spaceCounter_--;
@@ -121,9 +122,10 @@ void AstDebug::visit(WhileStmt& whiles) {
 void AstDebug::visit(VarStmt& stmt) {
     spacement();
     spaceCounter_++;
-    std::cout << "{VariableStatement} (" << stmt.identifier().literalToStr() << ") <<\n";
+    std::cout << "{VariableStatement} (" << stmt.identifier().literalToStr()
+              << ") <<\n";
 
-    if(&stmt.initializer() != nullptr) {
+    if (&stmt.initializer() != nullptr) {
         spacement();
         std::cout << "Initializer: \n";
         spaceCounter_++;
@@ -142,16 +144,18 @@ void AstDebug::visit(VarStmt& stmt) {
 void AstDebug::visit(FunctionStmt& stmt) {
     spacement();
     spaceCounter_++;
-    std::cout << "{FunctionStatement} (" << stmt.name().literalToStr() << ") <<\n";
+    std::cout << "{FunctionStatement} (" << stmt.name().literalToStr()
+              << ") <<\n";
 
     spacement();
     spaceCounter_++;
     std::cout << "[Parameters]:\n";
-    for(auto param: stmt.params()) {
+    for (auto param : stmt.params()) {
         spacement();
         Token name = param.first;
         Token type = param.second;
-        std::cout << "- Name: " << name.literalToStr() << " ; Type: " << type.literalToStr() << "\n";
+        std::cout << "- Name: " << name.literalToStr()
+                  << " ; Type: " << type.literalToStr() << "\n";
     }
     spaceCounter_--;
 
