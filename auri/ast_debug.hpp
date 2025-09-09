@@ -17,22 +17,22 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     void print();
 
     // Statement visitors
-    void visit(ExprStmt& expr);
-    void visit(RunStmt& run);
-    void visit(ImportStmt& import);
-    void visit(IfStmt& ifs);
-    void visit(WhileStmt& whiles);
-    void visit(VarStmt& stmt);
-    void visit(FunctionStmt& stmt);
-    void visit(ReturnStmt& stmt);
+    StatementPtr visit(ExprStmt& expr);
+    StatementPtr visit(RunStmt& run);
+    StatementPtr visit(ImportStmt& import);
+    StatementPtr visit(IfStmt& ifs);
+    StatementPtr visit(WhileStmt& whiles);
+    StatementPtr visit(VarStmt& stmt);
+    StatementPtr visit(FunctionStmt& stmt);
+    StatementPtr visit(ReturnStmt& stmt);
 
     // Expression vistors
-    void visit(LiteralExpr& expr);
-    void visit(GroupingExpr& expr);
-    void visit(UnaryExpr& expr);
-    void visit(BinaryExpr& expr);
-    void visit(VariableExpr& expr);
-    void visit(CallExpr& expr);
+    ExpressionPtr visit(LiteralExpr& expr);
+    ExpressionPtr visit(GroupingExpr& expr);
+    ExpressionPtr visit(UnaryExpr& expr);
+    ExpressionPtr visit(BinaryExpr& expr);
+    ExpressionPtr visit(VariableExpr& expr);
+    ExpressionPtr visit(CallExpr& expr);
 };
 }    // namespace AST
 }    // namespace Auri

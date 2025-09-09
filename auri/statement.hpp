@@ -20,14 +20,14 @@ using StatementPtr = std::unique_ptr<Statement>;
 
 class StatementVisitor {
    public:
-    virtual void visit(ExprStmt& stmt) = 0;
-    virtual void visit(RunStmt& stmt) = 0;
-    virtual void visit(ImportStmt& stmt) = 0;
-    virtual void visit(IfStmt& stmt) = 0;
-    virtual void visit(WhileStmt& stmt) = 0;
-    virtual void visit(VarStmt& stmt) = 0;
-    virtual void visit(FunctionStmt& stmt) = 0;
-    virtual void visit(ReturnStmt& stmt) = 0;
+    virtual StatementPtr visit(ExprStmt& stmt) = 0;
+    virtual StatementPtr visit(RunStmt& stmt) = 0;
+    virtual StatementPtr visit(ImportStmt& stmt) = 0;
+    virtual StatementPtr visit(IfStmt& stmt) = 0;
+    virtual StatementPtr visit(WhileStmt& stmt) = 0;
+    virtual StatementPtr visit(VarStmt& stmt) = 0;
+    virtual StatementPtr visit(FunctionStmt& stmt) = 0;
+    virtual StatementPtr visit(ReturnStmt& stmt) = 0;
     virtual ~StatementVisitor() = default;
 };
 

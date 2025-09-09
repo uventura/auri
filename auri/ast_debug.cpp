@@ -24,7 +24,7 @@ void AstDebug::print() {
     std::cout << "+===============================+\n";
 }
 
-void AstDebug::visit(ExprStmt& expr) {
+StatementPtr AstDebug::visit(ExprStmt& expr) {
     spacement();
     spaceCounter_++;
     std::cout << "{ExpressionStatement} <<\n";
@@ -34,9 +34,11 @@ void AstDebug::visit(ExprStmt& expr) {
     spaceCounter_--;
     spacement();
     std::cout << "{ExpressionStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(RunStmt& run) {
+StatementPtr AstDebug::visit(RunStmt& run) {
     spacement();
     spaceCounter_++;
     std::cout << "{RunStatement} (" << run.identifier().literalToStr()
@@ -51,9 +53,11 @@ void AstDebug::visit(RunStmt& run) {
     spaceCounter_--;
     spacement();
     std::cout << "{RunStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(ImportStmt& import) {
+StatementPtr AstDebug::visit(ImportStmt& import) {
     spacement();
     spaceCounter_++;
     std::cout << "{ImportStatement} <<\n";
@@ -69,9 +73,11 @@ void AstDebug::visit(ImportStmt& import) {
     spaceCounter_--;
     spacement();
     std::cout << "{ImportStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(IfStmt& ifs) {
+StatementPtr AstDebug::visit(IfStmt& ifs) {
     spacement();
     spaceCounter_++;
     std::cout << "{IfStatement} << \n";
@@ -93,9 +99,11 @@ void AstDebug::visit(IfStmt& ifs) {
     spaceCounter_--;
     spacement();
     std::cout << "{IfStatement} >> \n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(WhileStmt& whiles) {
+StatementPtr AstDebug::visit(WhileStmt& whiles) {
     spacement();
     spaceCounter_++;
     std::cout << "{WhileStatement} << \n";
@@ -117,9 +125,11 @@ void AstDebug::visit(WhileStmt& whiles) {
     spaceCounter_--;
     spacement();
     std::cout << "{WhileStatement} >> \n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(VarStmt& stmt) {
+StatementPtr AstDebug::visit(VarStmt& stmt) {
     spacement();
     spaceCounter_++;
     std::cout << "{VariableStatement} (" << stmt.identifier().literalToStr()
@@ -139,9 +149,11 @@ void AstDebug::visit(VarStmt& stmt) {
     spaceCounter_--;
     spacement();
     std::cout << "{VariableStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(FunctionStmt& stmt) {
+StatementPtr AstDebug::visit(FunctionStmt& stmt) {
     spacement();
     spaceCounter_++;
     std::cout << "{FunctionStatement} (" << stmt.name().literalToStr()
@@ -162,9 +174,11 @@ void AstDebug::visit(FunctionStmt& stmt) {
     spaceCounter_--;
     spacement();
     std::cout << "{FunctionStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(ReturnStmt& stmt) {
+StatementPtr AstDebug::visit(ReturnStmt& stmt) {
     spacement();
     spaceCounter_++;
     std::cout << "{ReturnStatement} <<\n";
@@ -174,9 +188,11 @@ void AstDebug::visit(ReturnStmt& stmt) {
     spaceCounter_--;
     spacement();
     std::cout << "{ReturnStatement} >>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(LiteralExpr& expr) {
+ExpressionPtr AstDebug::visit(LiteralExpr& expr) {
     spacement();
     spaceCounter_++;
 
@@ -185,15 +201,19 @@ void AstDebug::visit(LiteralExpr& expr) {
 
     std::visit(print, literal);
     spaceCounter_--;
+
+    return nullptr;
 }
 
-void AstDebug::visit(GroupingExpr& expr) {
+ExpressionPtr AstDebug::visit(GroupingExpr& expr) {
     spaceCounter_++;
     expr.expr().accept(*this);
     spaceCounter_--;
+
+    return nullptr;
 }
 
-void AstDebug::visit(UnaryExpr& expr) {
+ExpressionPtr AstDebug::visit(UnaryExpr& expr) {
     spacement();
     std::cout << "[Unary] <<\n";
 
@@ -212,9 +232,11 @@ void AstDebug::visit(UnaryExpr& expr) {
 
     spacement();
     std::cout << ">>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(BinaryExpr& expr) {
+ExpressionPtr AstDebug::visit(BinaryExpr& expr) {
     spacement();
     std::cout << "[Binary Expr] <<\n";
 
@@ -237,14 +259,18 @@ void AstDebug::visit(BinaryExpr& expr) {
 
     spacement();
     std::cout << ">>\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(VariableExpr& expr) {
+ExpressionPtr AstDebug::visit(VariableExpr& expr) {
     spacement();
     std::cout << "[Variable] " << expr.name().literalToStr() << "\n";
+
+    return nullptr;
 }
 
-void AstDebug::visit(CallExpr& expr) {
+ExpressionPtr AstDebug::visit(CallExpr& expr) {
     spacement();
     spaceCounter_++;
     std::cout << "[Function Call] (" << expr.name().literalToStr() << ") <<\n";
@@ -264,6 +290,8 @@ void AstDebug::visit(CallExpr& expr) {
     spaceCounter_--;
     spacement();
     std::cout << ">>\n";
+
+    return nullptr;
 }
 
 void AstDebug::spacement() {

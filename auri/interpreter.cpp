@@ -17,20 +17,20 @@ void Interpreter::run() {
     }
 }
 
-void Interpreter::visit(ExprStmt& expr) {}
-void Interpreter::visit(RunStmt& run) {}
-void Interpreter::visit(ImportStmt& import) {}
-void Interpreter::visit(IfStmt& ifs) {}
-void Interpreter::visit(WhileStmt& whiles) {}
-void Interpreter::visit(VarStmt& stmt) {}
-void Interpreter::visit(FunctionStmt& stmt) {}
-void Interpreter::visit(ReturnStmt& stmt) {}
-void Interpreter::visit(LiteralExpr& expr) {}
-void Interpreter::visit(GroupingExpr& expr) {}
-void Interpreter::visit(UnaryExpr& expr) {}
-void Interpreter::visit(BinaryExpr& expr) {}
-void Interpreter::visit(VariableExpr& expr) {}
-void Interpreter::visit(CallExpr& expr) {}
+StatementPtr Interpreter::visit(ExprStmt& expr) { return nullptr; }
+StatementPtr Interpreter::visit(RunStmt& run) { return nullptr; }
+StatementPtr Interpreter::visit(ImportStmt& import) { return nullptr; }
+StatementPtr Interpreter::visit(IfStmt& ifs) { return nullptr; }
+StatementPtr Interpreter::visit(WhileStmt& whiles) { return nullptr; }
+StatementPtr Interpreter::visit(VarStmt& stmt) { return nullptr; }
+StatementPtr Interpreter::visit(FunctionStmt& stmt) { return nullptr; }
+StatementPtr Interpreter::visit(ReturnStmt& stmt) { return nullptr; }
+ExpressionPtr Interpreter::visit(LiteralExpr& expr) { return nullptr; }
+ExpressionPtr Interpreter::visit(GroupingExpr& expr) { return nullptr; }
+ExpressionPtr Interpreter::visit(UnaryExpr& expr) { return nullptr; }
+ExpressionPtr Interpreter::visit(BinaryExpr& expr) { return nullptr; }
+ExpressionPtr Interpreter::visit(VariableExpr& expr) { return nullptr; }
+ExpressionPtr Interpreter::visit(CallExpr& expr) { return nullptr; }
 
 }    // namespace AST
 }    // namespace Auri
