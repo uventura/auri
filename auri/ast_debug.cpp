@@ -244,6 +244,11 @@ void AstDebug::visit(VariableExpr& expr) {
     std::cout << "[Variable] " << expr.name().literalToStr() << "\n";
 }
 
+void AstDebug::visit(CallExpr& expr) {
+    spacement();
+    std::cout << "[Function Call]" << expr.name().literalToStr() << "\n";
+}
+
 void AstDebug::spacement() {
     for (int i = 0; i < spaceCounter_; ++i) {
         std::cout << "|   ";

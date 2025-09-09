@@ -32,6 +32,7 @@ class AstDebug : public ExpressionVisitor, public StatementVisitor {
     void visit(UnaryExpr& expr);
     void visit(BinaryExpr& expr);
     void visit(VariableExpr& expr);
+    void visit(CallExpr& expr);
 };
 }    // namespace AST
 }    // namespace Auri

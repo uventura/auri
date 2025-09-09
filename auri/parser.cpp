@@ -192,14 +192,7 @@ std::vector<StatementPtr> Parser::blockStmt() {
     return block;
 }
 
-ExpressionPtr Parser::expression() {
-    if (match({TokenType::IDENTIFIER})) return variable();
-    return equality();
-}
-
-ExpressionPtr Parser::variable() {
-    return std::make_unique<VariableExpr>(previous());
-}
+ExpressionPtr Parser::expression() { return equality(); }
 
 ExpressionPtr Parser::equality() {
     ExpressionPtr left = comparison();
@@ -260,6 +253,8 @@ ExpressionPtr Parser::primary() {
     } else if (match({TokenType::AR_NULL, TokenType::NUMBER,
                       TokenType::STRING})) {
         return std::make_unique<LiteralExpr>(previous().literal());
+    } else if (match({TokenType::IDENTIFIER})) {
+        return function();
     } else if (match({TokenType::AR_EOF})) {
         return nullptr;
     }
@@ -275,6 +270,32 @@ ExpressionPtr Parser::primary() {
     throw std::runtime_error("Unrecognized expression -> Error in: '" +
                              peek().lexeme() + "' at line [" + peek().line() +
                              "]");
+}
+
+ExpressionPtr Parser::function() {
+    Token identifier = previous();
+    if (match({TokenType::LEFT_PAREN})) {
+        std::vector<ExpressionPtr> arguments;
+        while (!match({TokenType::RIGHT_PAREN})) {
+            arguments.push_back(expression());
+            std::cout << peek().literalToStr() << "\n";
+            if (!match({TokenType::COMMA})) {
+                consume(TokenType::RIGHT_PAREN,
+                        "Function call missing ')' at the end.");
+            }
+        }
+
+        consume(TokenType::SEMICOLON, "Function call needs semicolon ';'.");
+
+        return std::make_unique<CallExpr>(std::move(identifier),
+                                          std::move(arguments));
+    }
+
+    return variable();
+}
+
+ExpressionPtr Parser::variable() {
+    return std::make_unique<VariableExpr>(previous());
 }
 
 Token Parser::peek() { return tokens_[currentPos_]; }

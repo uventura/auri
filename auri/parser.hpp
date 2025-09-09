@@ -31,13 +31,14 @@ class Parser {
     std::vector<StatementPtr> blockStmt();
 
     ExpressionPtr expression();
-    ExpressionPtr variable();
     ExpressionPtr equality();
     ExpressionPtr comparison();
     ExpressionPtr term();
     ExpressionPtr factor();
     ExpressionPtr unary();
     ExpressionPtr primary();
+    ExpressionPtr function();
+    ExpressionPtr variable();
 
     Token peek();
     Token previous();
