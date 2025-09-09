@@ -42,7 +42,7 @@ class ExprStmt : public Statement {
     ExpressionPtr expr_;
 
    public:
-    ExprStmt(ExpressionPtr expr) : expr_(std::move(expr)) {};
+    ExprStmt(ExpressionPtr expr) : expr_(std::move(expr)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Expression& expr() { return *expr_; };
@@ -55,7 +55,7 @@ class RunStmt : public Statement {
 
    public:
     RunStmt(Token identifier, std::vector<StatementPtr> stmt)
-        : identifier_(identifier), stmt_(std::move(stmt)) {};
+        : identifier_(identifier), stmt_(std::move(stmt)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Token identifier() { return identifier_; }
@@ -70,7 +70,7 @@ class ImportStmt : public Statement {
    public:
     ImportStmt(Token importedModule, std::vector<Token> moduleBlocks)
         : importedModule_(importedModule),
-          moduleBlocks_(std::move(moduleBlocks)) {};
+          moduleBlocks_(std::move(moduleBlocks)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Token importedModule() { return importedModule_; }
@@ -85,7 +85,7 @@ class IfStmt : public Statement {
    public:
     IfStmt(ExpressionPtr condition, std::vector<StatementPtr> thenBranch)
         : condition_(std::move(condition)),
-          thenBranch_(std::move(thenBranch)) {};
+          thenBranch_(std::move(thenBranch)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Expression& condition() { return *condition_; }
@@ -99,7 +99,7 @@ class WhileStmt : public Statement {
 
    public:
     WhileStmt(ExpressionPtr condition, std::vector<StatementPtr> body)
-        : condition_(std::move(condition)), body_(std::move(body)) {};
+        : condition_(std::move(condition)), body_(std::move(body)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Expression& condition() { return *condition_; }
@@ -113,7 +113,7 @@ class VarStmt : public Statement {
 
    public:
     VarStmt(Token identifier, ExpressionPtr initializer)
-        : identifier_(identifier), initializer_(std::move(initializer)) {};
+        : identifier_(identifier), initializer_(std::move(initializer)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Token identifier() { return identifier_; }
@@ -129,7 +129,7 @@ class FunctionStmt : public Statement {
    public:
     FunctionStmt(Token name, std::vector<TokenPair> params,
                  std::vector<StatementPtr> body)
-        : name_(name), params_(std::move(params)), body_(std::move(body)) {};
+        : name_(name), params_(std::move(params)), body_(std::move(body)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Token name() { return name_; }
@@ -142,7 +142,7 @@ class ReturnStmt : public Statement {
     ExpressionPtr expr_;
 
    public:
-    ReturnStmt(ExpressionPtr expr) : expr_(std::move(expr)) {};
+    ReturnStmt(ExpressionPtr expr) : expr_(std::move(expr)){};
     void accept(StatementVisitor& statement) { statement.visit(*this); };
 
     Expression& expr() { return *expr_; }

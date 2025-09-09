@@ -246,7 +246,24 @@ void AstDebug::visit(VariableExpr& expr) {
 
 void AstDebug::visit(CallExpr& expr) {
     spacement();
-    std::cout << "[Function Call]" << expr.name().literalToStr() << "\n";
+    spaceCounter_++;
+    std::cout << "[Function Call] (" << expr.name().literalToStr() << ") <<\n";
+
+    spacement();
+    spaceCounter_++;
+    std::cout << "[Arguments]:\n";
+    for (uint32_t i = 0; i < expr.arguments().size(); ++i) {
+        spacement();
+        std::cout << "-----------------\n";
+        (*expr.arguments()[i]).accept(*this);
+    }
+    spaceCounter_--;
+    spacement();
+    std::cout << ">>\n";
+
+    spaceCounter_--;
+    spacement();
+    std::cout << ">>\n";
 }
 
 void AstDebug::spacement() {

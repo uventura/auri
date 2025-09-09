@@ -36,5 +36,11 @@ run my_run_scope {
 
 run another_scope {
     return a;
-    my_function(12, "Testing paramenter");
+    my_function(
+        12,
+        "Testing paramenter
+creating new line as test",
+        12 + 8,
+        another_function(true, (1 * 2) / 45)
+    );
 }

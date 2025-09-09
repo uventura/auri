@@ -278,14 +278,15 @@ ExpressionPtr Parser::function() {
         std::vector<ExpressionPtr> arguments;
         while (!match({TokenType::RIGHT_PAREN})) {
             arguments.push_back(expression());
-            std::cout << peek().literalToStr() << "\n";
+
             if (!match({TokenType::COMMA})) {
                 consume(TokenType::RIGHT_PAREN,
                         "Function call missing ')' at the end.");
+                break;
             }
         }
 
-        consume(TokenType::SEMICOLON, "Function call needs semicolon ';'.");
+        // consume(TokenType::SEMICOLON, "Function call needs semicolon ';'.");
 
         return std::make_unique<CallExpr>(std::move(identifier),
                                           std::move(arguments));
