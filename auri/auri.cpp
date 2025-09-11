@@ -2,10 +2,7 @@
 #include "auri/cli.hpp"
 #include "auri/parser.hpp"
 #include "auri/scanner.hpp"
-#include "auri/token.hpp"
-#include <fstream>
-#include <iostream>
-#include <string>
+#include "auri/interpreter.hpp"
 
 int main(int argc, char** argv) {
     Auri::Cli cli(argc, argv);
@@ -21,5 +18,8 @@ int main(int argc, char** argv) {
             Auri::AST::AstDebug debug(parser.ast());
             debug.print();
         }
+
+        Auri::AST::Interpreter interpreter(parser.ast());
+        interpreter.run();
     }
 }

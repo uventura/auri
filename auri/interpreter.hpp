@@ -8,6 +8,9 @@ namespace AST {
 class Interpreter : public ExpressionVisitor, public StatementVisitor {
    private:
     std::vector<StatementPtr>& program_;
+    TokenLiteral castLiteral(ExpressionPtr expr);
+
+    void print(std::vector<ExpressionPtr>& args);
 
    public:
     Interpreter(std::vector<StatementPtr>& program);
