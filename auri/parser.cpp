@@ -13,22 +13,27 @@ Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) { parse(); }
 
 std::vector<StatementPtr>& Parser::ast() { return program_; }
 std::vector<StatementPtr>& Parser::runStatement() { return runStatements_; }
+std::vector<StatementPtr>& Parser::preRunStatement() { return preRunStatements_; }
 
 void Parser::parse() {
     while (!isAtEnd()) {
         StatementPtr statement = nullptr;
 
-        if (match({TokenType::RUN}) && !startedRun_) {
-            startedRun_ = true;
-
-            statement = runStmt();
+        if (match({TokenType::RUN}) && !runScope_) {
+            runScope_ = true;
+            statement = scopeStmt();
             runStatements_.push_back(std::move(statement));
-
-            startedRun_ = false;
+            runScope_ = false;
             continue;
-        } else {
-            statement = declaration();
+        } else if(match({TokenType::PRE_RUN}) && !runScope_) {
+            runScope_ = true;
+            statement = scopeStmt();
+            preRunStatements_.push_back(std::move(statement));
+            runScope_ = false;
+            continue;
         }
+
+        statement = declaration();
         program_.push_back(std::move(statement));
     }
 }
@@ -47,7 +52,7 @@ StatementPtr Parser::defaultStmt() {
         return importStmt();
     }
 
-    if(!startedRun_) {
+    if(!runScope_) {
         throw std::runtime_error(
             "There statements that should be inside of run statements : -> Error in: '" +
             peek().lexeme() + "' at line [" + peek().line() + "]"
@@ -86,7 +91,7 @@ StatementPtr Parser::varStmt() {
     }
 }
 
-StatementPtr Parser::runStmt() {
+StatementPtr Parser::scopeStmt() {
     Token identifier = consume(TokenType::IDENTIFIER,
                                "The run statement expects an identifier");
     consume(TokenType::LEFT_BRACE, "The run statement expects a left brace");
