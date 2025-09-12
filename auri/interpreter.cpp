@@ -22,11 +22,11 @@ StatementPtr Interpreter::visit(ExprStmt& expr) {
     return nullptr;
  }
 StatementPtr Interpreter::visit(RunStmt& run) {
-    std::cout << "----[ Run: " << run.identifier().literalToStr() << " ]----\n\n";
+    std::cout << "|----[ Run: " << run.identifier().literalToStr() << " ]----|\n";
     for(uint64_t i=0; i < run.stmt().size(); ++i) {
         (*run.stmt()[i]).accept(*this);
     }
-    std::cout << "\n----[ End: " << run.identifier().literalToStr() << " ]----\n";
+    std::cout << "|----[ End: " << run.identifier().literalToStr() << " ]----|\n\n";
 
     return nullptr;
 }
