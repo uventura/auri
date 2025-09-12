@@ -20,13 +20,15 @@ StatementPtr Interpreter::visit(ExprStmt& expr) {
     expr.expr().accept(*this);
 
     return nullptr;
- }
+}
 StatementPtr Interpreter::visit(RunStmt& run) {
-    std::cout << "|----[ Run: " << run.identifier().literalToStr() << " ]----|\n";
-    for(uint64_t i=0; i < run.stmt().size(); ++i) {
+    std::cout << "|----[ Run: " << run.identifier().literalToStr()
+              << " ]----|\n";
+    for (uint64_t i = 0; i < run.stmt().size(); ++i) {
         (*run.stmt()[i]).accept(*this);
     }
-    std::cout << "|----[ End: " << run.identifier().literalToStr() << " ]----|\n\n";
+    std::cout << "|----[ End: " << run.identifier().literalToStr()
+              << " ]----|\n\n";
 
     return nullptr;
 }
@@ -80,14 +82,14 @@ ExpressionPtr Interpreter::visit(BinaryExpr& expr) {
     double rightValue = getNumber(right);
     double result = 0.0;
 
-    if(expr.op().type() == TokenType::PLUS) {
+    if (expr.op().type() == TokenType::PLUS) {
         result = leftValue + rightValue;
-    } else if(expr.op().type() == TokenType::MINUS) {
+    } else if (expr.op().type() == TokenType::MINUS) {
         result = leftValue - rightValue;
-    } else if(expr.op().type() == TokenType::STAR) {
+    } else if (expr.op().type() == TokenType::STAR) {
         result = leftValue * rightValue;
-    } else if(expr.op().type() == TokenType::SLASH) {
-        if(rightValue == 0) {
+    } else if (expr.op().type() == TokenType::SLASH) {
+        if (rightValue == 0) {
             throw std::runtime_error("Division by zero");
         }
         result = leftValue / rightValue;
@@ -100,7 +102,7 @@ ExpressionPtr Interpreter::visit(BinaryExpr& expr) {
 
 ExpressionPtr Interpreter::visit(VariableExpr& expr) { return nullptr; }
 ExpressionPtr Interpreter::visit(CallExpr& expr) {
-    if(expr.name().lexeme() == "print") {
+    if (expr.name().lexeme() == "print") {
         print(expr.arguments());
     }
     return nullptr;
@@ -112,18 +114,17 @@ TokenLiteral Interpreter::castLiteral(ExpressionPtr expr) {
 }
 
 void Interpreter::print(std::vector<ExpressionPtr>& args) {
-    for(uint32_t i = 0; i < args.size(); ++i) {
+    for (uint32_t i = 0; i < args.size(); ++i) {
         TokenLiteral literal = castLiteral(args[i]->accept(*this));
         if (std::holds_alternative<std::string>(literal)) {
             std::cout << std::get<std::string>(literal);
         } else if (std::holds_alternative<bool>(literal)) {
-            std::cout << (std::get<bool>(literal) ? "true" :
-                                            "false");
+            std::cout << (std::get<bool>(literal) ? "true" : "false");
         } else if (std::holds_alternative<double>(literal)) {
             std::cout << std::get<double>(literal);
         }
 
-        if(i < args.size() - 1) {
+        if (i < args.size() - 1) {
             std::cout << " ";
         }
     }

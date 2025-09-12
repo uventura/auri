@@ -1,8 +1,8 @@
 #include "auri/ast_debug.hpp"
 #include "auri/cli.hpp"
+#include "auri/interpreter.hpp"
 #include "auri/parser.hpp"
 #include "auri/scanner.hpp"
-#include "auri/interpreter.hpp"
 
 int main(int argc, char** argv) {
     Auri::Cli cli(argc, argv);

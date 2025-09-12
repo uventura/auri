@@ -13,7 +13,9 @@ Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) { parse(); }
 
 std::vector<StatementPtr>& Parser::ast() { return program_; }
 std::vector<StatementPtr>& Parser::runStatement() { return runStatements_; }
-std::vector<StatementPtr>& Parser::preRunStatement() { return preRunStatements_; }
+std::vector<StatementPtr>& Parser::preRunStatement() {
+    return preRunStatements_;
+}
 
 void Parser::parse() {
     while (!isAtEnd()) {
@@ -25,7 +27,7 @@ void Parser::parse() {
             runStatements_.push_back(std::move(statement));
             runScope_ = false;
             continue;
-        } else if(match({TokenType::PRE_RUN}) && !runScope_) {
+        } else if (match({TokenType::PRE_RUN}) && !runScope_) {
             runScope_ = true;
             statement = scopeStmt();
             preRunStatements_.push_back(std::move(statement));
@@ -52,11 +54,11 @@ StatementPtr Parser::defaultStmt() {
         return importStmt();
     }
 
-    if(!runScope_) {
+    if (!runScope_) {
         throw std::runtime_error(
-            "There statements that should be inside of run statements : -> Error in: '" +
-            peek().lexeme() + "' at line [" + peek().line() + "]"
-        );
+            "There statements that should be inside of run statements : -> "
+            "Error in: '" +
+            peek().lexeme() + "' at line [" + peek().line() + "]");
     }
 
     if (match({TokenType::IF})) {

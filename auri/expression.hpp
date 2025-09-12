@@ -37,7 +37,9 @@ class LiteralExpr : public Expression {
 
    public:
     LiteralExpr(TokenLiteral literal) : literal_(literal) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     TokenLiteral literal() { return literal_; };
 };
 
@@ -47,7 +49,9 @@ class GroupingExpr : public Expression {
 
    public:
     GroupingExpr(ExpressionPtr expr) : expr_(std::move(expr)) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     Expression& expr() { return *expr_.get(); };
 };
 
@@ -58,7 +62,9 @@ class UnaryExpr : public Expression {
 
    public:
     UnaryExpr(Token op, ExpressionPtr term) : op_(op), term_(std::move(term)) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     Token op() { return op_; };
     Expression& term() { return *term_.get(); };
 };
@@ -72,7 +78,9 @@ class BinaryExpr : public Expression {
    public:
     BinaryExpr(ExpressionPtr left, Token op, ExpressionPtr right)
         : left_(std::move(left)), op_(op), right_(std::move(right)) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     Expression& left() { return *left_.get(); };
     Token op() { return op_; };
     Expression& right() { return *right_.get(); };
@@ -84,7 +92,9 @@ class VariableExpr : public Expression {
 
    public:
     VariableExpr(Token name) : name_(name) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     Token name() { return name_; };
 };
 
@@ -96,7 +106,9 @@ class CallExpr : public Expression {
    public:
     CallExpr(Token name, std::vector<ExpressionPtr> arguments)
         : name_(name), arguments_(std::move(arguments)) {}
-    ExpressionPtr accept(ExpressionVisitor& visitor) { return visitor.visit(*this); };
+    ExpressionPtr accept(ExpressionVisitor& visitor) {
+        return visitor.visit(*this);
+    };
     Token name() { return name_; };
     std::vector<ExpressionPtr>& arguments() { return arguments_; };
 };

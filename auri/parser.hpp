@@ -51,9 +51,9 @@ class Parser {
     bool isAtEnd();
     bool match(std::vector<TokenType> possibleMatches);
 
-    bool runScope_ { false };
+    bool runScope_{false};
 
-    public:
+   public:
     Parser(const std::vector<Token>& tokens);
 
     std::vector<StatementPtr>& ast();
