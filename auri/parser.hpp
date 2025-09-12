@@ -14,6 +14,7 @@ class Parser {
     uint64_t currentPos_ = 0;
     std::vector<Token>
         tokens_;    // No need to keep this data after the tree generated.
+    std::vector<StatementPtr> runStatements_;
 
     void parse();
 
@@ -48,10 +49,13 @@ class Parser {
     bool isAtEnd();
     bool match(std::vector<TokenType> possibleMatches);
 
-   public:
+    bool startedRun_ { false };
+
+    public:
     Parser(const std::vector<Token>& tokens);
 
     std::vector<StatementPtr>& ast();
+    std::vector<StatementPtr>& runStatement();
 };
 }    // namespace AST
 }    // namespace Auri

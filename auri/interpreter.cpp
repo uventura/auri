@@ -21,7 +21,13 @@ StatementPtr Interpreter::visit(ExprStmt& expr) {
 
     return nullptr;
  }
-StatementPtr Interpreter::visit(RunStmt& run) { return nullptr; }
+StatementPtr Interpreter::visit(RunStmt& run) {
+    for(uint64_t i=0; i < run.stmt().size(); ++i) {
+        (*run.stmt()[i]).accept(*this);
+    }
+
+    return nullptr;
+}
 StatementPtr Interpreter::visit(ImportStmt& import) { return nullptr; }
 StatementPtr Interpreter::visit(IfStmt& ifs) { return nullptr; }
 StatementPtr Interpreter::visit(WhileStmt& whiles) { return nullptr; }

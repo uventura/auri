@@ -17,6 +17,7 @@ class VarStmt;
 class FunctionStmt;
 class ReturnStmt;
 using StatementPtr = std::unique_ptr<Statement>;
+using RunStmtPtr = std::unique_ptr<RunStmt>;
 
 class StatementVisitor {
    public:

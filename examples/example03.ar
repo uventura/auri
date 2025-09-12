@@ -1,2 +1,4 @@
-print(1 + 5 * (8 + 10));
-print(1 - 8);
+run test_example {
+    print(1 + 5 * (8 + 10));
+    print(1 - 8, "----| hello bye |----");
+}

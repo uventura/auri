@@ -12,17 +12,23 @@ namespace AST {
 Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens) { parse(); }
 
 std::vector<StatementPtr>& Parser::ast() { return program_; }
+std::vector<StatementPtr>& Parser::runStatement() { return runStatements_; }
 
 void Parser::parse() {
     while (!isAtEnd()) {
         StatementPtr statement = nullptr;
 
-        if (match({TokenType::RUN})) {
+        if (match({TokenType::RUN}) && !startedRun_) {
+            startedRun_ = true;
+
             statement = runStmt();
+            runStatements_.push_back(std::move(statement));
+
+            startedRun_ = false;
+            continue;
         } else {
             statement = declaration();
         }
-
         program_.push_back(std::move(statement));
     }
 }
@@ -39,13 +45,25 @@ StatementPtr Parser::declaration() {
 StatementPtr Parser::defaultStmt() {
     if (match({TokenType::IMPORT})) {
         return importStmt();
-    } else if (match({TokenType::IF})) {
+    }
+
+    if(!startedRun_) {
+        throw std::runtime_error(
+            "There statements that should be inside of run statements : -> Error in: '" +
+            peek().lexeme() + "' at line [" + peek().line() + "]"
+        );
+    }
+
+    if (match({TokenType::IF})) {
         return ifStmt();
-    } else if (match({TokenType::WHILE})) {
+    }
+    if (match({TokenType::WHILE})) {
         return whileStmt();
-    } else if (match({TokenType::FUN})) {
+    }
+    if (match({TokenType::FUN})) {
         return functionStmt();
-    } else if (match({TokenType::RETURN})) {
+    }
+    if (match({TokenType::RETURN})) {
         return returnStmt();
     }
 

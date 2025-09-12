@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
             debug.print();
         }
 
-        Auri::AST::Interpreter interpreter(parser.ast());
+        Auri::AST::Interpreter interpreter(parser.runStatement());
         interpreter.run();
     }
 }
