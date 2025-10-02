@@ -24,7 +24,6 @@ AuriCli auri_cli(int argc, char* argv[]) {
         } else if(strcmp(argv[i], "--tokens_debug") == 0) {
             cli.enable_tokens = true;
         } else {
-            cli.files_count++;
             void* path = argv[i];
             insert_dynamic_ptr_array(&cli.file_paths, path);
         }
