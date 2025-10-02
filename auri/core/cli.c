@@ -1,4 +1,5 @@
-#include "auri/impl/cli.h"
+#include "auri/core/cli.h"
+#include "auri/utils/basic_types.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -8,6 +9,8 @@ AuriCli auri_cli(int argc, char* argv[]) {
     cli.help = false;
     cli.enable_ast = false;
     cli.enable_tokens = false;
+
+    init_dynamic_ptr_array(&cli.file_paths, STRING_TYPE);
 
     for(int i=1; i < argc; ++i) {
         if(strcmp(argv[i], "--help") == 0) {
@@ -22,7 +25,8 @@ AuriCli auri_cli(int argc, char* argv[]) {
             cli.enable_tokens = true;
         } else {
             cli.files_count++;
-            strcpy(cli.file_paths[i-1], argv[i]);
+            void* path = argv[i];
+            insert_dynamic_ptr_array(&cli.file_paths, path);
         }
     }
 

@@ -1,5 +1,5 @@
-#include "auri/impl/common.h"
-#include "auri/impl/environment.h"
+#include "auri/core/common.h"
+#include "auri/core/environment.h"
 
 #include <stdio.h>
 #include <stdlib.h>

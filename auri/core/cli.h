@@ -1,12 +1,12 @@
 #ifndef AURI_CLI_H
 #define AURI_CLI_H
 
-#include "auri/impl/common.h"
-#include "auri/impl/environment.h"
+#include "auri/core/common.h"
+#include "auri/core/environment.h"
+#include "auri/utils/array.h"
 
 typedef struct {
-    char file_paths[MAX_PROVIDED_FILES][MAX_PATH_LENGTH];
-    uint32_t files_count;
+    DynamicPtrArray file_paths;
     bool help;
     bool enable_tokens;
     bool enable_ast;
