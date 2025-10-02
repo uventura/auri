@@ -2,6 +2,7 @@
 
 #include "auri/expression.hpp"
 #include "auri/statement.hpp"
+#include "auri/environment.hpp"
 
 namespace Auri {
 namespace AST {
@@ -9,6 +10,9 @@ class Interpreter : public ExpressionVisitor, public StatementVisitor {
    private:
     std::vector<StatementPtr>& program_;
     TokenLiteral castLiteral(ExpressionPtr expr);
+
+    Environment<TokenLiteral> baseEnv_;
+    Environment<TokenLiteral>* currentEnv_;
 
     void print(std::vector<ExpressionPtr>& args);
 

@@ -1,6 +1,8 @@
 run test_example {
     print(1 + 5 * (8 + 10));
     print(1 - 8);
+
+    var x = 2;
 }
 
 run test_wheel_movement {

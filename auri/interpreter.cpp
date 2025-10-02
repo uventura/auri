@@ -8,7 +8,7 @@
 namespace Auri {
 namespace AST {
 Interpreter::Interpreter(std::vector<StatementPtr>& program)
-    : program_(program) {}
+    : program_(program), currentEnv_(&baseEnv_) {}
 
 void Interpreter::run() {
     for (uint64_t i = 0; i < program_.size(); ++i) {
@@ -35,7 +35,36 @@ StatementPtr Interpreter::visit(RunStmt& run) {
 StatementPtr Interpreter::visit(ImportStmt& import) { return nullptr; }
 StatementPtr Interpreter::visit(IfStmt& ifs) { return nullptr; }
 StatementPtr Interpreter::visit(WhileStmt& whiles) { return nullptr; }
-StatementPtr Interpreter::visit(VarStmt& stmt) { return nullptr; }
+
+StatementPtr Interpreter::visit(VarStmt& stmt) {
+    TokenLiteral literal = castLiteral(stmt.initializer().accept(*this));
+    // std::variant<std::string, bool, double, char>
+    switch(literal.index()) {
+        case 0: {
+            std::string value = std::get<0>(literal);
+            currentEnv_->declare(stmt.identifier().lexeme(), value);
+            break;
+        }
+        case 1: {
+            bool value = std::get<1>(literal);
+            currentEnv_->declare(stmt.identifier().lexeme(), value);
+            break;
+        }
+        case 2: {
+            double value = std::get<2>(literal);
+            currentEnv_->declare(stmt.identifier().lexeme(), value);
+            break;
+        }
+        case 3: {
+            char value = std::get<3>(literal);
+            currentEnv_->declare(stmt.identifier().lexeme(), value);
+            break;
+        }
+    }
+
+    return nullptr;
+}
+
 StatementPtr Interpreter::visit(FunctionStmt& stmt) { return nullptr; }
 StatementPtr Interpreter::visit(ReturnStmt& stmt) { return nullptr; }
 
