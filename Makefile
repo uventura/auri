@@ -1,16 +1,15 @@
-CC = g++
+CC = gcc
 TARGET = auri
 FLAGS = -W
 FLAGS += -Wall
 FLAGS += -Werror
-FLAGS += -ansi
 FLAGS += -pedantic
 FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
-FLAGS += -std=c++17
+FLAGS += -std=c99
 
-SRC = $(shell find . -type f \( -name '*.cpp' \))
+SRC = $(shell find . -type f \( -name '*.c' \))
 OUT_DIR = out
 BIN = $(OUT_DIR)/$(TARGET)
 
@@ -27,8 +26,8 @@ clean:
 
 format:
 	@echo "Applying Format..."
-	@find . -type f \( -name "*.cpp" \) -exec clang-format -i {} \;
-	@find . -type f \( -name "*.h" -o -name "*.hpp" \) -exec clang-format -i {} \;
+	@find . -type f \( -name "*.c" \) -exec clang-format -i {} \;
+	@find . -type f \( -name "*.h" -o -name "*.h" \) -exec clang-format -i {} \;
 	@echo "Done! "
 
 .PHONY: all clean
