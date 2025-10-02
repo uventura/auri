@@ -6,7 +6,7 @@
 #include "auri/utils/array.h"
 
 typedef struct {
-    DynamicPtrArray file_paths;
+    DArrayVoidPtr file_paths;
     bool help;
     bool enable_tokens;
     bool enable_ast;

@@ -10,10 +10,10 @@ typedef struct {
     uint32_t size;
     uint32_t count;
     BasicType type;
-} DynamicPtrArray;
+} DArrayVoidPtr;
 
-void init_dynamic_ptr_array(DynamicPtrArray* array, BasicType type);
-void insert_dynamic_ptr_array(DynamicPtrArray* array, void* element);
-void free_dynamic_ptr_array(DynamicPtrArray* array);
+void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type);
+void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element);
+void free_dynamic_ptr_array(DArrayVoidPtr* array);
 
 #endif
