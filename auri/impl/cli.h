@@ -1,8 +1,8 @@
 #ifndef AURI_CLI_H
 #define AURI_CLI_H
 
-#include "auri/common.h"
-#include "auri/environment.h"
+#include "auri/impl/common.h"
+#include "auri/impl/environment.h"
 
 typedef struct {
     char file_paths[MAX_PROVIDED_FILES][MAX_PATH_LENGTH];

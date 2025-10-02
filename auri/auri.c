@@ -1,4 +1,4 @@
-#include "auri/cli.h"
+#include "auri/impl/cli.h"
 
 #include <stdio.h>
 
