@@ -1,0 +1,10 @@
+#ifndef AURI_ENVIRONMENT_H
+#define AURI_ENVIRONMENT_H
+
+#define MAX_PATH_LENGTH 4096
+#define MAX_PROVIDED_FILES 1000
+
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
+
+#endif
