@@ -10,13 +10,15 @@ void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type) {
     array->type = type;
 }
 
-void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element) {
-    if(array->count + 1 >= array->size) {
-        array->size *= 2;
+void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size) {
+    if(array->count + size >= array->size) {
+        array->size = (array->size + size) * 2;
         array->array = realloc(array->array, array->size * sizeof(void*));
     }
 
-    array->array[array->count++] = element;
+    for(uint32_t i=0; i < size; ++i){
+        array->array[array->count++] = *(element + i);
+    }
 }
 
 void free_dynamic_ptr_array(DArrayVoidPtr* array) {

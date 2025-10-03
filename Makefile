@@ -7,7 +7,7 @@ FLAGS += -pedantic
 FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
-FLAGS += -std=c99
+FLAGS += -std=c11
 
 SRC = $(shell find . -type f \( -name '*.c' \))
 OUT_DIR = out

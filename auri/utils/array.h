@@ -13,7 +13,7 @@ typedef struct {
 } DArrayVoidPtr;
 
 void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type);
-void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element);
+void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size);
 void free_dynamic_ptr_array(DArrayVoidPtr* array);
 
 #endif

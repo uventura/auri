@@ -25,7 +25,7 @@ AuriCli auri_cli(int argc, char* argv[]) {
             cli.enable_tokens = true;
         } else {
             void* path = argv[i];
-            insert_dynamic_ptr_array(&cli.file_paths, path);
+            insert_dynamic_ptr_array(&cli.file_paths, path, strlen(path));
         }
     }
 
