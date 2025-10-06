@@ -6,6 +6,7 @@
 #include <uchar.h>
 #include <string.h>
 #include <ctype.h>
+#include <malloc.h>
 
 FILE* auri_file;
 
@@ -26,7 +27,7 @@ AuriScanner auri_scan(char* path) {
     AuriTokenType type = AR_TOKEN_NONE;
 
     AuriString lexeme;
-    string_init(&lexeme);
+    auri_strinit(&lexeme);
 
     uint32_t line = 0;
 
@@ -69,7 +70,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_BANG;
                 if (match('=')) {
                     type = AR_TOKEN_BANG_EQUAL;
-                    string_concat(&lexeme, U"=");
+                    auri_strcat(&lexeme, L"=");
                 }
                 break;
             }
@@ -77,7 +78,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_EQUAL;
                 if (match('=')) {
                     type = AR_TOKEN_EQUAL_EQUAL;
-                    string_concat(&lexeme, U"=");
+                    auri_strcat(&lexeme, L"=");
                 }
                 break;
             }
@@ -85,7 +86,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_GREATER;
                 if (match('=')) {
                     type = AR_TOKEN_GREATER_EQUAL;
-                    string_concat(&lexeme, U"=");
+                    auri_strcat(&lexeme, L"=");
                 }
                 break;
             }
@@ -93,7 +94,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_LESS;
                 if (match('=')) {
                     type = AR_TOKEN_LESS_EQUAL;
-                    string_concat(&lexeme, U"=");
+                    auri_strcat(&lexeme, L"=");
                 }
                 break;
             }
@@ -132,6 +133,11 @@ AuriScanner auri_scan(char* path) {
             }
         }
         symbol = fgetc(auri_file);
+
+        AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
+        token->type = type;
+        insert_dynamic_ptr_array(&scanner.tokens, token, 1);
+        //void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size);
     }
 
     return scanner;

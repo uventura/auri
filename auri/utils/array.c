@@ -17,7 +17,7 @@ void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size
     }
 
     for(uint32_t i=0; i < size; ++i){
-        array->array[array->count++] = *(element + i);
+        array->array[array->count++] = element;
     }
 }
 
