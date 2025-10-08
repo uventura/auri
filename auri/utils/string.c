@@ -1,9 +1,10 @@
 #include "auri/utils/string.h"
 
 #include <malloc.h>
+#include <string.h>
 
-uint32_t auri_text_size(AURI_STRING_CHAR_TYPE* str) {
-    AURI_STRING_CHAR_TYPE* ptr = str;
+uint32_t auri_text_size(char32_t* str) {
+    char32_t* ptr = str;
     while (*ptr) {
         ++ptr;
     }
@@ -11,17 +12,44 @@ uint32_t auri_text_size(AURI_STRING_CHAR_TYPE* str) {
 }
 
 void auri_strinit(AuriString* str) {
-    str->text = (AURI_STRING_CHAR_TYPE*) malloc(sizeof(AURI_STRING_CHAR_TYPE) * AURI_STRING_START_SIZE);
+    str->text = (char32_t*) malloc(sizeof(char32_t) * AURI_STRING_START_SIZE);
     str->size = 0;
-    str->_container_size = AURI_STRING_START_SIZE;
+    str->capacity = AURI_STRING_START_SIZE;
 }
 
-void auri_strcat(AuriString* dest, AURI_STRING_CHAR_TYPE* text) {
+char32_t auri_char_to_char32(char symbol) {
+    char32_t out;
+    mbstate_t ps = {0};
+    mbrtoc32(&out, &symbol, 1, &ps);
+    return out;
+}
+
+void auri_strcat_char32(AuriString* dest, char32_t* text) {
     uint32_t size = auri_text_size(text);
 
-    if(dest->size + size > dest->_container_size) {
-        dest->_container_size = (dest->size + size) * 2;
-        dest->text = (AURI_STRING_CHAR_TYPE*)realloc(&dest->text, dest->_container_size * sizeof(AURI_STRING_CHAR_TYPE));
+    if(dest->size + size > dest->capacity) {
+        dest->capacity = (dest->size + size) * 2;
+        dest->text = (char32_t*)realloc(&dest->text, dest->capacity * sizeof(char32_t));
+    }
+
+    for(uint32_t i = 0; i < size; ++i) {
+        dest->text[dest->size + i] = text[i];
+    }
+
+    dest->size += size;
+}
+
+void auri_strcat_char(AuriString* dest, char* text) {
+    uint32_t size = strlen(text);
+
+    if(dest->size + size > dest->capacity) {
+        dest->capacity = (dest->size + size) * 2;
+        dest->text = (char32_t*)realloc(&dest->text, dest->capacity * sizeof(char32_t));
+    }
+
+    for(uint32_t i = 0; i < size; ++i) {
+        char32_t symbol = auri_char_to_char32(text[i]);
+        dest->text[dest->size + i] = symbol;
     }
 
     dest->size += size;
@@ -30,5 +58,5 @@ void auri_strcat(AuriString* dest, AURI_STRING_CHAR_TYPE* text) {
 void auri_strfree(AuriString* str) {
     free(str->text);
     str->size = 0;
-    str->_container_size = 0;
+    str->capacity = 0;
 }

@@ -1,8 +1,9 @@
 #include "auri/core/cli.h"
-#include "auri/utils/basic_types.h"
+#include "auri/utils/string.h"
 
 #include <string.h>
 #include <stdio.h>
+#include <malloc.h>
 
 AuriCli auri_cli(int argc, char* argv[]) {
     AuriCli cli;
@@ -24,8 +25,10 @@ AuriCli auri_cli(int argc, char* argv[]) {
         } else if(strcmp(argv[i], "--tokens_debug") == 0) {
             cli.enable_tokens = true;
         } else {
-            void* path = argv[i];
-            insert_dynamic_ptr_array(&cli.file_paths, path, strlen(path));
+            AuriString* path = (AuriString*) malloc(sizeof(AuriString));
+            auri_strinit(path);
+            auri_strcat_char(path, argv[i]);
+            insert_dynamic_ptr_array(&cli.file_paths, path, path->size);
         }
     }
 

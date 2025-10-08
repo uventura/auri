@@ -22,7 +22,9 @@ void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size
 }
 
 void free_dynamic_ptr_array(DArrayVoidPtr* array) {
-    free(array->array);
+    for(uint32_t i=0; i < array->size; ++i) {
+        free(array->array[i]);
+    }
     array->array = NULL;
     array->size = 1;
     array->count = 0;
