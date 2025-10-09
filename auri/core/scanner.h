@@ -11,6 +11,6 @@ typedef struct {
     DArrayVoidPtr tokens;
 } AuriScanner;
 
-AuriScanner auri_scan(char* path);
+AuriScanner auri_scan(const char* path);
 
 #endif

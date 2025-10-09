@@ -1,23 +1,8 @@
 !=
-<
-=
-!= ; >> !=
-* + - /..
-((( {} )))
+>=
 
-"My String
+<=
 
+>
 
-"
-"Another String
-
-"
-
-22.3597
-25
-837848
-
-bool true return while for
-; return 32;
-false;
-alias as
+>= >= ()

@@ -3,7 +3,7 @@
 
 #include <malloc.h>
 #include <string.h>
-#include <stdio.h>
+#include <malloc.h>
 
 uint32_t auri_text_size(char* str) {
     char* ptr = str;
@@ -14,7 +14,7 @@ uint32_t auri_text_size(char* str) {
 }
 
 void auri_strinit(AuriString* str) {
-    str->text = (char*) malloc(sizeof(char) * AURI_STRING_START_SIZE);
+    str->text = (char*)malloc(sizeof(char));
     str->size = 0;
     str->capacity = AURI_STRING_START_SIZE;
 }
@@ -23,11 +23,15 @@ const char* auri_strget(AuriString* str) {
     return str->text;
 }
 
-void auri_strcat(AuriString* dest, char* text) {
-    uint32_t size = strlen(text);
+char auri_strchar(AuriString* str, uint32_t pos) {
+    return str->text[pos];
+}
 
+void auri_strcat(AuriString* dest, char* text, uint32_t size) {
     if(dest->size + size > dest->capacity) {
+        printf("\n-> size: %d\n", size);
         dest->capacity = (dest->size + size) * 2;
+        printf("\n\nsize: %d; capacity: %d\n", dest->size, dest->capacity);
         dest->text = (char*)realloc(dest->text, dest->capacity * sizeof(char));
     }
 
@@ -36,6 +40,7 @@ void auri_strcat(AuriString* dest, char* text) {
     }
 
     dest->size += size;
+    dest->text[dest->size] = '\0';
 }
 
 void auri_strfree(AuriString* str) {

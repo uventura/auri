@@ -56,4 +56,7 @@ dkms.conf
 
 .vscode
 out/
+obj/
+bin/
+auri-*
 private/

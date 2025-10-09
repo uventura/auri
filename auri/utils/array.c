@@ -1,8 +1,8 @@
 #include "auri/utils/array.h"
 #include "auri/utils/string.h"
 
-#include <malloc.h>
 #include <stddef.h>
+#include <malloc.h>
 
 void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type) {
     array->size = 0;

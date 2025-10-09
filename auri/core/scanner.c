@@ -1,6 +1,7 @@
 #include "auri/core/scanner.h"
 #include "auri/core/common.h"
 #include "auri/utils/string.h"
+#include "auri/utils/debug.h"
 
 #include <stdio.h>
 #include <uchar.h>
@@ -8,30 +9,40 @@
 #include <ctype.h>
 #include <malloc.h>
 
-FILE* auri_file;
+AuriString* auri_file;
+uint32_t current_position = 0;
 
-bool match(char32_t symbol);
-char32_t peek();
-char32_t advance();
+void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line);
 
-AuriScanner auri_scan(char* path) {
+void read_file(const char* path);
+bool match(char symbol);
+char peek();
+char advance();
+
+AuriScanner auri_scan(const char* path) {
+    auri_debug_fprint("==========================\n");
+    auri_debug_fprint("|         SCANNER        |\n");
+    auri_debug_fprint("==========================\n");
     AuriScanner scanner;
     init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
 
-    auri_file = fopen(path, "r");
-    if(!auri_file) {
-        auri_throw_execution_error("The file '%s' contains errors", path);
-    }
+    auri_file = (AuriString*)malloc(sizeof(AuriString));
+    auri_strinit(auri_file);
+    read_file(path);
 
-    char32_t symbol = fgetc(auri_file);
-    AuriTokenType type = AR_TOKEN_NONE;
-
-    AuriString lexeme;
-    auri_strinit(&lexeme);
-
+    char symbol = peek();
     uint32_t line = 0;
 
     while(symbol) {
+        AuriTokenType type = AR_TOKEN_NONE;
+
+        AuriString lexeme;
+        auri_strinit(&lexeme);
+
+        auri_debug_fprint("Next token\n");
+        auri_strcat(&lexeme, &symbol, 1);
+        printf(">>> %s\n", lexeme.text);
+
         switch(symbol) {
             case '(':
                 type = AR_TOKEN_LEFT_PAREN;
@@ -70,7 +81,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_BANG;
                 if (match('=')) {
                     type = AR_TOKEN_BANG_EQUAL;
-                    auri_strcat(&lexeme, "=");
+                    auri_strcat(&lexeme, "=", 1);
                 }
                 break;
             }
@@ -78,7 +89,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_EQUAL;
                 if (match('=')) {
                     type = AR_TOKEN_EQUAL_EQUAL;
-                    auri_strcat(&lexeme, "=");
+                    auri_strcat(&lexeme, "=", 1);
                 }
                 break;
             }
@@ -86,7 +97,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_GREATER;
                 if (match('=')) {
                     type = AR_TOKEN_GREATER_EQUAL;
-                    auri_strcat(&lexeme, "=");
+                    auri_strcat(&lexeme, "=", 1);
                 }
                 break;
             }
@@ -94,7 +105,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_LESS;
                 if (match('=')) {
                     type = AR_TOKEN_LESS_EQUAL;
-                    auri_strcat(&lexeme, "=");
+                    auri_strcat(&lexeme, "=", 1);
                 }
                 break;
             }
@@ -132,25 +143,83 @@ AuriScanner auri_scan(char* path) {
                 break;
             }
         }
-        symbol = fgetc(auri_file);
+        symbol = advance();
 
-        AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
-        token->type = type;
-        insert_dynamic_ptr_array(&scanner.tokens, token);
-        //void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size);
+        if(type != AR_TOKEN_NONE) {
+            auri_debug_fprint("Adding new token");
+            append_token(&scanner, lexeme, lexeme, type, line);
+        }
+
+        auri_strfree(&lexeme);
     }
+
+    for(uint32_t i = 0; i < scanner.tokens.size; ++i) {
+        AuriToken* token = scanner.tokens.array[i];
+        printf(">> %s\n", token->lexeme.text);
+    }
+
+    auri_strfree(auri_file);
 
     return scanner;
 }
 
-bool match(char32_t symbol) {
-    return symbol == U'A';
+void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line) {
+    AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
+    token->type = type;
+    token->lexeme = lexeme;
+    token->line = line;
+    insert_dynamic_ptr_array(&scanner->tokens, token);
 }
 
-char32_t peek() {
-    return (char32_t) U'H';
+void read_file(const char* path) {
+    auri_debug_fprint("Opening file %s...\n", path);
+
+    FILE* file = fopen(path, "r");
+    if (!file) {
+        auri_throw_execution_error("The file '%s' can't be opened", path);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t length = ftell(file);
+    rewind(file);
+
+    char* buffer = (char*)malloc(sizeof(char) * (length + 1));
+    if (!buffer) {
+        auri_throw_execution_error("The file '%s' contains memory errors", path);
+        return;
+    }
+
+    fread(buffer, 1, length, file);
+
+    buffer[length] = '\0';
+    auri_strcat(auri_file, buffer, length + 1);
+
+    free(buffer);
+    fclose(file);
 }
 
-char32_t advance() {
-    return (char32_t) U'H';
+bool match(char symbol) {
+    if(current_position + 1 >= auri_file->size) {
+        return false;
+    }
+
+    if(auri_file->text[current_position + 1] == symbol) {
+        advance();
+        return true;
+    }
+
+    return false;
+}
+
+char peek() {
+    return auri_strchar(auri_file, current_position);
+}
+
+char advance() {
+    if(current_position + 1 < auri_file->size) {
+        current_position++;
+        return peek();
+    }
+    return '\0';
 }

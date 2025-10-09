@@ -8,21 +8,36 @@ FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
 FLAGS += -std=c11
+FLAGS += -DENABLE_DEBUG
+FLAGS += -fsanitize=address
+FLAGS += -g
 
-SRC = $(shell find . -type f \( -name '*.c' \))
 OUT_DIR = out
-BIN = $(OUT_DIR)/$(TARGET)
+BIN_DIR = $(OUT_DIR)/bin
+BIN = $(BIN_DIR)/$(TARGET)
 
-all: $(OUT_DIR) $(BIN)
+SRC_DIR = auri
+SRC = $(shell find $(SRC_DIR) -name '*.c')
 
-$(BIN): $(SRC)
-	$(CC) $(SRC) -o $(BIN) $(FLAGS) -I .
+OBJ_DIR = $(OUT_DIR)/obj
+OBJS=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o, $(SRC))
 
-$(OUT_DIR):
-	mkdir -p $(OUT_DIR)
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) -o $(BIN_DIR)/$@ $^ $(FLAGS) -I .
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(FLAGS) -o $@ -c $< -I .
 
 clean:
+	@echo "Clean up environment..."
+	@echo "-----------------------"
 	rm -rf $(OUT_DIR)
+	@echo "-----------------------"
+	@echo "Environment cleaned!"
 
 format:
 	@echo "Applying Format..."
