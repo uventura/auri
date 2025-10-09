@@ -20,9 +20,9 @@ AuriCli auri_cli(int argc, char* argv[]) {
 
             auri_help();
             break;
-        } else if(strcmp(argv[i], "--ast_debug") == 0) {
+        } else if(strcmp(argv[i], "--ast") == 0) {
             cli.enable_ast = true;
-        } else if(strcmp(argv[i], "--tokens_debug") == 0) {
+        } else if(strcmp(argv[i], "--tokens") == 0) {
             cli.enable_tokens = true;
         } else {
             AuriString* path = (AuriString*) malloc(sizeof(AuriString));
@@ -40,11 +40,12 @@ void auri_cli_free(AuriCli* cli) {
 }
 
 void auri_help() {
-    printf("========================\n");
-    printf("|         HELP         |\n");
-    printf("========================\n");
+    printf("====================================\n");
+    printf("|               HELP               |\n");
+    printf("====================================\n");
 
-    printf("<TODO>\n");
+    printf("| --tokens: Enable tokens visualization.\n");
+    printf("| --ast: Enable AST visualization.\n");
 
-    printf("========================\n");
+    printf("====================================\n");
 }

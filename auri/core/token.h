@@ -71,4 +71,6 @@ typedef struct {
     uint32_t line;
 } AuriToken;
 
+void auri_token_free(AuriToken* token);
+
 #endif

@@ -14,7 +14,9 @@ uint32_t auri_text_size(char* str) {
 }
 
 void auri_strinit(AuriString* str) {
-    str->text = (char*)malloc(sizeof(char));
+    str->text = (char*)malloc(sizeof(char) * AURI_STRING_START_SIZE);
+    str->text[0] = '\0';
+
     str->size = 0;
     str->capacity = AURI_STRING_START_SIZE;
 }
@@ -28,15 +30,13 @@ char auri_strchar(AuriString* str, uint32_t pos) {
 }
 
 void auri_strcat(AuriString* dest, char* text, uint32_t size) {
-    if(dest->size + size > dest->capacity) {
-        printf("\n-> size: %d\n", size);
-        dest->capacity = (dest->size + size) * 2;
-        printf("\n\nsize: %d; capacity: %d\n", dest->size, dest->capacity);
+    if(dest->size + size + 1 >= dest->capacity) {
+        dest->capacity = (dest->capacity + dest->size + size + 1) * 2;
         dest->text = (char*)realloc(dest->text, dest->capacity * sizeof(char));
     }
 
     for(uint32_t i = 0; i < size; ++i) {
-        dest->text[dest->size + i] = text[i];
+        dest->text[dest->size + i] = *(text + i);
     }
 
     dest->size += size;
@@ -44,7 +44,9 @@ void auri_strcat(AuriString* dest, char* text, uint32_t size) {
 }
 
 void auri_strfree(AuriString* str) {
-    free(str->text);
+    if(str->text != NULL && str->capacity != 0) {
+        free(str->text);
+    }
     str->text = NULL;
     str->size = 0;
     str->capacity = 0;

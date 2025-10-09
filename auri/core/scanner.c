@@ -8,6 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 AuriString* auri_file;
 uint32_t current_position = 0;
@@ -19,29 +20,22 @@ bool match(char symbol);
 char peek();
 char advance();
 
-AuriScanner auri_scan(const char* path) {
-    auri_debug_fprint("==========================\n");
-    auri_debug_fprint("|         SCANNER        |\n");
-    auri_debug_fprint("==========================\n");
+AuriScanner auri_scanner(const char* path) {
     AuriScanner scanner;
     init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
 
-    auri_file = (AuriString*)malloc(sizeof(AuriString));
-    auri_strinit(auri_file);
     read_file(path);
 
     char symbol = peek();
     uint32_t line = 0;
 
     while(symbol) {
+
         AuriTokenType type = AR_TOKEN_NONE;
 
         AuriString lexeme;
         auri_strinit(&lexeme);
-
-        auri_debug_fprint("Next token\n");
         auri_strcat(&lexeme, &symbol, 1);
-        printf(">>> %s\n", lexeme.text);
 
         switch(symbol) {
             case '(':
@@ -144,39 +138,50 @@ AuriScanner auri_scan(const char* path) {
             }
         }
         symbol = advance();
-
         if(type != AR_TOKEN_NONE) {
-            auri_debug_fprint("Adding new token");
             append_token(&scanner, lexeme, lexeme, type, line);
+        } else {
+            auri_strfree(&lexeme);
         }
-
-        auri_strfree(&lexeme);
-    }
-
-    for(uint32_t i = 0; i < scanner.tokens.size; ++i) {
-        AuriToken* token = scanner.tokens.array[i];
-        printf(">> %s\n", token->lexeme.text);
     }
 
     auri_strfree(auri_file);
-
     return scanner;
+}
+
+void auri_print_tokens(AuriScanner* scanner) {
+    printf("=========================\n");
+    printf("|         TOKENS        |\n");
+    printf("=========================\n");
+
+    for(uint32_t i = 0; i < scanner->tokens.size; ++i) {
+        AuriToken* token = scanner->tokens.array[i];
+        printf("| Token: (Line: %04d) '%s'\n", token->line, token->lexeme.text);
+    }
+
+    printf("=========================\n");
+}
+
+void auri_scanner_free(AuriScanner* scanner) {
+    for(uint32_t i = 0; i < scanner->tokens.size; ++i){
+        auri_token_free(scanner->tokens.array[i]);
+    }
+    free_dynamic_ptr_array(&scanner->tokens);
 }
 
 void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line) {
     AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
     token->type = type;
     token->lexeme = lexeme;
+    token->literal = literal;
     token->line = line;
     insert_dynamic_ptr_array(&scanner->tokens, token);
 }
 
 void read_file(const char* path) {
-    auri_debug_fprint("Opening file %s...\n", path);
-
     FILE* file = fopen(path, "r");
     if (!file) {
-        auri_throw_execution_error("The file '%s' can't be opened", path);
+        auri_throw_execution_error("The file '%s' can't be opened.\n", path);
         return;
     }
 
@@ -193,6 +198,9 @@ void read_file(const char* path) {
     fread(buffer, 1, length, file);
 
     buffer[length] = '\0';
+
+    auri_file = (AuriString*)malloc(sizeof(AuriString));
+    auri_strinit(auri_file);
     auri_strcat(auri_file, buffer, length + 1);
 
     free(buffer);

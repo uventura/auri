@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#define AURI_STRING_START_SIZE 1
+#define AURI_STRING_START_SIZE 10
 
 typedef struct {
     char* text;
