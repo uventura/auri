@@ -15,16 +15,22 @@ uint32_t current_position = 0;
 
 void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line);
 
-void read_file(const char* path);
+char* read_file(const char* path);
 bool match(char symbol);
 char peek();
 char advance();
 
 AuriScanner auri_scanner(const char* path) {
+    current_position = 0;
+
     AuriScanner scanner;
     init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
 
-    read_file(path);
+    char* buffer = read_file(path);
+    auri_file = (AuriString*)malloc(sizeof(AuriString));
+    auri_strinit(auri_file);
+    auri_strcat(auri_file, buffer, strlen(buffer));
+    free(buffer);
 
     char symbol = peek();
     uint32_t line = 0;
@@ -146,6 +152,8 @@ AuriScanner auri_scanner(const char* path) {
     }
 
     auri_strfree(auri_file);
+    free(auri_file);
+
     return scanner;
 }
 
@@ -178,11 +186,11 @@ void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, A
     insert_dynamic_ptr_array(&scanner->tokens, token);
 }
 
-void read_file(const char* path) {
+char* read_file(const char* path) {
     FILE* file = fopen(path, "r");
     if (!file) {
         auri_throw_execution_error("The file '%s' can't be opened.\n", path);
-        return;
+        return NULL;
     }
 
     fseek(file, 0, SEEK_END);
@@ -192,21 +200,16 @@ void read_file(const char* path) {
     char* buffer = (char*)malloc(sizeof(char) * (length + 1));
     if (!buffer) {
         auri_throw_execution_error("The file '%s' contains memory errors", path);
-        return;
+        return NULL;
     }
 
     fread(buffer, 1, length, file);
-
     buffer[length] = '\0';
-
-    auri_file = (AuriString*)malloc(sizeof(AuriString));
-    auri_strinit(auri_file);
-    auri_strcat(auri_file, buffer, length + 1);
-
-    free(buffer);
 
     rewind(file);
     fclose(file);
+
+    return buffer;
 }
 
 bool match(char symbol) {
