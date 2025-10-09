@@ -43,6 +43,11 @@ void auri_strcat(AuriString* dest, char* text, uint32_t size) {
     dest->text[dest->size] = '\0';
 }
 
+void auri_strclear(AuriString* str) {
+    auri_strfree(str);
+    auri_strinit(str);
+}
+
 void auri_strfree(AuriString* str) {
     if(str->text != NULL && str->capacity != 0) {
         free(str->text);

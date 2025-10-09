@@ -16,6 +16,8 @@ uint32_t current_position = 0;
 void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line);
 
 char* read_file(const char* path);
+
+void text(AuriString* lexeme, AuriString* literal);
 bool match(char symbol);
 char peek();
 char advance();
@@ -36,8 +38,11 @@ AuriScanner auri_scanner(const char* path) {
     uint32_t line = 0;
 
     while(symbol) {
-
         AuriTokenType type = AR_TOKEN_NONE;
+
+        AuriString literal;
+        auri_strinit(&literal);
+        auri_strcat(&literal, &symbol, 1);
 
         AuriString lexeme;
         auri_strinit(&lexeme);
@@ -110,10 +115,8 @@ AuriScanner auri_scanner(const char* path) {
                 break;
             }
             case '"': {
-                // type = AR_TOKEN_STRING;
-                // text(lexeme, line);
-                // lexeme += '"';
-                // literal = lexeme.substr(1, lexeme.size() - 2);
+                type = AR_TOKEN_STRING;
+                text(&lexeme, &literal);
                 break;
             }
             case ' ':
@@ -133,21 +136,18 @@ AuriScanner auri_scanner(const char* path) {
                 //     literal = lexeme;
                 // } else {
                 //     auri_throw_execution_error(
-                //         "In the file '%s' there is an unexpected element '%s' on line %d",
+                //         "In the file '%s' there is an unexpected element '%s' on line %d", path, lexeme.text, line
                 //     );
-                //     throw std::invalid_argument(
-                //         "In the file '" + filePath_ +
-                //         "' there is an unexpected element '" + lexeme +
-                //         "' on line " + std::to_string(line));
                 // }
                 break;
             }
         }
         symbol = advance();
         if(type != AR_TOKEN_NONE) {
-            append_token(&scanner, lexeme, lexeme, type, line);
+            append_token(&scanner, lexeme, literal, type, line);
         } else {
             auri_strfree(&lexeme);
+            auri_strfree(&literal);
         }
     }
 
@@ -210,6 +210,23 @@ char* read_file(const char* path) {
     fclose(file);
 
     return buffer;
+}
+
+void text(AuriString* lexeme, AuriString* literal) {
+    auri_strclear(literal);
+
+    char previous = peek();
+    char current = advance();
+
+    while(current != '"' && previous != '\\') {
+        auri_strcat(lexeme, &current, 1);
+        auri_strcat(literal, &current, 1);
+
+        previous = peek();
+        current = advance();
+    }
+
+    auri_strcat(lexeme, "\"", 1);
 }
 
 bool match(char symbol) {

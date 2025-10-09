@@ -6,5 +6,5 @@
 
 void auri_token_free(AuriToken* token) {
     auri_strfree(&token->lexeme);
-    // auri_strfree(&token->literal);
+    auri_strfree(&token->literal);
 }
