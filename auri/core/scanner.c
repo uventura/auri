@@ -16,7 +16,7 @@ char32_t advance();
 
 AuriScanner auri_scan(char* path) {
     AuriScanner scanner;
-    init_dynamic_ptr_array(&scanner.tokens, TOKENS);
+    init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
 
     auri_file = fopen(path, "r");
     if(!auri_file) {
@@ -70,7 +70,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_BANG;
                 if (match('=')) {
                     type = AR_TOKEN_BANG_EQUAL;
-                    auri_strcat_char32(&lexeme, U"=");
+                    auri_strcat(&lexeme, "=");
                 }
                 break;
             }
@@ -78,7 +78,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_EQUAL;
                 if (match('=')) {
                     type = AR_TOKEN_EQUAL_EQUAL;
-                    auri_strcat_char32(&lexeme, U"=");
+                    auri_strcat(&lexeme, "=");
                 }
                 break;
             }
@@ -86,7 +86,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_GREATER;
                 if (match('=')) {
                     type = AR_TOKEN_GREATER_EQUAL;
-                    auri_strcat_char32(&lexeme, U"=");
+                    auri_strcat(&lexeme, "=");
                 }
                 break;
             }
@@ -94,7 +94,7 @@ AuriScanner auri_scan(char* path) {
                 type = AR_TOKEN_LESS;
                 if (match('=')) {
                     type = AR_TOKEN_LESS_EQUAL;
-                    auri_strcat_char32(&lexeme, U"=");
+                    auri_strcat(&lexeme, "=");
                 }
                 break;
             }

@@ -13,6 +13,7 @@ typedef struct {
 } AuriCli;
 
 AuriCli auri_cli(int argc, char* argv[]);
+void auri_cli_free(AuriCli* cli);
 void auri_help();
 
 #endif

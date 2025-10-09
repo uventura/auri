@@ -27,12 +27,16 @@ AuriCli auri_cli(int argc, char* argv[]) {
         } else {
             AuriString* path = (AuriString*) malloc(sizeof(AuriString));
             auri_strinit(path);
-            auri_strcat_char(path, argv[i]);
+            auri_strcat(path, argv[i]);
             insert_dynamic_ptr_array(&cli.file_paths, path);
         }
     }
 
     return cli;
+}
+
+void auri_cli_free(AuriCli* cli) {
+    free_dynamic_ptr_array(&cli->file_paths);
 }
 
 void auri_help() {

@@ -1,4 +1,5 @@
 #include "auri/utils/array.h"
+#include "auri/utils/string.h"
 
 #include <malloc.h>
 #include <stddef.h>
@@ -22,8 +23,13 @@ void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element) {
 
 void free_dynamic_ptr_array(DArrayVoidPtr* array) {
     for(uint32_t i=0; i < array->size; ++i) {
-        free(array->array[i]);
+        if(array->type == STRING_TYPE) {
+            auri_strfree(*array->array);
+        } else {
+            free(array->array[i]);
+        }
     }
+
     array->array = NULL;
     array->size = 0;
     array->capacity = 0;
