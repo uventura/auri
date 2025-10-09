@@ -18,7 +18,9 @@ uint32_t auri_text_size(char32_t* str);
 
 void auri_strinit(AuriString* str);
 
+int auri_char32_to_utf8(char *out, char32_t ch);
 char32_t auri_char_to_char32(char symbol);
+
 void auri_strcat_char(AuriString* dest, char* text);
 void auri_strcat_char32(AuriString* dest, char32_t* text);
 

@@ -136,7 +136,7 @@ AuriScanner auri_scan(char* path) {
 
         AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
         token->type = type;
-        insert_dynamic_ptr_array(&scanner.tokens, token, 1);
+        insert_dynamic_ptr_array(&scanner.tokens, token);
         //void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size);
     }
 

@@ -8,12 +8,12 @@
 typedef struct {
     void** array;
     uint32_t size;
-    uint32_t count;
+    uint32_t capacity;
     BasicType type;
 } DArrayVoidPtr;
 
 void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type);
-void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element, uint32_t size);
+void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element);
 void free_dynamic_ptr_array(DArrayVoidPtr* array);
 
 #endif
