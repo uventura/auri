@@ -8,29 +8,45 @@ FLAGS += -g
 FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
 FLAGS += -std=c11
-FLAGS += -DENABLE_DEBUG
-FLAGS += -fsanitize=address
-FLAGS += -g
+
+DEBUG_FLAGS += $(FLAGS)
+DEBUG_FLAGS += -DENABLE_DEBUG
+DEBUG_FLAGS += -fsanitize=address
+DEBUG_FLAGS += -g
 
 OUT_DIR = out
-BIN_DIR = $(OUT_DIR)/bin
-BIN = $(BIN_DIR)/$(TARGET)
+RELEASE_DIR = $(OUT_DIR)/release
+DEBUG_DIR = $(OUT_DIR)/debug
+
+DEBUG_BIN_DIR = $(DEBUG_DIR)/bin
+RELEASE_BIN_DIR = $(RELEASE_DIR)/bin
 
 SRC_DIR = auri
 SRC = $(shell find $(SRC_DIR) -name '*.c')
 
-OBJ_DIR = $(OUT_DIR)/obj
-OBJS=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o, $(SRC))
+OBJ_RELEASE_DIR = $(RELEASE_DIR)/obj
+OBJS_RELEASE=$(patsubst $(SRC_DIR)/%.c,$(OBJ_RELEASE_DIR)/%.o, $(SRC))
 
-all: $(TARGET)
+OBJ_DEBUG_DIR = $(DEBUG_DIR)/obj
+OBJS_DEBUG=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DEBUG_DIR)/%.o, $(SRC))
 
-$(TARGET): $(OBJS)
-	@mkdir -p $(BIN_DIR)
-	$(CC) -o $(BIN_DIR)/$@ $^ $(FLAGS) -I .
+$(TARGET): $(OBJS_RELEASE)
+	@mkdir -p $(RELEASE_BIN_DIR)
+	$(CC) -o $(RELEASE_BIN_DIR)/$@ $^ $(FLAGS) -I .
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_RELEASE_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(FLAGS) -o $@ -c $< -I .
+
+$(OBJ_DEBUG_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(DEBUG_FLAGS) -o $@ -c $< -I .
+
+release: $(TARGET)
+
+debug: $(OBJS_DEBUG)
+	@mkdir -p $(DEBUG_BIN_DIR)
+	$(CC) -o $(DEBUG_BIN_DIR)/$(TARGET) $^ $(DEBUG_FLAGS) -I .
 
 clean:
 	@echo "Clean up environment..."

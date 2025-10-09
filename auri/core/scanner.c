@@ -204,6 +204,8 @@ void read_file(const char* path) {
     auri_strcat(auri_file, buffer, length + 1);
 
     free(buffer);
+
+    rewind(file);
     fclose(file);
 }
 
