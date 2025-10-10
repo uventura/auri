@@ -13,14 +13,16 @@
 AuriString* auri_file;
 uint32_t current_position = 0;
 
-void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line);
+void append_token(AuriScanner* scanner, AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line);
 
 char* read_file(const char* path);
 
-void text(AuriString* lexeme, AuriString* literal);
+void text(AuriString* lexeme, AuriLiteral* literal);
+void digit(AuriString* lexeme);
 bool match(char symbol);
 char peek();
 char advance();
+bool eof();
 
 AuriScanner auri_scanner(const char* path) {
     current_position = 0;
@@ -40,9 +42,9 @@ AuriScanner auri_scanner(const char* path) {
     while(symbol) {
         AuriTokenType type = AR_TOKEN_NONE;
 
-        AuriString literal;
-        auri_strinit(&literal);
-        auri_strcat(&literal, &symbol, 1);
+        AuriLiteral literal;
+        auri_strinit(&literal.string);
+        auri_strcat(&literal.string, &symbol, 1);
 
         AuriString lexeme;
         auri_strinit(&lexeme);
@@ -127,13 +129,14 @@ AuriScanner auri_scanner(const char* path) {
                 line++;
                 break;
             default: {
-                // if (isdigit(symbol)) {
-                //     type = AR_TOKEN_NUMBER;
-                //     digit(lexeme);
-                //     literal = stod(lexeme);
+                if (isdigit(symbol)) {
+                    type = AR_TOKEN_NUMBER;
+                    digit(&lexeme);
+                    literal.numeric = strtod(lexeme.text, NULL);
+                }
                 // } else if (isalpha(symbol)) {
                 //     identifier(lexeme, type);
-                //     literal = lexeme;
+                //     string = lexeme;
                 // } else {
                 //     auri_throw_execution_error(
                 //         "In the file '%s' there is an unexpected element '%s' on line %d", path, lexeme.text, line
@@ -147,7 +150,7 @@ AuriScanner auri_scanner(const char* path) {
             append_token(&scanner, lexeme, literal, type, line);
         } else {
             auri_strfree(&lexeme);
-            auri_strfree(&literal);
+            auri_strfree(&literal.string);
         }
     }
 
@@ -164,7 +167,7 @@ void auri_print_tokens(AuriScanner* scanner) {
 
     for(uint32_t i = 0; i < scanner->tokens.size; ++i) {
         AuriToken* token = scanner->tokens.array[i];
-        printf("| Token: (Line: %04d) '%s'\n", token->line, token->lexeme.text);
+        printf("| Token: (Line: %04d) <%s>:: '%s'\n", token->line, auri_token_name(token->type), token->lexeme.text);
     }
 
     printf("=========================\n");
@@ -177,7 +180,7 @@ void auri_scanner_free(AuriScanner* scanner) {
     free_dynamic_ptr_array(&scanner->tokens);
 }
 
-void append_token(AuriScanner* scanner, AuriString lexeme, AuriString literal, AuriTokenType type, uint32_t line) {
+void append_token(AuriScanner* scanner, AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line) {
     AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
     token->type = type;
     token->lexeme = lexeme;
@@ -212,25 +215,48 @@ char* read_file(const char* path) {
     return buffer;
 }
 
-void text(AuriString* lexeme, AuriString* literal) {
-    auri_strclear(literal);
+void text(AuriString* lexeme, AuriLiteral* literal) {
+    auri_strclear(&literal->string);
 
     char previous = peek();
     char current = advance();
 
-    while(current != '"' && previous != '\\') {
+    while(current != '"' && !eof()) {
         auri_strcat(lexeme, &current, 1);
-        auri_strcat(literal, &current, 1);
+        auri_strcat(&literal->string, &current, 1);
 
         previous = peek();
         current = advance();
+
+        if(current == '"' && previous == '\\') {
+            auri_strcat(&literal->string, &current, 1);
+            previous = peek();
+            current = advance();
+        }
     }
 
     auri_strcat(lexeme, "\"", 1);
 }
 
+void digit(AuriString* lexeme) {
+    char symbol = advance();
+    while(!eof() && isdigit(symbol)) {
+        auri_strcat(lexeme, &symbol, 1);
+        symbol = advance();
+    }
+
+    if(!eof() && symbol == '.') {
+        auri_strcat(lexeme, &symbol, 1);
+        symbol = advance();
+        while(!eof() && isdigit(symbol)) {
+            auri_strcat(lexeme, &symbol, 1);
+            symbol = advance();
+        }
+    }
+}
+
 bool match(char symbol) {
-    if(current_position + 1 >= auri_file->size) {
+    if(eof()) {
         return false;
     }
 
@@ -247,9 +273,13 @@ char peek() {
 }
 
 char advance() {
-    if(current_position + 1 < auri_file->size) {
-        current_position++;
+    if(!eof()) {
+        ++current_position;
         return peek();
     }
     return '\0';
+}
+
+bool eof() {
+    return current_position >= auri_file->size;
 }

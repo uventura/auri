@@ -64,13 +64,21 @@ typedef enum {
     AR_TOKEN_NONE
 } AuriTokenType;
 
+typedef union {
+    AuriString string;
+    double numeric;
+    bool boolean;
+} AuriLiteral;
+
 typedef struct {
     AuriString lexeme;
-    AuriString literal;
-    AuriTokenType type;
     uint32_t line;
+    AuriTokenType type;
+    AuriLiteral literal;
 } AuriToken;
 
+AuriToken* auri_token_init(AuriString lexeme, uint32_t line, AuriTokenType type, AuriLiteral literal);
 void auri_token_free(AuriToken* token);
+const char* auri_token_name(AuriTokenType token_type);
 
 #endif
