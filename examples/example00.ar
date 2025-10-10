@@ -3,6 +3,7 @@
 
 <=
 
+
 >
 
 >= >= ()
@@ -26,3 +27,5 @@
 string\""
 
 10000.27
+
+fun if this_is_identifier

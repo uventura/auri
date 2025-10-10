@@ -7,6 +7,8 @@
 
 #include <uchar.h>
 
+#define AURI_TOKEN_IDENTIFIER_START 1000
+
 typedef enum {
     // Math Operators
     AR_TOKEN_LEFT_PAREN,
@@ -33,7 +35,7 @@ typedef enum {
     AR_TOKEN_NUMBER,
     AR_TOKEN_IDENTIFIER,
     // Variables
-    AR_TOKEN_GENERIC_VAR,
+    AR_TOKEN_GENERIC_VAR = AURI_TOKEN_IDENTIFIER_START,
     AR_TOKEN_NUMERIC_VAR,
     AR_TOKEN_STRING_VAR,
     AR_TOKEN_BOOL_VAR,
@@ -64,6 +66,9 @@ typedef enum {
     AR_TOKEN_NONE
 } AuriTokenType;
 
+extern const uint32_t AuriTokenIdentifiersSize;
+extern const char*  AuriTokenIdentifiers[];
+
 typedef union {
     AuriString string;
     double numeric;
@@ -77,7 +82,7 @@ typedef struct {
     AuriLiteral literal;
 } AuriToken;
 
-AuriToken* auri_token_init(AuriString lexeme, uint32_t line, AuriTokenType type, AuriLiteral literal);
+AuriToken* auri_token_init(AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line);
 void auri_token_free(AuriToken* token);
 const char* auri_token_name(AuriTokenType token_type);
 

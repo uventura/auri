@@ -39,7 +39,7 @@ void auri_cli_free(AuriCli* cli) {
     free_dynamic_ptr_array(&cli->file_paths);
 }
 
-void auri_help() {
+void auri_help(void) {
     printf("====================================\n");
     printf("|               HELP               |\n");
     printf("====================================\n");

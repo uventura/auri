@@ -1,4 +1,4 @@
-CC = gcc
+CC = clang
 TARGET = auri
 FLAGS = -W
 FLAGS += -Wall
@@ -11,8 +11,9 @@ FLAGS += -std=c11
 
 DEBUG_FLAGS += $(FLAGS)
 DEBUG_FLAGS += -DENABLE_DEBUG
-DEBUG_FLAGS += -fsanitize=address
+DEBUG_FLAGS += -fsanitize=address,undefined
 DEBUG_FLAGS += -g
+DEBUG_FLAGS += -O1
 
 OUT_DIR = out
 RELEASE_DIR = $(OUT_DIR)/release

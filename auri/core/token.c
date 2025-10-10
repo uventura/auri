@@ -5,7 +5,34 @@
 #include <malloc.h>
 #include <stdio.h>
 
-AuriToken* auri_token_init(AuriString lexeme, uint32_t line, AuriTokenType type, AuriLiteral literal) {
+const uint32_t AuriTokenIdentifiersSize = 23;
+const char*  AuriTokenIdentifiers[] = {
+    "var",
+    "numeric",
+    "string",
+    "bool",
+    "if",
+    "else",
+    "else_if",
+    "for",
+    "while",
+    "return",
+    "true",
+    "false",
+    "or",
+    "and",
+    "alias",
+    "as",
+    "import",
+    "fun",
+    "null",
+    "setup",
+    "pre_run",
+    "run",
+    "post_run"
+};
+
+AuriToken* auri_token_init(AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line) {
     AuriToken* token = (AuriToken*)malloc(sizeof(AuriToken));
     token->lexeme = lexeme;
     token->line = line;
@@ -19,7 +46,6 @@ void auri_token_free(AuriToken* token) {
     auri_strfree(&token->lexeme);
     auri_strfree(&token->literal.string);
 }
-
 
 const char* auri_token_name(AuriTokenType token_type) {
     switch(token_type) {
