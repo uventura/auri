@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 AuriString* auri_file;
+uint32_t line = 0;
 uint32_t current_position = 0;
 
 void append_token(AuriScanner* scanner, AuriToken* token);
@@ -29,6 +30,7 @@ bool eof(void);
 
 AuriScanner auri_scanner(const char* path) {
     current_position = 0;
+    uint32_t line = 0;
 
     AuriScanner scanner;
     init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
@@ -40,7 +42,6 @@ AuriScanner auri_scanner(const char* path) {
     free(buffer);
 
     char symbol = peek();
-    uint32_t line = 0;
 
     while(symbol) {
         AuriTokenType type = AR_TOKEN_NONE;
@@ -141,11 +142,11 @@ AuriScanner auri_scanner(const char* path) {
                 } else if(isalpha(symbol)) {
                     type = identifier(&lexeme, &literal);
                 }
-                // else {
-                //     auri_throw_execution_error(
-                //         "In the file '%s' there is an unexpected element '%s' on line %d", path, lexeme.text, line
-                //     );
-                // }
+                else {
+                    auri_throw_execution_error(
+                        "In the file '%s' there is an unexpected element '%s' on line %d\n", path, lexeme.text, line
+                    );
+                }
                 break;
             }
         }
@@ -232,6 +233,8 @@ void text(AuriString* lexeme, AuriLiteral* literal) {
             auri_strcat(&literal->string, &current, 1);
             previous = peek();
             current = advance();
+        } else if(current == '\n') {
+            line++;
         }
     }
 
