@@ -13,7 +13,7 @@ const char*  AuriTokenIdentifiers[] = {
     "bool",
     "if",
     "else",
-    "else_if",
+    "elseif",
     "for",
     "while",
     "return",

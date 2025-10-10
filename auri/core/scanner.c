@@ -10,12 +10,11 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-AuriString* auri_file;
-uint32_t line = 0;
-uint32_t current_position = 0;
+AuriString* auri_scanner_file;
+uint32_t auri_scanner_line = 0;
+uint32_t auri_scanner_current_position = 0;
 
 void append_token(AuriScanner* scanner, AuriToken* token);
-
 char* read_file(const char* path);
 
 void text(AuriString* lexeme, AuriLiteral* literal);
@@ -29,16 +28,16 @@ char advance(void);
 bool eof(void);
 
 AuriScanner auri_scanner(const char* path) {
-    current_position = 0;
-    uint32_t line = 0;
+    auri_scanner_current_position = 0;
+    auri_scanner_line = 0;
 
     AuriScanner scanner;
     init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
 
     char* buffer = read_file(path);
-    auri_file = (AuriString*)malloc(sizeof(AuriString));
-    auri_strinit(auri_file);
-    auri_strcat(auri_file, buffer, strlen(buffer));
+    auri_scanner_file = (AuriString*)malloc(sizeof(AuriString));
+    auri_strinit(auri_scanner_file);
+    auri_strcat(auri_scanner_file, buffer, strlen(buffer));
     free(buffer);
 
     char symbol = peek();
@@ -130,7 +129,7 @@ AuriScanner auri_scanner(const char* path) {
             case '\t':
                 break;
             case '\n':
-                line++;
+                auri_scanner_line++;
                 break;
             default: {
                 if (isdigit(symbol)) {
@@ -144,7 +143,7 @@ AuriScanner auri_scanner(const char* path) {
                 }
                 else {
                     auri_throw_execution_error(
-                        "In the file '%s' there is an unexpected element '%s' on line %d\n", path, lexeme.text, line
+                        "In the file '%s' there is an unexpected element '%s' on auri_scanner_line %d\n", path, lexeme.text, auri_scanner_line
                     );
                 }
                 break;
@@ -152,7 +151,7 @@ AuriScanner auri_scanner(const char* path) {
         }
         symbol = advance();
         if(type != AR_TOKEN_NONE) {
-            AuriToken* token = auri_token_init(lexeme, literal, type, line);
+            AuriToken* token = auri_token_init(lexeme, literal, type, auri_scanner_line);
             append_token(&scanner, token);
         } else {
             auri_strfree(&lexeme);
@@ -160,8 +159,8 @@ AuriScanner auri_scanner(const char* path) {
         }
     }
 
-    auri_strfree(auri_file);
-    free(auri_file);
+    auri_strfree(auri_scanner_file);
+    free(auri_scanner_file);
 
     return scanner;
 }
@@ -173,7 +172,7 @@ void auri_print_tokens(AuriScanner* scanner) {
 
     for(uint32_t i = 0; i < scanner->tokens.size; ++i) {
         AuriToken* token = scanner->tokens.array[i];
-        printf("| Token[%d]: (Line: %04d) <%s>:: '%s'\n", i, token->line + 1, auri_token_name(token->type), token->lexeme.text);
+        printf("| Token[%d]: (auri_scanner_line: %04d) <%s>:: '%s'\n", i, token->line + 1, auri_token_name(token->type), token->lexeme.text);
     }
 
     printf("=========================\n");
@@ -221,6 +220,7 @@ void text(AuriString* lexeme, AuriLiteral* literal) {
 
     char previous = peek();
     char current = advance();
+    uint32_t line = auri_scanner_line;
 
     while(current != '"' && !eof()) {
         auri_strcat(lexeme, &current, 1);
@@ -234,8 +234,12 @@ void text(AuriString* lexeme, AuriLiteral* literal) {
             previous = peek();
             current = advance();
         } else if(current == '\n') {
-            line++;
+            auri_scanner_line++;
         }
+    }
+
+    if(peek() != '"') {
+        auri_throw_execution_error("The string on line %d doesn't have an end.\n", line + 1);
     }
 
     auri_strcat(lexeme, "\"", 1);
@@ -283,7 +287,7 @@ bool match(char symbol) {
         return false;
     }
 
-    if(auri_file->text[current_position + 1] == symbol) {
+    if(auri_scanner_file->text[auri_scanner_current_position + 1] == symbol) {
         advance();
         return true;
     }
@@ -292,12 +296,12 @@ bool match(char symbol) {
 }
 
 char peek(void) {
-    return auri_strchar(auri_file, current_position);
+    return auri_strchar(auri_scanner_file, auri_scanner_current_position);
 }
 
 char back(void) {
-    if(current_position > 0) {
-        --current_position;
+    if(auri_scanner_current_position > 0) {
+        --auri_scanner_current_position;
         return peek();
     }
 
@@ -306,12 +310,12 @@ char back(void) {
 
 char advance(void) {
     if(!eof()) {
-        ++current_position;
+        ++auri_scanner_current_position;
         return peek();
     }
     return '\0';
 }
 
 bool eof(void) {
-    return current_position >= auri_file->size;
+    return auri_scanner_current_position >= auri_scanner_file->size;
 }

@@ -12,6 +12,10 @@ run testing_scope_execution {
 
 run testing_another_execution {
     fun my_function(element_a, element_b) {
+        elseif(1 > 2) {
+            print("Hello, World!");
+        }
+
         return 42.456768;
     }
 }

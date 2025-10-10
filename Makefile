@@ -9,6 +9,9 @@ FLAGS += -Wno-unused-parameter
 FLAGS += -Wno-implicit-fallthrough
 FLAGS += -std=c11
 
+RELEASE_FLAGS += $(FLAGS)
+RELEASE_FLAGS += -O3
+
 DEBUG_FLAGS += $(FLAGS)
 DEBUG_FLAGS += -DENABLE_DEBUG
 DEBUG_FLAGS += -fsanitize=address,undefined
@@ -33,11 +36,11 @@ OBJS_DEBUG=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DEBUG_DIR)/%.o, $(SRC))
 
 $(TARGET): $(OBJS_RELEASE)
 	@mkdir -p $(RELEASE_BIN_DIR)
-	$(CC) -o $(RELEASE_BIN_DIR)/$@ $^ $(FLAGS) -I .
+	$(CC) -o $(RELEASE_BIN_DIR)/$@ $^ $(RELEASE_FLAGS) -I .
 
 $(OBJ_RELEASE_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(FLAGS) -o $@ -c $< -I .
+	$(CC) $(RELEASE_FLAGS) -o $@ -c $< -I .
 
 $(OBJ_DEBUG_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
