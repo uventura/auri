@@ -23,6 +23,7 @@ AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal);
 
 bool match(char symbol);
 char peek(void);
+char back(void);
 char advance(void);
 bool eof(void);
 
@@ -252,6 +253,8 @@ void digit(AuriString* lexeme) {
             symbol = advance();
         }
     }
+
+    back();
 }
 
 AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal) {
@@ -287,6 +290,15 @@ bool match(char symbol) {
 
 char peek(void) {
     return auri_strchar(auri_file, current_position);
+}
+
+char back(void) {
+    if(current_position > 0) {
+        --current_position;
+        return peek();
+    }
+
+    return peek();
 }
 
 char advance(void) {
