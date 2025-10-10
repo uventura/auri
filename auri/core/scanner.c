@@ -21,6 +21,8 @@ void text(AuriString* lexeme, AuriLiteral* literal);
 void digit(AuriString* lexeme);
 AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal);
 
+AuriToken* eof_token(void);
+
 bool match(char symbol);
 char peek(void);
 char back(void);
@@ -159,6 +161,8 @@ AuriScanner auri_scanner(const char* path) {
         }
     }
 
+    append_token(&scanner, eof_token());
+
     auri_strfree(auri_scanner_file);
     free(auri_scanner_file);
 
@@ -280,6 +284,16 @@ AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal) {
     }
 
     return AR_TOKEN_IDENTIFIER;
+}
+
+AuriToken* eof_token(void) {
+    AuriString lexeme;
+    lexeme.text = NULL;
+
+    AuriLiteral literal;
+    literal.numeric = 0;
+
+    return auri_token_init(lexeme, literal, AR_TOKEN_EOF, auri_scanner_line);
 }
 
 bool match(char symbol) {
