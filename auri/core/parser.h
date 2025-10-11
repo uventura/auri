@@ -11,9 +11,8 @@ typedef enum {
 } AuriNodeType;
 
 typedef struct Node {
-    AuriToken* token;
     AuriNodeType type;
-    AuriToken* op;
+    AuriToken* token;
     struct Node* left;
     struct Node* right;
 } AuriNode;
