@@ -1,6 +1,11 @@
 #include "auri/core/printer.h"
 
 #include <stdio.h>
+#include <stdint.h>
+
+uint32_t ast_spaces_counter = 0;
+
+void ast_print_spaces(void);
 
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
@@ -15,6 +20,10 @@ void auri_ast_print(AuriNode* node) {
     ast_print_node(node);
 
     printf("\n=========================\n");
+}
+
+void ast_print_spaces(void) {
+    for(uint32_t i = 0; i < ast_spaces_counter; ++i) printf("|    ");
 }
 
 void ast_print_node(AuriNode* node) {
@@ -34,32 +43,71 @@ void ast_print_node(AuriNode* node) {
 }
 
 void ast_print_unary(AuriNode* node) {
-    printf("%s", node->token->lexeme.text);
+    ast_print_spaces();
+    printf("[Unary] <<<\n");
+
+    ast_spaces_counter++;
+    ast_print_spaces();
+    printf("  \\\n");
+
+    ast_print_spaces();
+    printf(" [%s]\n", node->token->lexeme.text);
+
+    ast_print_spaces();
+    printf("  /\n");
+    ast_spaces_counter--;
+
+    ast_spaces_counter++;
     ast_print_node(node->right);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>>\n");
 }
 
 void ast_print_binary(AuriNode* node) {
+    ast_print_spaces();
+    printf("[Binary] <<< \n");
+
+    ast_spaces_counter++;
     ast_print_node(node->left);
-    printf("Op: %s\n", node->token->lexeme.text);
+    ast_spaces_counter--;
+
+    ast_spaces_counter++;
+    ast_print_spaces();
+    printf("  \\\n");
+
+    ast_print_spaces();
+    printf("  [%s]\n", node->token->lexeme.text);
+
+    ast_print_spaces();
+    printf("  /\n");
+    ast_spaces_counter--;
+
+    ast_spaces_counter++;
     ast_print_node(node->right);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>>\n");
 }
 
 void ast_print_literal(AuriNode* node) {
+    ast_print_spaces();
     switch(node->token->type) {
         case AR_TOKEN_STRING:
-            printf("%s", node->token->lexeme.text);
+            printf(" (%s)\n", node->token->lexeme.text);
             break;
         case AR_TOKEN_NUMBER:
-            printf("%lf", node->token->literal.numeric);
+            printf(" (%lf)\n", node->token->literal.numeric);
             break;
         case AR_TOKEN_TRUE:
-            printf("true");
+            printf(" (true)\n");
             break;
         case AR_TOKEN_FALSE:
-            printf("false");
+            printf(" (false)\n");
             break;
         default:
             break;
     }
-    printf("\n");
 }

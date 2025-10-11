@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
             auri_ast_print(ast->node);
         }
 
+        auri_parser_free(ast);
         auri_scanner_free(&scanner);
         printf("End of '%s'\n\n", path->text);
     }

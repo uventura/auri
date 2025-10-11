@@ -22,5 +22,6 @@ typedef struct {
 } AuriAst;
 
 AuriAst* auri_parser(AuriScanner* scanner);
+void auri_parser_free(AuriAst* ast);
 
 #endif

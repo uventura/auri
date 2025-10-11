@@ -11,6 +11,7 @@ AuriNode* auri_parser_node;
 uint32_t auri_parser_token_pos = 0;
 
 AuriNode* node_init(AuriNodeType type, AuriToken* token, AuriNode* left, AuriNode* right);
+void node_free(AuriNode* node);
 
 AuriNode* expression(void);
 AuriNode* factor(void);
@@ -36,6 +37,34 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     return ast;
 }
 
+void auri_parser_free(AuriAst* ast) {
+    node_free(ast->node);
+    free(ast->node);
+    free(ast);
+}
+
+AuriNode* node_init(AuriNodeType type, AuriToken* token, AuriNode* left, AuriNode* right) {
+    AuriNode* node = (AuriNode*) malloc(sizeof(AuriNode));
+    node->type = type;
+    node->token = token;
+    node->left = left;
+    node->right = right;
+
+    return node;
+}
+
+void node_free(AuriNode* node) {
+    if(node->left != NULL) {
+        node_free(node->left);
+        free(node->left);
+    }
+
+    if(node->right != NULL) {
+        node_free(node->right);
+        free(node->right);
+    }
+}
+
 AuriNode* expression(void) {
     return factor();
 }
@@ -45,28 +74,17 @@ AuriNode* factor(void) {
 
     AuriNode* current = node;
     while(parser_match(2, AR_TOKEN_STAR, AR_TOKEN_SLASH)) {
+        current->left = node_init(current->type, current->token, current->left, current->right);
         current->type = AST_NODE_BINARY;
-        current->left = current;
         current->token = parser_previous();
         current->right = unary();
 
         current = current->right;
     }
 
-    printf("Left: %lf\n", node->left->token->literal.numeric);
-    printf("Operator: %s\n", node->token->lexeme.text);
     return node;
 }
-/*
-1 * 23 * 56
 
-   *
- /   \
-1     *
-    /   \
-  23     56
-
-*/
 AuriNode* unary(void) {
     if(parser_match(2, AR_TOKEN_BANG_EQUAL, AR_TOKEN_MINUS)) {
         AuriToken* operator = parser_previous();
@@ -84,16 +102,6 @@ AuriNode* primary(void) {
     auri_throw_execution_error("Literal undefined (Line: %d)[%s]: %s\n",
         parser_peek()->line + 1, auri_token_name(parser_peek()->type), parser_peek()->lexeme.text);
     return NULL;
-}
-
-AuriNode* node_init(AuriNodeType type, AuriToken* token, AuriNode* left, AuriNode* right) {
-    AuriNode* node = (AuriNode*) malloc(sizeof(AuriNode));
-    node->type = type;
-    node->token = token;
-    node->left = left;
-    node->right = right;
-
-    return node;
 }
 
 bool parser_match(uint32_t size, ...) {
