@@ -8,10 +8,11 @@ typedef enum {
     AST_NODE_UNARY,
     AST_NODE_BINARY,
     AST_NODE_GROUPING
-} AuriAstType;
+} AuriNodeType;
 
 typedef struct Node {
     AuriToken* token;
+    AuriNodeType type;
     AuriToken* op;
     struct Node* left;
     struct Node* right;

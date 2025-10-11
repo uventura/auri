@@ -169,7 +169,7 @@ const char* auri_token_name(AuriTokenType token_type) {
         case AR_TOKEN_FUN:
             return "FUN";
             break;
-        case AR_TOKEN_AR_NULL:
+        case AR_TOKEN_NULL:
             return "AR_NULL";
             break;
         case AR_TOKEN_SETUP:

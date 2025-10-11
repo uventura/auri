@@ -21,13 +21,13 @@ void text(AuriString* lexeme, AuriLiteral* literal);
 void digit(AuriString* lexeme);
 AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal);
 
-AuriToken* eof_token(void);
+AuriToken* scanner_eof_token(void);
 
-bool match(char symbol);
-char peek(void);
-char back(void);
-char advance(void);
-bool eof(void);
+bool scanner_match(char symbol);
+char scanner_peek(void);
+char scanner_back(void);
+char scanner_advance(void);
+bool scanner_eof(void);
 
 AuriScanner auri_scanner(const char* path) {
     auri_scanner_current_position = 0;
@@ -42,7 +42,7 @@ AuriScanner auri_scanner(const char* path) {
     auri_strcat(auri_scanner_file, buffer, strlen(buffer));
     free(buffer);
 
-    char symbol = peek();
+    char symbol = scanner_peek();
 
     while(symbol) {
         AuriTokenType type = AR_TOKEN_NONE;
@@ -91,7 +91,7 @@ AuriScanner auri_scanner(const char* path) {
                 break;
             case '!': {
                 type = AR_TOKEN_BANG;
-                if (match('=')) {
+                if (scanner_match('=')) {
                     type = AR_TOKEN_BANG_EQUAL;
                     auri_strcat(&lexeme, "=", 1);
                 }
@@ -99,7 +99,7 @@ AuriScanner auri_scanner(const char* path) {
             }
             case '=': {
                 type = AR_TOKEN_EQUAL;
-                if (match('=')) {
+                if (scanner_match('=')) {
                     type = AR_TOKEN_EQUAL_EQUAL;
                     auri_strcat(&lexeme, "=", 1);
                 }
@@ -107,7 +107,7 @@ AuriScanner auri_scanner(const char* path) {
             }
             case '>': {
                 type = AR_TOKEN_GREATER;
-                if (match('=')) {
+                if (scanner_match('=')) {
                     type = AR_TOKEN_GREATER_EQUAL;
                     auri_strcat(&lexeme, "=", 1);
                 }
@@ -115,7 +115,7 @@ AuriScanner auri_scanner(const char* path) {
             }
             case '<': {
                 type = AR_TOKEN_LESS;
-                if (match('=')) {
+                if (scanner_match('=')) {
                     type = AR_TOKEN_LESS_EQUAL;
                     auri_strcat(&lexeme, "=", 1);
                 }
@@ -151,7 +151,7 @@ AuriScanner auri_scanner(const char* path) {
                 break;
             }
         }
-        symbol = advance();
+        symbol = scanner_advance();
         if(type != AR_TOKEN_NONE) {
             AuriToken* token = auri_token_init(lexeme, literal, type, auri_scanner_line);
             append_token(&scanner, token);
@@ -161,7 +161,7 @@ AuriScanner auri_scanner(const char* path) {
         }
     }
 
-    append_token(&scanner, eof_token());
+    append_token(&scanner, scanner_eof_token());
 
     auri_strfree(auri_scanner_file);
     free(auri_scanner_file);
@@ -222,27 +222,27 @@ char* read_file(const char* path) {
 void text(AuriString* lexeme, AuriLiteral* literal) {
     auri_strclear(&literal->string);
 
-    char previous = peek();
-    char current = advance();
+    char previous = scanner_peek();
+    char current = scanner_advance();
     uint32_t line = auri_scanner_line;
 
-    while(current != '"' && !eof()) {
+    while(current != '"' && !scanner_eof()) {
         auri_strcat(lexeme, &current, 1);
         auri_strcat(&literal->string, &current, 1);
 
-        previous = peek();
-        current = advance();
+        previous = scanner_peek();
+        current = scanner_advance();
 
         if(current == '"' && previous == '\\') {
             auri_strcat(&literal->string, &current, 1);
-            previous = peek();
-            current = advance();
+            previous = scanner_peek();
+            current = scanner_advance();
         } else if(current == '\n') {
             auri_scanner_line++;
         }
     }
 
-    if(peek() != '"') {
+    if(scanner_peek() != '"') {
         auri_throw_execution_error("The string on line %d doesn't have an end.\n", line + 1);
     }
 
@@ -250,31 +250,31 @@ void text(AuriString* lexeme, AuriLiteral* literal) {
 }
 
 void digit(AuriString* lexeme) {
-    char symbol = advance();
-    while(!eof() && isdigit(symbol)) {
+    char symbol = scanner_advance();
+    while(!scanner_eof() && isdigit(symbol)) {
         auri_strcat(lexeme, &symbol, 1);
-        symbol = advance();
+        symbol = scanner_advance();
     }
 
-    if(!eof() && symbol == '.') {
+    if(!scanner_eof() && symbol == '.') {
         auri_strcat(lexeme, &symbol, 1);
-        symbol = advance();
-        while(!eof() && isdigit(symbol)) {
+        symbol = scanner_advance();
+        while(!scanner_eof() && isdigit(symbol)) {
             auri_strcat(lexeme, &symbol, 1);
-            symbol = advance();
+            symbol = scanner_advance();
         }
     }
 
-    back();
+    scanner_back();
 }
 
 AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal) {
-    char symbol = advance();
+    char symbol = scanner_advance();
 
-    while((isalnum(symbol) || symbol == '_') && !eof()) {
+    while((isalnum(symbol) || symbol == '_') && !scanner_eof()) {
         auri_strcat(lexeme, &symbol, 1);
         auri_strcat(&literal->string, &symbol, 1);
-        symbol = advance();
+        symbol = scanner_advance();
     }
 
     for(uint32_t i = 0; i < AuriTokenIdentifiersSize; ++i) {
@@ -286,7 +286,7 @@ AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal) {
     return AR_TOKEN_IDENTIFIER;
 }
 
-AuriToken* eof_token(void) {
+AuriToken* scanner_eof_token(void) {
     AuriString lexeme;
     lexeme.text = NULL;
 
@@ -296,40 +296,40 @@ AuriToken* eof_token(void) {
     return auri_token_init(lexeme, literal, AR_TOKEN_EOF, auri_scanner_line);
 }
 
-bool match(char symbol) {
-    if(eof()) {
+bool scanner_match(char symbol) {
+    if(scanner_eof()) {
         return false;
     }
 
     if(auri_scanner_file->text[auri_scanner_current_position + 1] == symbol) {
-        advance();
+        scanner_advance();
         return true;
     }
 
     return false;
 }
 
-char peek(void) {
+char scanner_peek(void) {
     return auri_strchar(auri_scanner_file, auri_scanner_current_position);
 }
 
-char back(void) {
+char scanner_back(void) {
     if(auri_scanner_current_position > 0) {
         --auri_scanner_current_position;
-        return peek();
+        return scanner_peek();
     }
 
-    return peek();
+    return scanner_peek();
 }
 
-char advance(void) {
-    if(!eof()) {
+char scanner_advance(void) {
+    if(!scanner_eof()) {
         ++auri_scanner_current_position;
-        return peek();
+        return scanner_peek();
     }
     return '\0';
 }
 
-bool eof(void) {
+bool scanner_eof(void) {
     return auri_scanner_current_position >= auri_scanner_file->size;
 }

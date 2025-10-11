@@ -17,14 +17,26 @@ whileStmt       → "while" "(" expression ")" blockStmt
 blockStmt       → defaultStmt ";" | "{" defaultStmt* "}"
 varStmt         → ("var" | "bool" | "numeric" | "string") IDENTIFIER ("=")? ";"
 
-expression      → literal
+expression      → primary
                 | unary
                 | binary
                 | grouping ;
 
-literal         → NUMBER | STRING | "true" | "false" | "null" ;
 grouping        → "(" expression ")" ;
 unary           → ( "-" | "!" ) expression ;
 binary          → expression operator expression ;
 operator        → "==" | "!=" | "<" | "<=" | ">" | ">="
                 | "+"  | "-"  | "*" | "/" ;
+primary         → NUMBER | STRING | "true" | "false" | "null" ;
+
+expression → assignment
+assignment → ( call "." )? IDENTIFIER "=" assignment
+or         → and (|| equality )*
+and        → equality (&& equality)*
+equality   → comparison (("==" | "!=") comparison)*
+comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term       → factor ( ( "-" | "+" ) factor )* ;
+factor     → unary ( ( "/" | "*" ) unary )* ;
+unary      → ( "!" | "-" ) unary | call ;
+call       → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+primary    → NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
