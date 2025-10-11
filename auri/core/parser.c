@@ -71,8 +71,8 @@ AuriNode* expression(void) {
 
 AuriNode* factor(void) {
     AuriNode* node = unary();
-
     AuriNode* current = node;
+
     while(parser_match(2, AR_TOKEN_STAR, AR_TOKEN_SLASH)) {
         current->left = node_init(current->type, current->token, current->left, current->right);
         current->type = AST_NODE_BINARY;
@@ -97,6 +97,15 @@ AuriNode* unary(void) {
 AuriNode* primary(void) {
     if(parser_match(5, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL)) {
         return node_init(AST_NODE_LITERAL, parser_previous(), NULL, NULL);
+    }
+
+    if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        AuriNode* expr = expression();
+        if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+            auri_throw_execution_error("No matching parenthesis in %d\n!", parser_peek()->line);
+        }
+
+        return expr;
     }
 
     auri_throw_execution_error("Literal undefined (Line: %d)[%s]: %s\n",

@@ -277,6 +277,7 @@ AuriTokenType identifier(AuriString* lexeme, AuriLiteral* literal) {
         symbol = scanner_advance();
     }
 
+    scanner_back();
     for(uint32_t i = 0; i < AuriTokenIdentifiersSize; ++i) {
         if(strcmp(lexeme->text, AuriTokenIdentifiers[i]) == 0) {
             return AURI_TOKEN_IDENTIFIER_START + i;
