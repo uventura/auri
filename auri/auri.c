@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 
         AuriAst* ast = auri_parser(&scanner);
         if(cli.enable_ast) {
-            auri_ast_print(ast->node);
+            auri_ast_print(ast);
         }
 
         auri_parser_free(ast);

@@ -2,6 +2,7 @@
 #define AURI_PARSER_H
 
 #include "auri/core/scanner.h"
+#include "auri/utils/array.h"
 
 typedef enum {
     AST_NODE_LITERAL,
@@ -18,7 +19,8 @@ typedef struct Node {
 } AuriNode;
 
 typedef struct {
-    AuriNode* node;
+    DArrayVoidPtr statements;
+    // AuriNode* node;
 } AuriAst;
 
 AuriAst* auri_parser(AuriScanner* scanner);

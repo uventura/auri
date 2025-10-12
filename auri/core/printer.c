@@ -12,12 +12,15 @@ void ast_print_unary(AuriNode* node);
 void ast_print_binary(AuriNode* node);
 void ast_print_literal(AuriNode* node);
 
-void auri_ast_print(AuriNode* node) {
+void auri_ast_print(AuriAst* ast) {
     printf("=========================\n");
     printf("|           AST         |\n");
     printf("=========================\n");
 
-    ast_print_node(node);
+    for(uint32_t i = 0; i < ast->statements.size; ++i) {
+        ast_print_node(ast->statements.array[i]);
+        printf("\n");
+    }
 
     printf("\n=========================\n");
 }

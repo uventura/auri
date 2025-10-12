@@ -7,13 +7,22 @@
 #include <stdio.h>
 
 AuriScanner* auri_parser_scanner;
-AuriNode* auri_parser_node;
 uint32_t auri_parser_token_pos = 0;
 
 AuriNode* node_init(AuriNodeType type, AuriToken* token, AuriNode* left, AuriNode* right);
 void node_free(AuriNode* node);
 
+// Statements
+AuriNode* expression_stmt(void);
+
+// Expressions
 AuriNode* expression(void);
+AuriNode* assignment(void);
+AuriNode* or(void);
+AuriNode* and(void);
+AuriNode* equality(void);
+AuriNode* comparison(void);
+AuriNode* term(void);
 AuriNode* factor(void);
 AuriNode* unary(void);
 AuriNode* primary(void);
@@ -21,25 +30,31 @@ AuriNode* primary(void);
 AuriToken* parser_peek(void);
 AuriToken* parser_previous(void);
 AuriToken* parser_advance(void);
+
 bool parser_match(uint32_t size, ...);
 bool parser_is_at_end(AuriScanner* scanner);
 
 AuriAst* auri_parser(AuriScanner* scanner) {
     AuriAst* ast = (AuriAst*)malloc(sizeof(AuriAst));
+    init_dynamic_ptr_array(&ast->statements, AST_TYPE);
+
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
 
     while(parser_is_at_end(scanner)) {
-        auri_parser_node = expression();
+        AuriNode* node = expression_stmt();
+        insert_dynamic_ptr_array(&ast->statements, node);
     }
 
-    ast->node = auri_parser_node;
     return ast;
 }
 
 void auri_parser_free(AuriAst* ast) {
-    node_free(ast->node);
-    free(ast->node);
+    for(uint32_t i = 0; i < ast->statements.size; ++i){
+        AuriNode* node = ast->statements.array[i];
+        node_free(node);
+    }
+    free_dynamic_ptr_array(&ast->statements);
     free(ast);
 }
 
@@ -65,24 +80,69 @@ void node_free(AuriNode* node) {
     }
 }
 
-AuriNode* expression(void) {
-    return factor();
+AuriNode* expression_stmt(void) {
+    AuriNode* expr = expression();
+    if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
+        auri_throw_execution_error("Missing ';' on line %d.\n", parser_peek()->line - 1);
+    }
+
+    return expr;
 }
 
-AuriNode* factor(void) {
-    AuriNode* node = unary();
+
+#define BINARY_NODE(func, comparison_args_size, ...) \
+    AuriNode* node = func();\
+    AuriNode* current = node;\
+    while(parser_match(comparison_args_size, __VA_ARGS__)) {\
+        current->left = node_init(current->type, current->token, current->left, current->right);\
+        current->type = AST_NODE_BINARY;\
+        current->token = parser_previous();\
+        current->right = func();\
+        current = current->right;\
+    }\
+    return node
+
+AuriNode* expression(void) {
+    return or();
+}
+
+AuriNode* assignment(void) {
+    return NULL;
+}
+
+AuriNode* or(void) {
+    AuriNode* node = and();
     AuriNode* current = node;
 
-    while(parser_match(2, AR_TOKEN_STAR, AR_TOKEN_SLASH)) {
+    while(parser_match(1, AR_TOKEN_OR)) {
         current->left = node_init(current->type, current->token, current->left, current->right);
         current->type = AST_NODE_BINARY;
         current->token = parser_previous();
-        current->right = unary();
-
+        current->right = equality();
         current = current->right;
     }
 
     return node;
+}
+
+AuriNode* and(void) {
+    BINARY_NODE(equality, 1, AR_TOKEN_AND);
+}
+
+AuriNode* equality(void) {
+    BINARY_NODE(comparison, 2, AR_TOKEN_EQUAL_EQUAL, AR_TOKEN_BANG_EQUAL);
+}
+
+AuriNode* comparison(void) {
+    BINARY_NODE(term, 4, AR_TOKEN_GREATER, AR_TOKEN_GREATER_EQUAL, AR_TOKEN_LESS, AR_TOKEN_LESS_EQUAL);
+}
+
+AuriNode* term(void) {
+    BINARY_NODE(factor, 2, AR_TOKEN_MINUS, AR_TOKEN_PLUS);
+}
+
+AuriNode* factor(void) {
+    BINARY_NODE(unary, 2, AR_TOKEN_STAR, AR_TOKEN_SLASH);
 }
 
 AuriNode* unary(void) {

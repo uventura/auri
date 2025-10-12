@@ -3,6 +3,6 @@
 
 #include "auri/core/parser.h"
 
-void auri_ast_print(AuriNode* node);
+void auri_ast_print(AuriAst* ast);
 
 #endif
