@@ -11,6 +11,8 @@ AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
 
 // Statements
+AuriNode* statement(void);
+AuriNode* import_stmt(void);
 AuriNode* expression_stmt(void);
 
 // Expressions
@@ -40,7 +42,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     auri_parser_token_pos = 0;
 
     while(parser_is_at_end(scanner)) {
-        AuriNode* node = expression_stmt();
+        AuriNode* node = statement();
         insert_dynamic_ptr_array(&ast->statements, node);
     }
 
@@ -54,6 +56,16 @@ void auri_parser_free(AuriAst* ast) {
     }
     free_dynamic_ptr_array(&ast->statements);
     free(ast);
+}
+
+AuriNode* statement(void) {
+    if(parser_match(1, AR_TOKEN_IMPORT)) import_stmt();
+
+    return expression_stmt();
+}
+
+AuriNode* import_stmt(void) {
+    return NULL;
 }
 
 AuriNode* expression_stmt(void) {
