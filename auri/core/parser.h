@@ -4,23 +4,8 @@
 #include "auri/core/scanner.h"
 #include "auri/utils/array.h"
 
-typedef enum {
-    AST_NODE_LITERAL,
-    AST_NODE_UNARY,
-    AST_NODE_BINARY,
-    AST_NODE_GROUPING
-} AuriNodeType;
-
-typedef struct Node {
-    AuriNodeType type;
-    AuriToken* token;
-    struct Node* left;
-    struct Node* right;
-} AuriNode;
-
 typedef struct {
     DArrayVoidPtr statements;
-    // AuriNode* node;
 } AuriAst;
 
 AuriAst* auri_parser(AuriScanner* scanner);
