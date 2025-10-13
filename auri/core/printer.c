@@ -1,4 +1,5 @@
 #include "auri/core/printer.h"
+#include "auri/core/ast_node.h"
 
 #include <stdio.h>
 #include <stdint.h>

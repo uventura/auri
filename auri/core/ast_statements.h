@@ -10,17 +10,40 @@ typedef enum {
     AST_STMT_RUN,
     AST_STMT_IF,
     AST_STMT_WHILE,
+    AST_STMT_FOR,
     AST_STMT_VAR,
     AST_STMT_IMPORT,
+    AST_STMT_RETURN,
+    AST_STMT_BREAK,
+    AST_STMT_CONTINUE
 } AuriStmtType;
 
-typedef struct {
-    AuriNode* expression;
-} AuriExprStmt;
+typedef enum {
+    AST_SETUP_BLOCK,
+    AST_PRERUN_BLOCK,
+    AST_RUN_BLOCK,
+    AST_POST_RUN_BLOCK,
+    AST_END_BLOCK
+} AuriStmtRunType;
 
-typedef struct {
-    AuriString name;
-    DArrayVoidPtr expressions;
-} AuriRunStmt;
+typedef struct stmt {
+    AuriStmtType type;
+    union {
+        // Expression
+        struct {
+            AuriNode* expression;
+        } expr;
+        // Block
+        struct {
+            DArrayVoidPtr items; // Statements - Run
+        } block;
+        // Run
+        struct {
+            AuriString name;
+            AuriStmtRunType type;
+            struct stmt* block;
+        } run;
+    };
+} AuriStmt;
 
 #endif
