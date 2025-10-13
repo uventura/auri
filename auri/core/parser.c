@@ -27,12 +27,17 @@ AuriNode* factor(void);
 AuriNode* unary(void);
 AuriNode* primary(void);
 
+// Parser
 AuriToken* parser_peek(void);
 AuriToken* parser_previous(void);
 AuriToken* parser_advance(void);
 
 bool parser_match(uint32_t size, ...);
 bool parser_is_at_end(AuriScanner* scanner);
+
+//||========================================================||
+//||========================================================||
+//||========================================================||
 
 AuriAst* auri_parser(AuriScanner* scanner) {
     AuriAst* ast = (AuriAst*)malloc(sizeof(AuriAst));
@@ -58,6 +63,14 @@ void auri_parser_free(AuriAst* ast) {
     free(ast);
 }
 
+//||========================================================||
+//||========================================================||
+//||========================================================||
+
+//+-------------+
+//|  STATEMENTS |
+//+-------------+
+
 AuriNode* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) import_stmt();
 
@@ -76,6 +89,10 @@ AuriNode* expression_stmt(void) {
 
     return expr;
 }
+
+//+-------------+
+//| EXPRESSIONS |
+//+-------------+
 
 #define BINARY_NODE(func, comparison_args_size, ...) \
     AuriNode* node = func();\
@@ -159,6 +176,10 @@ AuriNode* primary(void) {
         parser_peek()->line + 1, auri_token_name(parser_peek()->type), parser_peek()->lexeme.text);
     return NULL;
 }
+
+//+-------------+
+//|    PARSER   |
+//+-------------+
 
 bool parser_match(uint32_t size, ...) {
     va_list args;
