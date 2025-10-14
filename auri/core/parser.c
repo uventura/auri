@@ -15,6 +15,7 @@ uint32_t auri_parser_token_pos = 0;
 AuriStmt* statement(void);
 AuriStmt* import_stmt(void);
 AuriStmt* expression_stmt(void);
+AuriStmt* block_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -47,7 +48,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
 
-    while(parser_is_at_end(scanner)) {
+    while(!parser_is_at_end(scanner)) {
         AuriStmt* stmt = statement();
         insert_dynamic_ptr_array(&ast->statements, stmt);
     }
@@ -73,7 +74,8 @@ void auri_parser_free(AuriAst* ast) {
 //+-------------+
 
 AuriStmt* statement(void) {
-    if(parser_match(1, AR_TOKEN_IMPORT)) import_stmt();
+    if(parser_match(1, AR_TOKEN_IMPORT)) return import_stmt();
+    else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
 
     return expression_stmt();
 }
@@ -85,13 +87,32 @@ AuriStmt* import_stmt(void) {
 AuriStmt* expression_stmt(void) {
     AuriNode* expr = expression();
     if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
-        auri_throw_execution_error("Missing ';' on line %d.\n", parser_peek()->line - 1);
+        auri_throw_execution_error("Missing ';' on line %d.\n", parser_peek()->line);
     }
 
     AuriStmtNode expr_stmt;
     expr_stmt.expr.item = expr;
 
     return auri_stmt_init(AST_STMT_EXPR, expr_stmt);
+}
+
+AuriStmt* block_stmt(void) {
+    DArrayVoidPtr items;
+    init_dynamic_ptr_array(&items, STATEMENT_TYPE);
+
+    while(!parser_match(1, AR_TOKEN_RIGHT_BRACE)) {
+        AuriStmt* stmt = statement();
+        insert_dynamic_ptr_array(&items, stmt);
+
+        if(parser_is_at_end(auri_parser_scanner)) {
+            auri_throw_execution_error("Missing '}' on line %d.\n", parser_peek()->line);
+        }
+    }
+
+    AuriStmtNode block_stmt;
+    block_stmt.block.items = items;
+
+    return auri_stmt_init(AST_STMT_BLOCK, block_stmt);
 }
 
 //+-------------+
@@ -222,5 +243,5 @@ AuriToken* parser_advance(void) {
 bool parser_is_at_end(AuriScanner* scanner) {
     AuriToken* token = scanner->tokens.array[auri_parser_token_pos];
 
-    return token->type != AR_TOKEN_EOF;
+    return token->type == AR_TOKEN_EOF;
 }

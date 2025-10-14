@@ -11,6 +11,7 @@ void ast_print_spaces(void);
 
 void ast_print_stmt(AuriStmt* stmt);
 void ast_print_expr_stmt(AuriStmt* stmt);
+void ast_print_block_stmt(AuriStmt* stmt);
 
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
@@ -39,6 +40,10 @@ void ast_print_stmt(AuriStmt* stmt) {
     {
         case AST_STMT_EXPR:
             ast_print_expr_stmt(stmt);
+            break;
+        case AST_STMT_BLOCK:
+            ast_print_block_stmt(stmt);
+            break;
         case AST_STMT_RUN:
         case AST_STMT_IF:
         case AST_STMT_WHILE:
@@ -60,6 +65,20 @@ void ast_print_expr_stmt(AuriStmt* stmt) {
     ast_spaces_counter++;
     ast_print_node(stmt->stmt.expr.item);
     ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
+}
+
+void ast_print_block_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{BlockStmt} << \n");
+
+    for(uint32_t i = 0; i < stmt->stmt.block.items.size; ++i){
+        ast_spaces_counter++;
+        ast_print_stmt(stmt->stmt.block.items.array[i]);
+        ast_spaces_counter--;
+    }
 
     ast_print_spaces();
     printf(">>\n");

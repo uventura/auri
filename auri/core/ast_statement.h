@@ -7,6 +7,7 @@
 
 typedef enum {
     AST_STMT_EXPR,
+    AST_STMT_BLOCK,
     AST_STMT_RUN,
     AST_STMT_IF,
     AST_STMT_WHILE,
