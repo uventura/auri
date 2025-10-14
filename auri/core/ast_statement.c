@@ -1,5 +1,6 @@
 #include "auri/core/ast_statement.h"
 #include "auri/utils/array.h"
+#include "auri/core/ast_node.h"
 
 #include <stdio.h>
 #include <malloc.h>
@@ -22,6 +23,9 @@ void auri_stmt_free(AuriStmt* stmt) {
             break;
         case AST_STMT_RUN:
         case AST_STMT_IF:
+            ast_node_free(stmt->stmt.if_else.expr);
+            auri_stmt_free(stmt->stmt.if_else.block);
+            break;
         case AST_STMT_WHILE:
         case AST_STMT_FOR:
         case AST_STMT_VAR:

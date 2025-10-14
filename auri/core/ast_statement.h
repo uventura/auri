@@ -42,6 +42,11 @@ typedef union {
         AuriStmtRunType type;
         struct stmt* block;
     } run;
+    // If
+    struct {
+        AuriNode* expr;
+        struct stmt* block;
+    } if_else;
 } AuriStmtNode;
 
 typedef struct stmt {

@@ -16,6 +16,7 @@ AuriStmt* statement(void);
 AuriStmt* import_stmt(void);
 AuriStmt* expression_stmt(void);
 AuriStmt* block_stmt(void);
+AuriStmt* if_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -75,6 +76,7 @@ void auri_parser_free(AuriAst* ast) {
 
 AuriStmt* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) return import_stmt();
+    else if(parser_match(1, AR_TOKEN_IF)) return if_stmt();
     else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
 
     return expression_stmt();
@@ -113,6 +115,25 @@ AuriStmt* block_stmt(void) {
     block_stmt.block.items = items;
 
     return auri_stmt_init(AST_STMT_BLOCK, block_stmt);
+}
+
+AuriStmt* if_stmt(void) {
+    if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        auri_throw_execution_error("Missing '(' on if statement on line %d.\n", parser_peek()->line);
+    }
+
+    AuriNode* expr = expression();
+
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("Missing ')' on if statement on line %d.\n", parser_peek()->line);
+    }
+    AuriStmt* stmt = statement();
+
+    AuriStmtNode if_stmt;
+    if_stmt.if_else.expr = expr;
+    if_stmt.if_else.block = stmt;
+
+    return auri_stmt_init(AST_STMT_IF, if_stmt);
 }
 
 //+-------------+
