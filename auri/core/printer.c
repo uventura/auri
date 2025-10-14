@@ -1,5 +1,6 @@
 #include "auri/core/printer.h"
 #include "auri/core/ast_node.h"
+#include "auri/core/ast_statement.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -7,6 +8,9 @@
 uint32_t ast_spaces_counter = 0;
 
 void ast_print_spaces(void);
+
+void ast_print_stmt(AuriStmt* stmt);
+void ast_print_expr_stmt(AuriStmt* stmt);
 
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
@@ -19,7 +23,7 @@ void auri_ast_print(AuriAst* ast) {
     printf("=========================\n");
 
     for(uint32_t i = 0; i < ast->statements.size; ++i) {
-        ast_print_node(ast->statements.array[i]);
+        ast_print_stmt(ast->statements.array[i]);
         printf("\n");
     }
 
@@ -28,6 +32,37 @@ void auri_ast_print(AuriAst* ast) {
 
 void ast_print_spaces(void) {
     for(uint32_t i = 0; i < ast_spaces_counter; ++i) printf("|    ");
+}
+
+void ast_print_stmt(AuriStmt* stmt) {
+    switch (stmt->type)
+    {
+        case AST_STMT_EXPR:
+            ast_print_expr_stmt(stmt);
+        case AST_STMT_RUN:
+        case AST_STMT_IF:
+        case AST_STMT_WHILE:
+        case AST_STMT_FOR:
+        case AST_STMT_VAR:
+        case AST_STMT_IMPORT:
+        case AST_STMT_RETURN:
+        case AST_STMT_BREAK:
+        case AST_STMT_CONTINUE:
+        default:
+            break;
+    }
+}
+
+void ast_print_expr_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{ExpressionStmt} <<\n");
+
+    ast_spaces_counter++;
+    ast_print_node(stmt->stmt.expr.item);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
 }
 
 void ast_print_node(AuriNode* node) {

@@ -26,24 +26,29 @@ typedef enum {
     AST_END_BLOCK
 } AuriStmtRunType;
 
+typedef union {
+    // Expression
+    struct {
+        AuriNode* item;
+    } expr;
+    // Block
+    struct {
+        DArrayVoidPtr items; // Statements - Run
+    } block;
+    // Run
+    struct {
+        AuriString name;
+        AuriStmtRunType type;
+        struct stmt* block;
+    } run;
+} AuriStmtNode;
+
 typedef struct stmt {
     AuriStmtType type;
-    union {
-        // Expression
-        struct {
-            AuriNode* expression;
-        } expr;
-        // Block
-        struct {
-            DArrayVoidPtr items; // Statements - Run
-        } block;
-        // Run
-        struct {
-            AuriString name;
-            AuriStmtRunType type;
-            struct stmt* block;
-        } run;
-    };
+    AuriStmtNode stmt;
 } AuriStmt;
+
+AuriStmt* auri_stmt_init(AuriStmtType type, AuriStmtNode node);
+void auri_stmt_free(AuriStmt* stmt);
 
 #endif

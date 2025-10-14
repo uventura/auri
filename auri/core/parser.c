@@ -1,5 +1,6 @@
 #include "auri/core/parser.h"
 #include "auri/core/ast_node.h"
+#include "auri/core/ast_statement.h"
 
 #include <malloc.h>
 #include <stddef.h>
@@ -11,9 +12,9 @@ AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
 
 // Statements
-AuriNode* statement(void);
-AuriNode* import_stmt(void);
-AuriNode* expression_stmt(void);
+AuriStmt* statement(void);
+AuriStmt* import_stmt(void);
+AuriStmt* expression_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -41,14 +42,14 @@ bool parser_is_at_end(AuriScanner* scanner);
 
 AuriAst* auri_parser(AuriScanner* scanner) {
     AuriAst* ast = (AuriAst*)malloc(sizeof(AuriAst));
-    init_dynamic_ptr_array(&ast->statements, AST_TYPE);
+    init_dynamic_ptr_array(&ast->statements, STATEMENT_TYPE);
 
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
 
     while(parser_is_at_end(scanner)) {
-        AuriNode* node = statement();
-        insert_dynamic_ptr_array(&ast->statements, node);
+        AuriStmt* stmt = statement();
+        insert_dynamic_ptr_array(&ast->statements, stmt);
     }
 
     return ast;
@@ -56,8 +57,8 @@ AuriAst* auri_parser(AuriScanner* scanner) {
 
 void auri_parser_free(AuriAst* ast) {
     for(uint32_t i = 0; i < ast->statements.size; ++i){
-        AuriNode* node = ast->statements.array[i];
-        ast_node_free(node);
+        AuriStmt* stmt = ast->statements.array[i];
+        auri_stmt_free(stmt);
     }
     free_dynamic_ptr_array(&ast->statements);
     free(ast);
@@ -71,23 +72,26 @@ void auri_parser_free(AuriAst* ast) {
 //|  STATEMENTS |
 //+-------------+
 
-AuriNode* statement(void) {
+AuriStmt* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) import_stmt();
 
     return expression_stmt();
 }
 
-AuriNode* import_stmt(void) {
+AuriStmt* import_stmt(void) {
     return NULL;
 }
 
-AuriNode* expression_stmt(void) {
+AuriStmt* expression_stmt(void) {
     AuriNode* expr = expression();
     if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
         auri_throw_execution_error("Missing ';' on line %d.\n", parser_peek()->line - 1);
     }
 
-    return expr;
+    AuriStmtNode expr_stmt;
+    expr_stmt.expr.item = expr;
+
+    return auri_stmt_init(AST_STMT_EXPR, expr_stmt);
 }
 
 //+-------------+

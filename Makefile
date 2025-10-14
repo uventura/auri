@@ -16,7 +16,7 @@ DEBUG_FLAGS += $(FLAGS)
 DEBUG_FLAGS += -DENABLE_DEBUG
 DEBUG_FLAGS += -fsanitize=address,undefined
 DEBUG_FLAGS += -g
-DEBUG_FLAGS += -O1
+DEBUG_FLAGS += -O0
 
 OUT_DIR = out
 RELEASE_DIR = $(OUT_DIR)/release

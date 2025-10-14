@@ -1,4 +1,5 @@
 #include "auri/core/ast_node.h"
+#include "auri/core/token.h"
 
 #include <malloc.h>
 #include <stddef.h>
