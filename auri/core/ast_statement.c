@@ -19,6 +19,7 @@ void auri_stmt_free(AuriStmt* stmt) {
             break;
         case AST_STMT_BLOCK:
             free_dynamic_ptr_array(&stmt->stmt.block.items);
+            break;
         case AST_STMT_RUN:
         case AST_STMT_IF:
         case AST_STMT_WHILE:

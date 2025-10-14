@@ -1,6 +1,7 @@
 #include "auri/utils/array.h"
 #include "auri/utils/string.h"
 #include "auri/core/token.h"
+#include "auri/core/ast_statement.h"
 
 #include <stdio.h>
 #include <stddef.h>
@@ -29,6 +30,8 @@ void free_dynamic_ptr_array(DArrayVoidPtr* array) {
             auri_strfree(array->array[i]);
         } else if(array->type == TOKEN_TYPE) {
             auri_token_free(array->array[i]);
+        } else if(array->type == STATEMENT_TYPE) {
+            auri_stmt_free(array->array[i]);
         }
 
         free(array->array[i]);
