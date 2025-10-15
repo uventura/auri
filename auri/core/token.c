@@ -43,8 +43,11 @@ AuriToken* auri_token_init(AuriString lexeme, AuriLiteral literal, AuriTokenType
 }
 
 void auri_token_free(AuriToken* token) {
+    if(token == NULL) return;
+
     auri_strfree(&token->lexeme);
     auri_strfree(&token->literal.string);
+    free(token);
 }
 
 const char* auri_token_name(AuriTokenType token_type) {

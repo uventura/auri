@@ -59,6 +59,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
 
 void auri_parser_free(AuriAst* ast) {
     for(uint32_t i = 0; i < ast->statements.size; ++i){
+        printf("Free!!\n");
         AuriStmt* stmt = ast->statements.array[i];
         auri_stmt_free(stmt);
     }

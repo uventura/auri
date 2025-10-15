@@ -3,7 +3,6 @@
 
 #include <malloc.h>
 #include <string.h>
-#include <malloc.h>
 
 uint32_t auri_text_size(char* str) {
     char* ptr = str;

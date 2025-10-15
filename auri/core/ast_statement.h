@@ -6,6 +6,7 @@
 #include "auri/utils/string.h"
 
 typedef enum {
+    AST_STMT_NULL,
     AST_STMT_EXPR,
     AST_STMT_BLOCK,
     AST_STMT_RUN,
