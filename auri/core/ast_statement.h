@@ -48,6 +48,7 @@ typedef union {
         AuriNode* expr;
         struct stmt* if_block;
         struct stmt* else_block;
+        DArrayVoidPtr else_if_block;
     } if_else;
 } AuriStmtNode;
 

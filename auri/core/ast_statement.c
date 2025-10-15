@@ -7,6 +7,7 @@
 #include <malloc.h>
 
 void stmt_block_free(AuriStmt* stmt);
+void stmt_if_block_free(AuriStmt* stmt);
 
 AuriStmt* auri_stmt_init(AuriStmtType type, AuriStmtNode node) {
     AuriStmt* stmt = (AuriStmt*) malloc(sizeof(AuriStmt));
@@ -28,12 +29,7 @@ void auri_stmt_free(AuriStmt* stmt) {
             break;
         case AST_STMT_RUN:
         case AST_STMT_IF:
-            ast_node_free(stmt->stmt.if_else.expr);
-            auri_stmt_free(stmt->stmt.if_else.if_block);
-            auri_stmt_free(stmt->stmt.if_else.else_block);
-            stmt->stmt.if_else.expr = NULL;
-            stmt->stmt.if_else.if_block = NULL;
-            stmt->stmt.if_else.else_block = NULL;
+            stmt_if_block_free(stmt);
             break;
         case AST_STMT_WHILE:
         case AST_STMT_FOR:
@@ -56,4 +52,19 @@ void stmt_block_free(AuriStmt* stmt) {
         auri_stmt_free(inner_stmt);
     }
     free_dynamic_ptr_array(&stmt->stmt.block.items);
+}
+
+void stmt_if_block_free(AuriStmt* stmt) {
+    ast_node_free(stmt->stmt.if_else.expr);
+    auri_stmt_free(stmt->stmt.if_else.if_block);
+    auri_stmt_free(stmt->stmt.if_else.else_block);
+
+    for(uint32_t i = 0; i < stmt->stmt.if_else.else_if_block.size; ++i) {
+        auri_stmt_free(stmt->stmt.if_else.else_if_block.array[i]);
+    }
+    free_dynamic_ptr_array(&stmt->stmt.if_else.else_if_block);
+
+    stmt->stmt.if_else.expr = NULL;
+    stmt->stmt.if_else.if_block = NULL;
+    stmt->stmt.if_else.else_block = NULL;
 }
