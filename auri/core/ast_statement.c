@@ -29,9 +29,11 @@ void auri_stmt_free(AuriStmt* stmt) {
         case AST_STMT_RUN:
         case AST_STMT_IF:
             ast_node_free(stmt->stmt.if_else.expr);
-            auri_stmt_free(stmt->stmt.if_else.block);
+            auri_stmt_free(stmt->stmt.if_else.if_block);
+            auri_stmt_free(stmt->stmt.if_else.else_block);
             stmt->stmt.if_else.expr = NULL;
-            stmt->stmt.if_else.block = NULL;
+            stmt->stmt.if_else.if_block = NULL;
+            stmt->stmt.if_else.else_block = NULL;
             break;
         case AST_STMT_WHILE:
         case AST_STMT_FOR:

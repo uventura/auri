@@ -37,6 +37,8 @@ void ast_print_spaces(void) {
 }
 
 void ast_print_stmt(AuriStmt* stmt) {
+    if(stmt == NULL) return;
+
     switch (stmt->type)
     {
         case AST_STMT_EXPR:
@@ -96,7 +98,17 @@ void ast_print_if_stmt(AuriStmt* stmt) {
     ast_spaces_counter--;
 
     ast_spaces_counter++;
-    ast_print_block_stmt(stmt->stmt.if_else.block);
+    ast_print_stmt(stmt->stmt.if_else.if_block);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
+
+    ast_print_spaces();
+    printf("{ElseStmt} << \n");
+
+    ast_spaces_counter++;
+    ast_print_stmt(stmt->stmt.if_else.else_block);
     ast_spaces_counter--;
 
     ast_print_spaces();

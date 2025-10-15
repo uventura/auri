@@ -127,11 +127,17 @@ AuriStmt* if_stmt(void) {
     if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
         auri_throw_execution_error("Missing ')' on if statement on line %d.\n", parser_peek()->line);
     }
-    AuriStmt* stmt = statement();
+    AuriStmt* block = statement();
+
+    AuriStmt* else_block = NULL;
+    if(parser_match(1, AR_TOKEN_ELSE)) {
+        else_block = statement();
+    }
 
     AuriStmtNode if_stmt;
     if_stmt.if_else.expr = expr;
-    if_stmt.if_else.block = stmt;
+    if_stmt.if_else.if_block = block;
+    if_stmt.if_else.else_block = else_block;
 
     return auri_stmt_init(AST_STMT_IF, if_stmt);
 }

@@ -35,7 +35,7 @@ typedef union {
     } expr;
     // Block
     struct {
-        DArrayVoidPtr items; // Statements - Run
+        DArrayVoidPtr items; // Statements - Except "Run"
     } block;
     // Run
     struct {
@@ -46,7 +46,8 @@ typedef union {
     // If
     struct {
         AuriNode* expr;
-        struct stmt* block;
+        struct stmt* if_block;
+        struct stmt* else_block;
     } if_else;
 } AuriStmtNode;
 
