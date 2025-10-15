@@ -1,30 +1,53 @@
-program         → statement* EOF;
+program         → declaration* EOF;
 
-statement       → defaultStmt
-                | runStmt;
+declaration     → default_declaration
+                | run_statement ;
 
-defaultStmt     → exprStmt
-                | importStmt
-                | ifStmt
-                | whileStmt
-                | varStmt;
+default_declaration → fun_decl
+                    | var_decl
+                    | struct_decl
+                    | statement
 
-runStmt         → run IDENTIFIER "{" defaultStmt* "}";
-exprStmt        → expression ";"
-importStmt      → import "(" STRING ("," STRING)*  ")" ";"
-ifStmt          → "if" "(" expression ")" blockStmt
-whileStmt       → "while" "(" expression ")" blockStmt
-blockStmt       → defaultStmt ";" | "{" defaultStmt* "}"
-varStmt         → ("var" | "bool" | "numeric" | "string") IDENTIFIER ("=")? ";"
+statement   → expr_stmt
+            | for_stmt
+            | while_stmt
+            | if_stmt
+            | block_stmt
+            | return_stmt;
 
-expression      → literal
+//====================================================
+run_statement → run_stmt
+
+block_stmt       → "{" default_declaration* "}"
+expr_stmt        → expression ";"
+while_stmt       → "while" "(" expression ")" block_stmt
+if_stmt          → "if" "(" expression ")" block_stmt
+import_stmt      → import "(" STRING ("," STRING)*  ")" ";"
+var_stmt         → ("var" | "bool" | "numeric" | "string") IDENTIFIER ("=")? ";"
+return_stmt     → "return" expression? ";" ;
+
+run_stmt         → (run | pre_run | post_run | setup) IDENTIFIER block_stmt;
+
+//====================================================
+expression      → primary
                 | unary
                 | binary
                 | grouping ;
-
-literal         → NUMBER | STRING | "true" | "false" | "null" ;
 grouping        → "(" expression ")" ;
 unary           → ( "-" | "!" ) expression ;
 binary          → expression operator expression ;
 operator        → "==" | "!=" | "<" | "<=" | ">" | ">="
                 | "+"  | "-"  | "*" | "/" ;
+primary         → NUMBER | STRING | "true" | "false" | "null" ;
+
+expression → assignment
+assignment → IDENTIFIER "=" assignment
+or         → and (|| equality )*
+and        → equality (&& equality)*
+equality   → comparison (("==" | "!=") comparison)*
+comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term       → factor ( ( "-" | "+" ) factor )* ;
+factor     → unary ( ( "/" | "*" ) unary )* ;
+unary      → ( "!" | "-" ) unary | call ;
+call       → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+primary    → NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;

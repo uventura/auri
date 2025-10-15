@@ -1,23 +1,17 @@
-!=
-<
-=
-!= ; >> !=
-* + - /..
-((( {} )))
 
-"My String
+{
+    if(1 > true) {
+        1 + 1;
+    } else {
+        34 + 7;
+    }
 
+    {
+        if(1 > 2) 34 * 7; 1 + 1 / (15 + 7);
+    }
 
-"
-"Another String
-
-"
-
-22.3597
-25
-837848
-
-bool true return while for
-; return 32;
-false;
-alias as
+    if(1 > 2 and 45 == 7) {
+        1 + 9;
+        10 + 17;
+    }
+}
