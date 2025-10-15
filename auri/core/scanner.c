@@ -34,7 +34,7 @@ AuriScanner auri_scanner(const char* path) {
     auri_scanner_line = 0;
 
     AuriScanner scanner;
-    init_dynamic_ptr_array(&scanner.tokens, TOKEN_TYPE);
+    init_dynamic_ptr_array(&scanner.tokens);
 
     char* buffer = read_file(path);
     auri_scanner_file = (AuriString*)malloc(sizeof(AuriString));

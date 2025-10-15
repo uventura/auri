@@ -44,7 +44,7 @@ bool parser_is_at_end(AuriScanner* scanner);
 
 AuriAst* auri_parser(AuriScanner* scanner) {
     AuriAst* ast = (AuriAst*)malloc(sizeof(AuriAst));
-    init_dynamic_ptr_array(&ast->statements, STATEMENT_TYPE);
+    init_dynamic_ptr_array(&ast->statements);
 
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
@@ -59,7 +59,6 @@ AuriAst* auri_parser(AuriScanner* scanner) {
 
 void auri_parser_free(AuriAst* ast) {
     for(uint32_t i = 0; i < ast->statements.size; ++i){
-        printf("Free!!\n");
         AuriStmt* stmt = ast->statements.array[i];
         auri_stmt_free(stmt);
     }
@@ -101,7 +100,7 @@ AuriStmt* expression_stmt(void) {
 
 AuriStmt* block_stmt(void) {
     DArrayVoidPtr items;
-    init_dynamic_ptr_array(&items, STATEMENT_TYPE);
+    init_dynamic_ptr_array(&items);
 
     while(!parser_match(1, AR_TOKEN_RIGHT_BRACE)) {
         AuriStmt* stmt = statement();

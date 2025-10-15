@@ -7,11 +7,10 @@
 #include <stddef.h>
 #include <malloc.h>
 
-void init_dynamic_ptr_array(DArrayVoidPtr* array, BasicType type) {
+void init_dynamic_ptr_array(DArrayVoidPtr* array) {
     array->size = 0;
     array->capacity = 1;
     array->array = NULL;
-    array->type = type;
 }
 
 void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element) {
@@ -25,23 +24,6 @@ void insert_dynamic_ptr_array(DArrayVoidPtr* array, void* element) {
 }
 
 void free_dynamic_ptr_array(DArrayVoidPtr* array) {
-    for(uint32_t i=0; i < array->size; ++i) {
-        if(array->array == NULL) {
-            break;
-        }
-
-        if(array->type == STRING_TYPE) {
-            auri_strfree(array->array[i]);
-            free(array->array[i]);
-        } else if(array->type == TOKEN_TYPE) {
-            // auri_token_free(array->array[i]);
-        } else if(array->type == STATEMENT_TYPE) {
-            // auri_stmt_free(array->array[i]);
-        } else {
-            free(array->array[i]);
-        }
-    }
-
     free(array->array);
     array->array = NULL;
     array->size = 0;

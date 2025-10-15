@@ -1,6 +1,7 @@
 #include "auri/core/cli.h"
 #include "auri/utils/string.h"
 
+#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -11,7 +12,7 @@ AuriCli auri_cli(int argc, char* argv[]) {
     cli.enable_ast = false;
     cli.enable_tokens = false;
 
-    init_dynamic_ptr_array(&cli.file_paths, STRING_TYPE);
+    init_dynamic_ptr_array(&cli.file_paths);
 
     for(int i=1; i < argc; ++i) {
         if(strcmp(argv[i], "--help") == 0) {
@@ -36,6 +37,10 @@ AuriCli auri_cli(int argc, char* argv[]) {
 }
 
 void auri_cli_free(AuriCli* cli) {
+    for(uint32_t i = 0; i < cli->file_paths.size; ++i) {
+        auri_strfree(cli->file_paths.array[i]);
+        free(cli->file_paths.array[i]);
+    }
     free_dynamic_ptr_array(&cli->file_paths);
 }
 
