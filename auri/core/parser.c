@@ -28,6 +28,7 @@ AuriNode* comparison(void);
 AuriNode* term(void);
 AuriNode* factor(void);
 AuriNode* unary(void);
+AuriNode* call(void);
 AuriNode* primary(void);
 
 // Parser
@@ -162,11 +163,22 @@ AuriStmt* if_stmt(void) {
     return node
 
 AuriNode* expression(void) {
-    return or();
+    return assignment();
 }
 
 AuriNode* assignment(void) {
-    return NULL;
+    if(parser_match(1, AR_TOKEN_IDENTIFIER)) {
+        AuriToken* identifier = parser_previous();
+
+        if(!parser_match(1, AR_TOKEN_EQUAL)) {
+            auri_throw_execution_error("Assignment expects '=' on line %d\n.", parser_peek()->line);
+        }
+
+        AuriNode* left = ast_node_init(AST_NODE_LITERAL, identifier, NULL, NULL);
+        return ast_node_init(AST_NODE_BINARY, parser_previous(), left, assignment());
+    }
+
+    return or();
 }
 
 AuriNode* or(void) {
@@ -211,6 +223,10 @@ AuriNode* unary(void) {
     }
 
     return primary();
+}
+
+AuriNode* call(void) {
+    return NULL;
 }
 
 AuriNode* primary(void) {

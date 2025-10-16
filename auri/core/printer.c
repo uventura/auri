@@ -37,7 +37,9 @@ void ast_print_spaces(void) {
 }
 
 void ast_print_stmt(AuriStmt* stmt) {
-    if(stmt == NULL) return;
+    if(stmt == NULL) {
+        return;
+    }
 
     switch (stmt->type)
     {
@@ -116,6 +118,8 @@ void ast_print_if_stmt(AuriStmt* stmt) {
 }
 
 void ast_print_node(AuriNode* node) {
+    if(node == NULL) return;
+
     switch(node->type) {
         case AST_NODE_LITERAL:
             ast_print_literal(node);
@@ -196,7 +200,11 @@ void ast_print_literal(AuriNode* node) {
         case AR_TOKEN_FALSE:
             printf(" (false)\n");
             break;
+        case AR_TOKEN_IDENTIFIER:
+            printf(" (%s)\n", node->token->lexeme.text);
+            break;
         default:
+            printf("\n");
             break;
     }
 }
