@@ -167,18 +167,13 @@ AuriNode* expression(void) {
 }
 
 AuriNode* assignment(void) {
-    if(parser_match(1, AR_TOKEN_IDENTIFIER)) {
-        AuriToken* identifier = parser_previous();
+    AuriNode* node = or();
 
-        if(!parser_match(1, AR_TOKEN_EQUAL)) {
-            auri_throw_execution_error("Assignment expects '=' on line %d\n.", parser_peek()->line);
-        }
-
-        AuriNode* left = ast_node_init(AST_NODE_LITERAL, identifier, NULL, NULL);
-        return ast_node_init(AST_NODE_BINARY, parser_previous(), left, assignment());
+    if(parser_match(1, AR_TOKEN_EQUAL)) {
+        node = ast_node_init(AST_NODE_BINARY, parser_previous(), node, assignment());
     }
 
-    return or();
+    return node;
 }
 
 AuriNode* or(void) {
@@ -230,7 +225,7 @@ AuriNode* call(void) {
 }
 
 AuriNode* primary(void) {
-    if(parser_match(5, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL)) {
+    if(parser_match(6, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER)) {
         return ast_node_init(AST_NODE_LITERAL, parser_previous(), NULL, NULL);
     }
 
@@ -243,7 +238,7 @@ AuriNode* primary(void) {
         return expr;
     }
 
-    auri_throw_execution_error("Literal undefined (Line: %d)[%s]: %s\n",
+    auri_throw_execution_error("Wrong usage (Line: %d)[%s]: %s\n",
         parser_peek()->line + 1, auri_token_name(parser_peek()->type), parser_peek()->lexeme.text);
     return NULL;
 }
