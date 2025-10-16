@@ -12,6 +12,7 @@ void ast_print_spaces(void);
 void ast_print_stmt(AuriStmt* stmt);
 void ast_print_expr_stmt(AuriStmt* stmt);
 void ast_print_block_stmt(AuriStmt* stmt);
+void ast_print_run_stmt(AuriStmt* stmt);
 void ast_print_if_stmt(AuriStmt* stmt);
 
 void ast_print_node(AuriNode* node);
@@ -50,6 +51,8 @@ void ast_print_stmt(AuriStmt* stmt) {
             ast_print_block_stmt(stmt);
             break;
         case AST_STMT_RUN:
+            ast_print_run_stmt(stmt);
+            break;
         case AST_STMT_IF:
             ast_print_if_stmt(stmt);
             break;
@@ -86,6 +89,18 @@ void ast_print_block_stmt(AuriStmt* stmt) {
         ast_print_stmt(stmt->stmt.block.items.array[i]);
         ast_spaces_counter--;
     }
+
+    ast_print_spaces();
+    printf(">>\n");
+}
+
+void ast_print_run_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{RunStmt} (%s) <<\n", stmt->stmt.run.name->lexeme.text);
+
+    ast_spaces_counter++;
+    ast_print_block_stmt(stmt->stmt.run.block);
+    ast_spaces_counter--;
 
     ast_print_spaces();
     printf(">>\n");

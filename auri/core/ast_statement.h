@@ -20,14 +20,6 @@ typedef enum {
     AST_STMT_CONTINUE
 } AuriStmtType;
 
-typedef enum {
-    AST_SETUP_BLOCK,
-    AST_PRERUN_BLOCK,
-    AST_RUN_BLOCK,
-    AST_POST_RUN_BLOCK,
-    AST_END_BLOCK
-} AuriStmtRunType;
-
 typedef union {
     // Expression
     struct {
@@ -39,8 +31,8 @@ typedef union {
     } block;
     // Run
     struct {
-        AuriString name;
-        AuriStmtRunType type;
+        AuriToken* name;
+        AuriTokenType type;
         struct stmt* block;
     } run;
     // If

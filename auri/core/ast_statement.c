@@ -28,6 +28,9 @@ void auri_stmt_free(AuriStmt* stmt) {
             stmt_block_free(stmt);
             break;
         case AST_STMT_RUN:
+            stmt_block_free(stmt->stmt.run.block);
+            free(stmt->stmt.run.block);
+            break;
         case AST_STMT_IF:
             stmt_if_block_free(stmt);
             break;

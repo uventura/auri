@@ -11,12 +11,15 @@
 AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
 
+AuriStmt* declaration(void);
+
 // Statements
 AuriStmt* statement(void);
 AuriStmt* import_stmt(void);
 AuriStmt* expression_stmt(void);
 AuriStmt* block_stmt(void);
 AuriStmt* if_stmt(void);
+AuriStmt* run_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -51,7 +54,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     auri_parser_token_pos = 0;
 
     while(!parser_is_at_end(scanner)) {
-        AuriStmt* stmt = statement();
+        AuriStmt* stmt = declaration();
         insert_dynamic_ptr_array(&ast->statements, stmt);
     }
 
@@ -74,6 +77,12 @@ void auri_parser_free(AuriAst* ast) {
 //+-------------+
 //|  STATEMENTS |
 //+-------------+
+
+AuriStmt* declaration(void) {
+    if(parser_match(4, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP)) return run_stmt();
+
+    return statement();
+}
 
 AuriStmt* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) return import_stmt();
@@ -106,7 +115,6 @@ AuriStmt* block_stmt(void) {
     while(!parser_match(1, AR_TOKEN_RIGHT_BRACE)) {
         AuriStmt* stmt = statement();
         insert_dynamic_ptr_array(&items, stmt);
-
         if(parser_is_at_end(auri_parser_scanner)) {
             auri_throw_execution_error("Missing '}' on line %d.\n", parser_peek()->line);
         }
@@ -144,6 +152,25 @@ AuriStmt* if_stmt(void) {
     if_stmt.if_else.else_if_block = else_if_items; // Not implemented yet.
 
     return auri_stmt_init(AST_STMT_IF, if_stmt);
+}
+
+AuriStmt* run_stmt(void) {
+    AuriTokenType type = parser_previous()->type;
+    if(!parser_match(1, AR_TOKEN_IDENTIFIER)) {
+        auri_throw_execution_error("Run statement missing identification on line %d\n", parser_peek()->line);
+    }
+
+    AuriToken* name = parser_previous();
+    if(!parser_match(1, AR_TOKEN_LEFT_BRACE)) {
+        auri_throw_execution_error("Run statement missing '{' at start on line %d\n", parser_peek()->line);
+    }
+
+    AuriStmtNode run_stmt;
+    run_stmt.run.name = name;
+    run_stmt.run.block = block_stmt();
+    run_stmt.run.type = type;
+
+    return auri_stmt_init(AST_STMT_RUN, run_stmt);
 }
 
 //+-------------+
