@@ -2,4 +2,6 @@ run my_statemtent_run {
     if(1 = 2) {
         34 + "Hello";
     }
+
+    a = 2;
 }
