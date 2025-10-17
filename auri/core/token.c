@@ -27,9 +27,9 @@ const char*  AuriTokenIdentifiers[] = {
     "fun",
     "null",
     "setup",
-    "pre_run",
+    "prerun",
     "run",
-    "post_run"
+    "postrun"
 };
 
 AuriToken* auri_token_init(AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line) {

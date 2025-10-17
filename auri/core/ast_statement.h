@@ -42,6 +42,11 @@ typedef union {
         struct stmt* else_block;
         DArrayVoidPtr else_if_block;
     } if_else;
+    // While
+    struct {
+        AuriNode* condition;
+        struct stmt* block;
+    } while_loop;
 } AuriStmtNode;
 
 typedef struct stmt {

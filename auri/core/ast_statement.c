@@ -34,6 +34,9 @@ void auri_stmt_free(AuriStmt* stmt) {
             stmt_if_block_free(stmt);
             break;
         case AST_STMT_WHILE:
+            ast_node_free(stmt->stmt.while_loop.condition);
+            auri_stmt_free(stmt->stmt.while_loop.block);
+            break;
         case AST_STMT_FOR:
         case AST_STMT_VAR:
         case AST_STMT_IMPORT:

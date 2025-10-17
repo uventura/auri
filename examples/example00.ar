@@ -1,7 +1,10 @@
-run my_statemtent_run {
+prerun my_statemtent_run {
     if(1 = 2) {
         34 + "Hello";
     }
 
-    a = 2;
+    a = a + 1;
+    while(a < 2) {
+        1+1;
+    }
 }

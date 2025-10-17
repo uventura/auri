@@ -18,8 +18,9 @@ AuriStmt* statement(void);
 AuriStmt* import_stmt(void);
 AuriStmt* expression_stmt(void);
 AuriStmt* block_stmt(void);
-AuriStmt* if_stmt(void);
 AuriStmt* run_stmt(void);
+AuriStmt* if_stmt(void);
+AuriStmt* while_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -88,6 +89,7 @@ AuriStmt* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) return import_stmt();
     else if(parser_match(1, AR_TOKEN_IF)) return if_stmt();
     else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
+    else if(parser_match(1, AR_TOKEN_WHILE)) return while_stmt();
 
     return expression_stmt();
 }
@@ -171,6 +173,24 @@ AuriStmt* run_stmt(void) {
     run_stmt.run.type = type;
 
     return auri_stmt_init(AST_STMT_RUN, run_stmt);
+}
+
+AuriStmt* while_stmt(void) {
+    if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        auri_throw_execution_error("'while' missing '(' in condition.\n");
+    }
+
+    AuriNode* condition = expression();
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("'while' missing ')' in condition.\n");
+    }
+
+    AuriStmt* block = statement();
+    AuriStmtNode while_loop;
+    while_loop.while_loop.condition = condition;
+    while_loop.while_loop.block = block;
+
+    return auri_stmt_init(AST_STMT_WHILE, while_loop);
 }
 
 //+-------------+
