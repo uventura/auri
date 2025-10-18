@@ -2,6 +2,9 @@
 #define AURI_AST_NODE_H
 
 #include "auri/core/token.h"
+#include "auri/utils/array.h"
+
+#include <stdarg.h>
 
 typedef enum {
     AST_NODE_LITERAL,
@@ -13,11 +16,19 @@ typedef enum {
 typedef struct Node {
     AuriNodeType type;
     AuriToken* token;
-    struct Node* left;
-    struct Node* right;
+    union {
+        struct {int lit;} literal;
+        struct {
+            struct Node* expr;
+        } unary;
+        struct {
+            struct Node* left;
+            struct Node* right;
+        } binary;
+    };
 } AuriNode;
 
-AuriNode* ast_node_init(AuriNodeType type, AuriToken* token, AuriNode* left, AuriNode* right);
+AuriNode* ast_node_init(AuriNodeType type, AuriToken* token, ...);
 void ast_node_free(AuriNode* node);
 
 #endif

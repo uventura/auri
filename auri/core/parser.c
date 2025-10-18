@@ -33,6 +33,7 @@ AuriNode* term(void);
 AuriNode* factor(void);
 AuriNode* unary(void);
 AuriNode* call(void);
+AuriNode* function_call(AuriNode* node);
 AuriNode* primary(void);
 
 // Parser
@@ -201,13 +202,11 @@ AuriStmt* while_stmt(void) {
     AuriNode* node = func();\
     AuriNode* current = node;\
     while(parser_match(comparison_args_size, __VA_ARGS__)) {\
-        current->left = ast_node_init(current->type, current->token, current->left, current->right);\
-        current->type = AST_NODE_BINARY;\
-        current->token = parser_previous();\
-        current->right = func();\
-        current = current->right;\
+        AuriToken* operator = parser_previous();\
+        AuriNode* right = func();\
+        current = ast_node_init(AST_NODE_BINARY, operator, current, right);\
     }\
-    return node
+    return current
 
 AuriNode* expression(void) {
     return assignment();
@@ -228,11 +227,13 @@ AuriNode* or(void) {
     AuriNode* current = node;
 
     while(parser_match(1, AR_TOKEN_OR)) {
-        current->left = ast_node_init(current->type, current->token, current->left, current->right);
+        current->binary.left = ast_node_init(AST_NODE_BINARY, current->token, current->binary.left, current->binary.right);
+
         current->type = AST_NODE_BINARY;
         current->token = parser_previous();
-        current->right = equality();
-        current = current->right;
+
+        current->binary.right = equality();
+        current = current->binary.right;
     }
 
     return node;
@@ -261,19 +262,27 @@ AuriNode* factor(void) {
 AuriNode* unary(void) {
     if(parser_match(2, AR_TOKEN_BANG_EQUAL, AR_TOKEN_MINUS)) {
         AuriToken* operator = parser_previous();
-        return ast_node_init(AST_NODE_UNARY, operator, NULL, unary());
+        return ast_node_init(AST_NODE_UNARY, operator, unary());
     }
 
     return primary();
 }
 
 AuriNode* call(void) {
-    return NULL;
+    AuriNode* node = primary();
+
+    while(true) {
+        if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        } else if(parser_match(1, AR_TOKEN_DOT)) {
+        }
+    }
+
+    return node;
 }
 
 AuriNode* primary(void) {
     if(parser_match(6, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER)) {
-        return ast_node_init(AST_NODE_LITERAL, parser_previous(), NULL, NULL);
+        return ast_node_init(AST_NODE_LITERAL, parser_previous());
     }
 
     if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {

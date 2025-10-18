@@ -168,6 +168,8 @@ void ast_print_node(AuriNode* node) {
             break;
         case AST_NODE_GROUPING:
             break;
+        default:
+            printf("<Undefined>\n");
     }
 }
 
@@ -187,7 +189,7 @@ void ast_print_unary(AuriNode* node) {
     ast_spaces_counter--;
 
     ast_spaces_counter++;
-    ast_print_node(node->right);
+    ast_print_node(node->unary.expr);
     ast_spaces_counter--;
 
     ast_print_spaces();
@@ -199,7 +201,7 @@ void ast_print_binary(AuriNode* node) {
     printf("[Binary] <<< \n");
 
     ast_spaces_counter++;
-    ast_print_node(node->left);
+    ast_print_node(node->binary.left);
     ast_spaces_counter--;
 
     ast_spaces_counter++;
@@ -214,7 +216,7 @@ void ast_print_binary(AuriNode* node) {
     ast_spaces_counter--;
 
     ast_spaces_counter++;
-    ast_print_node(node->right);
+    ast_print_node(node->binary.right);
     ast_spaces_counter--;
 
     ast_print_spaces();
