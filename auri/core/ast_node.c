@@ -93,15 +93,11 @@ void node_unary_child_free(AuriNode* node) {
 void node_binary_child_free(AuriNode* node) {
     if(node->binary.left != NULL) {
         ast_node_free(node->binary.left);
-        free(node->binary.left);
-
         node->binary.left = NULL;
     }
 
     if(node->binary.right != NULL) {
         ast_node_free(node->binary.right);
-        free(node->binary.right);
-
         node->binary.right = NULL;
     }
 }
