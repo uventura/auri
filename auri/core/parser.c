@@ -21,6 +21,7 @@ AuriStmt* block_stmt(void);
 AuriStmt* run_stmt(void);
 AuriStmt* if_stmt(void);
 AuriStmt* while_stmt(void);
+AuriStmt* for_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -91,6 +92,7 @@ AuriStmt* statement(void) {
     else if(parser_match(1, AR_TOKEN_IF)) return if_stmt();
     else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
     else if(parser_match(1, AR_TOKEN_WHILE)) return while_stmt();
+    else if(parser_match(1, AR_TOKEN_FOR)) return for_stmt();
 
     return expression_stmt();
 }
@@ -102,7 +104,7 @@ AuriStmt* import_stmt(void) {
 AuriStmt* expression_stmt(void) {
     AuriNode* expr = expression();
     if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
-        auri_throw_execution_error("Missing ';' on line %d.\n", parser_peek()->line);
+        auri_throw_execution_error("Expression missing ';' on line %d.\n", parser_peek()->line);
     }
 
     AuriStmtNode expr_stmt;
@@ -192,6 +194,56 @@ AuriStmt* while_stmt(void) {
     while_loop.while_loop.block = block;
 
     return auri_stmt_init(AST_STMT_WHILE, while_loop);
+}
+
+AuriStmt* for_stmt(void) {
+    // for(expr1; comparison; expr2)
+    if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        auri_throw_execution_error("Missing '(' on for loop on line %d.\n", parser_peek()->line);
+    }
+
+    AuriStmt* initializer = NULL;
+    if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
+        initializer = expression_stmt();
+    }
+
+    AuriNode* condition = NULL;
+    if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
+        condition = expression();
+    }
+    if(condition != NULL && !parser_match(1, AR_TOKEN_SEMICOLON)) {
+        auri_throw_execution_error("Missing ';' after for condition on line %d.\n", parser_peek()->line);
+    }
+
+    AuriNode* increment = NULL;
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        increment = expression();
+    }
+    if(increment != NULL && !parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("Missing ')' on for loop in line %d\n", parser_peek()->line);
+    }
+    
+    AuriStmtNode inc_stmt_node;
+    inc_stmt_node.expr.item = increment;
+    AuriStmt* inc_stmt = auri_stmt_init(AST_STMT_EXPR, inc_stmt_node);
+ 
+    AuriStmt* block = statement();   
+    insert_dynamic_ptr_array(&block->stmt.block.items, inc_stmt);
+
+    AuriStmtNode loop;
+    loop.while_loop.condition = condition;
+    loop.while_loop.block = block;
+    AuriStmt* while_loop = auri_stmt_init(AST_STMT_WHILE, loop);
+
+    DArrayVoidPtr for_loop;
+    init_dynamic_ptr_array(&for_loop);
+    insert_dynamic_ptr_array(&for_loop, initializer); 
+    insert_dynamic_ptr_array(&for_loop, while_loop);
+
+    AuriStmtNode for_block;
+    for_block.block.items = for_loop;
+
+    return auri_stmt_init(AST_STMT_BLOCK, for_block);
 }
 
 //+-------------+
@@ -349,7 +401,7 @@ AuriToken* parser_peek(void) {
 }
 
 AuriToken* parser_previous(void) {
-    if(auri_parser_token_pos - 1 < 0) {
+    if(auri_parser_token_pos <= 0) {
         return auri_parser_scanner->tokens.array[auri_parser_token_pos];
     }
     return auri_parser_scanner->tokens.array[auri_parser_token_pos - 1];
