@@ -11,12 +11,16 @@
 AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
 
+AuriStmt* declaration(void);
+
 // Statements
 AuriStmt* statement(void);
 AuriStmt* import_stmt(void);
 AuriStmt* expression_stmt(void);
 AuriStmt* block_stmt(void);
+AuriStmt* run_stmt(void);
 AuriStmt* if_stmt(void);
+AuriStmt* while_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -28,6 +32,8 @@ AuriNode* comparison(void);
 AuriNode* term(void);
 AuriNode* factor(void);
 AuriNode* unary(void);
+AuriNode* call(void);
+AuriNode* function_call(AuriNode* node);
 AuriNode* primary(void);
 
 // Parser
@@ -50,7 +56,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     auri_parser_token_pos = 0;
 
     while(!parser_is_at_end(scanner)) {
-        AuriStmt* stmt = statement();
+        AuriStmt* stmt = declaration();
         insert_dynamic_ptr_array(&ast->statements, stmt);
     }
 
@@ -74,10 +80,17 @@ void auri_parser_free(AuriAst* ast) {
 //|  STATEMENTS |
 //+-------------+
 
+AuriStmt* declaration(void) {
+    if(parser_match(4, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP)) return run_stmt();
+
+    return statement();
+}
+
 AuriStmt* statement(void) {
     if(parser_match(1, AR_TOKEN_IMPORT)) return import_stmt();
     else if(parser_match(1, AR_TOKEN_IF)) return if_stmt();
     else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
+    else if(parser_match(1, AR_TOKEN_WHILE)) return while_stmt();
 
     return expression_stmt();
 }
@@ -105,7 +118,6 @@ AuriStmt* block_stmt(void) {
     while(!parser_match(1, AR_TOKEN_RIGHT_BRACE)) {
         AuriStmt* stmt = statement();
         insert_dynamic_ptr_array(&items, stmt);
-
         if(parser_is_at_end(auri_parser_scanner)) {
             auri_throw_execution_error("Missing '}' on line %d.\n", parser_peek()->line);
         }
@@ -145,6 +157,43 @@ AuriStmt* if_stmt(void) {
     return auri_stmt_init(AST_STMT_IF, if_stmt);
 }
 
+AuriStmt* run_stmt(void) {
+    AuriTokenType type = parser_previous()->type;
+    if(!parser_match(1, AR_TOKEN_IDENTIFIER)) {
+        auri_throw_execution_error("Run statement missing identification on line %d\n", parser_peek()->line);
+    }
+
+    AuriToken* name = parser_previous();
+    if(!parser_match(1, AR_TOKEN_LEFT_BRACE)) {
+        auri_throw_execution_error("Run statement missing '{' at start on line %d\n", parser_peek()->line);
+    }
+
+    AuriStmtNode run_stmt;
+    run_stmt.run.name = name;
+    run_stmt.run.block = block_stmt();
+    run_stmt.run.type = type;
+
+    return auri_stmt_init(AST_STMT_RUN, run_stmt);
+}
+
+AuriStmt* while_stmt(void) {
+    if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+        auri_throw_execution_error("'while' missing '(' in condition.\n");
+    }
+
+    AuriNode* condition = expression();
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("'while' missing ')' in condition.\n");
+    }
+
+    AuriStmt* block = statement();
+    AuriStmtNode while_loop;
+    while_loop.while_loop.condition = condition;
+    while_loop.while_loop.block = block;
+
+    return auri_stmt_init(AST_STMT_WHILE, while_loop);
+}
+
 //+-------------+
 //| EXPRESSIONS |
 //+-------------+
@@ -153,20 +202,24 @@ AuriStmt* if_stmt(void) {
     AuriNode* node = func();\
     AuriNode* current = node;\
     while(parser_match(comparison_args_size, __VA_ARGS__)) {\
-        current->left = ast_node_init(current->type, current->token, current->left, current->right);\
-        current->type = AST_NODE_BINARY;\
-        current->token = parser_previous();\
-        current->right = func();\
-        current = current->right;\
+        AuriToken* operator = parser_previous();\
+        AuriNode* right = func();\
+        current = ast_node_init(AST_NODE_BINARY, operator, current, right);\
     }\
-    return node
+    return current
 
 AuriNode* expression(void) {
-    return or();
+    return assignment();
 }
 
 AuriNode* assignment(void) {
-    return NULL;
+    AuriNode* node = or();
+
+    if(parser_match(1, AR_TOKEN_EQUAL)) {
+        node = ast_node_init(AST_NODE_BINARY, parser_previous(), node, assignment());
+    }
+
+    return node;
 }
 
 AuriNode* or(void) {
@@ -174,11 +227,13 @@ AuriNode* or(void) {
     AuriNode* current = node;
 
     while(parser_match(1, AR_TOKEN_OR)) {
-        current->left = ast_node_init(current->type, current->token, current->left, current->right);
+        current->binary.left = ast_node_init(AST_NODE_BINARY, current->token, current->binary.left, current->binary.right);
+
         current->type = AST_NODE_BINARY;
         current->token = parser_previous();
-        current->right = equality();
-        current = current->right;
+
+        current->binary.right = equality();
+        current = current->binary.right;
     }
 
     return node;
@@ -207,15 +262,53 @@ AuriNode* factor(void) {
 AuriNode* unary(void) {
     if(parser_match(2, AR_TOKEN_BANG_EQUAL, AR_TOKEN_MINUS)) {
         AuriToken* operator = parser_previous();
-        return ast_node_init(AST_NODE_UNARY, operator, NULL, unary());
+        return ast_node_init(AST_NODE_UNARY, operator, unary());
     }
 
-    return primary();
+    return call();
+}
+
+AuriNode* call(void) {
+    AuriNode* node = primary();
+
+    while(true) {
+        if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
+            node = function_call(node);
+        } else {
+            break;
+        }
+        // // No support for structs yet
+        // else if(parser_match(1, AR_TOKEN_DOT)) {
+        // }
+    }
+
+    return node;
+}
+
+AuriNode* function_call(AuriNode* node) {
+    DArrayVoidPtr arguments;
+    init_dynamic_ptr_array(&arguments);
+    AuriToken* paren = parser_previous();
+
+    while(parser_peek()->type != AR_TOKEN_RIGHT_PAREN && parser_peek()->type != AR_TOKEN_EOF) {
+        AuriNode* argument = expression();
+        insert_dynamic_ptr_array(&arguments, argument);
+
+        if(parser_peek()->type != AR_TOKEN_RIGHT_PAREN && !parser_match(1, AR_TOKEN_COMMA)) {
+            auri_throw_execution_error("Missing ',' o function call on line %d.\n", parser_previous()->line);
+        }
+    }
+
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("Missing parenthesis on function call on line %d.\n", parser_previous()->line);
+    }
+
+    return ast_node_init(AST_NODE_CALL, paren, node, arguments);
 }
 
 AuriNode* primary(void) {
-    if(parser_match(5, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL)) {
-        return ast_node_init(AST_NODE_LITERAL, parser_previous(), NULL, NULL);
+    if(parser_match(6, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER)) {
+        return ast_node_init(AST_NODE_LITERAL, parser_previous());
     }
 
     if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
@@ -227,7 +320,7 @@ AuriNode* primary(void) {
         return expr;
     }
 
-    auri_throw_execution_error("Literal undefined (Line: %d)[%s]: %s\n",
+    auri_throw_execution_error("Wrong usage (Line: %d)[%s]: %s\n",
         parser_peek()->line + 1, auri_token_name(parser_peek()->type), parser_peek()->lexeme.text);
     return NULL;
 }

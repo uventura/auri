@@ -41,7 +41,7 @@ operator        → "==" | "!=" | "<" | "<=" | ">" | ">="
 primary         → NUMBER | STRING | "true" | "false" | "null" ;
 
 expression → assignment
-assignment → IDENTIFIER "=" assignment
+assignment     → IDENTIFIER "=" assignment | logic_or ;
 or         → and (|| equality )*
 and        → equality (&& equality)*
 equality   → comparison (("==" | "!=") comparison)*
