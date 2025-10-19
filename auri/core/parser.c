@@ -22,6 +22,7 @@ AuriStmt* run_stmt(void);
 AuriStmt* if_stmt(void);
 AuriStmt* while_stmt(void);
 AuriStmt* for_stmt(void);
+AuriStmt* var_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -83,8 +84,27 @@ void auri_parser_free(AuriAst* ast) {
 
 AuriStmt* declaration(void) {
     if(parser_match(4, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP)) return run_stmt();
+    if(parser_match(4, AR_TOKEN_NUMERIC_VAR, AR_TOKEN_STRING_VAR, AR_TOKEN_BOOL_VAR)) return var_stmt();
 
     return statement();
+}
+
+AuriStmt* var_stmt(void) {
+    printf("Variable statement.\n");
+    AuriToken* type = parser_previous();
+    AuriStmt* expr = NULL;
+
+    if(parser_match(1, AR_TOKEN_EQUAL)) {
+        expr = expression_stmt();
+    } else if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
+        auri_throw_execution_error("The variable declaration on line %d is missing ';'.", type->line);
+    }
+
+    AuriStmtNode var;
+    var.var.type = type;
+    var.var.expr = expr;
+
+    return auri_stmt_init(AST_STMT_VAR, var);
 }
 
 AuriStmt* statement(void) {

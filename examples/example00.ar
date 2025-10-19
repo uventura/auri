@@ -2,6 +2,7 @@ for(a = 2; a < 2; a = a + 1) {
     print("Hello, World!");
 
     a = 2 + 3;
+    numeric my_variable = 2;
 }
 
 run test_run_process {

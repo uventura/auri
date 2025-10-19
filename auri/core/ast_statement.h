@@ -47,6 +47,11 @@ typedef union {
         AuriNode* condition;
         struct stmt* block;
     } while_loop;
+    // Variable
+    struct {
+        AuriToken* type;
+        struct stmt* expr; 
+    } var;
 } AuriStmtNode;
 
 typedef struct stmt {
