@@ -3,3 +3,7 @@ for(a = 2; a < 2; a = a + 1) {
 
     a = 2 + 3;
 }
+
+run test_run_process {
+    print("This is a run step.\n");
+}

@@ -3,6 +3,7 @@
 
 #include "auri/core/common.h"
 
+#include <stdio.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <inttypes.h>

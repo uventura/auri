@@ -268,7 +268,8 @@ AuriNode* assignment(void) {
     AuriNode* node = or();
 
     if(parser_match(1, AR_TOKEN_EQUAL)) {
-        node = ast_node_init(AST_NODE_BINARY, parser_previous(), node, assignment());
+        AuriToken* operator = parser_previous();
+        node = ast_node_init(AST_NODE_BINARY, operator, node, assignment());
     }
 
     return node;
