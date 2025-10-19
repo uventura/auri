@@ -19,6 +19,7 @@ void ast_print_while_stmt(AuriStmt* stmt);
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
 void ast_print_binary(AuriNode* node);
+void ast_print_call(AuriNode* node);
 void ast_print_literal(AuriNode* node);
 
 void auri_ast_print(AuriAst* ast) {
@@ -166,6 +167,9 @@ void ast_print_node(AuriNode* node) {
         case AST_NODE_BINARY:
             ast_print_binary(node);
             break;
+        case AST_NODE_CALL:
+            ast_print_call(node);
+            break;
         case AST_NODE_GROUPING:
             break;
         default:
@@ -221,6 +225,28 @@ void ast_print_binary(AuriNode* node) {
 
     ast_print_spaces();
     printf(">>>\n");
+}
+
+void ast_print_call(AuriNode* node) {
+    ast_print_spaces();
+    printf("[Function Call]<<\n");
+
+    ast_spaces_counter++;
+    ast_print_spaces();
+    printf("# Caller:\n");
+    ast_print_node(node->call.callee);
+
+    ast_print_spaces();
+    printf("# Arguments:\n");
+    for(uint32_t i = 0; i < node->call.arguments.size; ++i) {
+        ast_print_node(node->call.arguments.array[i]);
+        ast_print_spaces();
+        printf("----------------\n");
+    }
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
 }
 
 void ast_print_literal(AuriNode* node) {

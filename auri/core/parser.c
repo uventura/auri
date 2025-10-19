@@ -265,7 +265,7 @@ AuriNode* unary(void) {
         return ast_node_init(AST_NODE_UNARY, operator, unary());
     }
 
-    return primary();
+    return call();
 }
 
 AuriNode* call(void) {
@@ -273,11 +273,37 @@ AuriNode* call(void) {
 
     while(true) {
         if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
-        } else if(parser_match(1, AR_TOKEN_DOT)) {
+            node = function_call(node);
+        } else {
+            break;
         }
+        // // No support for structs yet
+        // else if(parser_match(1, AR_TOKEN_DOT)) {
+        // }
     }
 
     return node;
+}
+
+AuriNode* function_call(AuriNode* node) {
+    DArrayVoidPtr arguments;
+    init_dynamic_ptr_array(&arguments);
+    AuriToken* paren = parser_previous();
+
+    while(parser_peek()->type != AR_TOKEN_RIGHT_PAREN && parser_peek()->type != AR_TOKEN_EOF) {
+        AuriNode* argument = expression();
+        insert_dynamic_ptr_array(&arguments, argument);
+
+        if(parser_peek()->type != AR_TOKEN_RIGHT_PAREN && !parser_match(1, AR_TOKEN_COMMA)) {
+            auri_throw_execution_error("Missing ',' o function call on line %d.\n", parser_previous()->line);
+        }
+    }
+
+    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
+        auri_throw_execution_error("Missing parenthesis on function call on line %d.\n", parser_previous()->line);
+    }
+
+    return ast_node_init(AST_NODE_CALL, paren, node, arguments);
 }
 
 AuriNode* primary(void) {

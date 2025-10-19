@@ -10,6 +10,7 @@ typedef enum {
     AST_NODE_LITERAL,
     AST_NODE_UNARY,
     AST_NODE_BINARY,
+    AST_NODE_CALL,
     AST_NODE_GROUPING
 } AuriNodeType;
 
@@ -25,6 +26,10 @@ typedef struct Node {
             struct Node* left;
             struct Node* right;
         } binary;
+        struct {
+            struct Node* callee;
+            DArrayVoidPtr arguments;
+        } call;
     };
 } AuriNode;
 
