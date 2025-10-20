@@ -3,7 +3,13 @@ import("module/path/file.ar", "element", "second_element");
 alias module.scope.function as module;
 alias module.scope.function as module02;
 
+module meu {
+    
+} 
+
 run testing_scope_execution {
+    meu.func
+
     var testing_var = 2;
     module.scope.function;
 
@@ -19,3 +25,4 @@ run testing_another_execution {
         return 42.456768;
     }
 }
+

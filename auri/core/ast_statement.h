@@ -50,6 +50,7 @@ typedef union {
     // Variable
     struct {
         AuriToken* type;
+        AuriToken* identifier;
         struct stmt* expr; 
     } var;
 } AuriStmtNode;

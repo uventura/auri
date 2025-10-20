@@ -10,6 +10,7 @@ uint32_t ast_spaces_counter = 0;
 void ast_print_spaces(void);
 
 void ast_print_stmt(AuriStmt* stmt);
+void ast_print_var_stmt(AuriStmt* stmt);
 void ast_print_expr_stmt(AuriStmt* stmt);
 void ast_print_block_stmt(AuriStmt* stmt);
 void ast_print_run_stmt(AuriStmt* stmt);
@@ -63,6 +64,8 @@ void ast_print_stmt(AuriStmt* stmt) {
             break;
         case AST_STMT_FOR:
         case AST_STMT_VAR:
+            ast_print_var_stmt(stmt);
+            break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
         case AST_STMT_BREAK:
@@ -70,6 +73,26 @@ void ast_print_stmt(AuriStmt* stmt) {
         default:
             break;
     }
+}
+
+void ast_print_var_stmt(AuriStmt* stmt) { 
+    ast_print_spaces();
+    printf("{VariableStmt} <<\n");
+
+    ast_spaces_counter++;
+    ast_print_spaces();
+    printf("# Identifier: %s\n", stmt->stmt.var.identifier->lexeme.text);
+
+    ast_print_spaces();
+    printf("# Type: %s\n", stmt->stmt.var.type->lexeme.text);
+
+    ast_print_spaces();
+    printf("# Variable value:\n");
+    ast_print_stmt(stmt->stmt.var.expr);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
 }
 
 void ast_print_expr_stmt(AuriStmt* stmt) {
