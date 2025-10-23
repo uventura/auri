@@ -39,6 +39,8 @@ void auri_stmt_free(AuriStmt* stmt) {
             break;
         case AST_STMT_FOR:
         case AST_STMT_VAR:
+            auri_stmt_free(stmt->stmt.var.expr);
+            break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
         case AST_STMT_BREAK:
