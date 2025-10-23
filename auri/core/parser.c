@@ -24,6 +24,7 @@ AuriStmt* if_stmt(void);
 AuriStmt* while_stmt(void);
 AuriStmt* for_stmt(void);
 AuriStmt* var_stmt(void);
+AuriStmt* function_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -46,6 +47,7 @@ AuriToken* parser_advance(void);
 
 bool parser_match(uint32_t size, ...);
 bool parser_is_at_end(AuriScanner* scanner);
+void parser_consume(char* message, uint32_t size, ...);
 
 //||========================================================||
 //||========================================================||
@@ -117,6 +119,33 @@ AuriStmt* var_stmt(void) {
     var.var.expr = expr;
 
     return auri_stmt_init(AST_STMT_VAR, var);
+}
+
+AuriStmt* function_stmt(void){
+    parser_consume("The function declaration is missing '[' in type definition", 1, AR_TOKEN_LEFT_BRACKET); 
+    parser_consume("The function is missing type in declaration", 6, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER);
+    AuriToken* type = parser_previous();
+
+    parser_consume("The function is missing ']' in type definition", AR_TOKEN_RIGHT_BRACKET);
+    parser_consume("The function is missing identification", 1, AR_TOKEN_IDENTIFIER);
+
+    AuriToken* identifier = parser_previous();
+    parser_consume("The function is missing '(' to declare arguments", 1, AR_TOKEN_LEFT_PAREN);
+    
+    DArrayVoidPtr arguments;
+    init_dynamic_ptr_array(&arguments);
+    // get parameters
+    parser_consume("The function is missing ')' to declare arguments", 1, AR_TOKEN_RIGHT_PAREN);
+    
+    AuriStmt* body = block_stmt();
+
+    AuriStmtNode fun;
+    fun.function.type = type;
+    fun.function.identifier = identifier;
+    fun.function.arguments = arguments;
+    fun.function.body = body;
+
+    return auri_stmt_init(AST_STMT_FUNCTION, fun);
 }
 
 AuriStmt* statement(void) {
@@ -452,4 +481,25 @@ bool parser_is_at_end(AuriScanner* scanner) {
     AuriToken* token = scanner->tokens.array[auri_parser_token_pos];
 
     return token->type == AR_TOKEN_EOF;
+}
+
+void parser_consume(char* message, uint32_t size, ...) {
+    va_list args;
+    va_start(args, size);
+    bool found = false;
+    for(uint32_t i = 0; i < size; ++i) {
+        AuriTokenType type = va_arg(args, AuriTokenType);
+    
+        if(type == parser_peek()->type) {
+            found = true;
+            parser_advance();
+            break;
+        }
+    }
+    va_end(args);
+
+    if(!found) {
+        printf("%s", message);
+        auri_throw_execution_error(" on line %d.\n", parser_peek()->line);
+    }
 }
