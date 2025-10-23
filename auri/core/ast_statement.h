@@ -1,6 +1,4 @@
 #ifndef AURI_AST_STATEMENTS_H
-#define AURI_AST_STATEMENTS_H
-
 #include "auri/core/ast_node.h"
 #include "auri/utils/array.h"
 #include "auri/utils/string.h"
@@ -14,6 +12,7 @@ typedef enum {
     AST_STMT_WHILE,
     AST_STMT_FOR,
     AST_STMT_VAR,
+    AST_STMT_FUNCTION,
     AST_STMT_IMPORT,
     AST_STMT_RETURN,
     AST_STMT_BREAK,
@@ -47,6 +46,21 @@ typedef union {
         AuriNode* condition;
         struct stmt* block;
     } while_loop;
+    // Variable
+    // <type> identifier = <expression>;
+    struct {
+        AuriToken* type;
+        AuriToken* identifier;
+        struct stmt* expr; 
+    } var;
+    // Function
+    // fun[type] identifier(<parameters>) <block>
+    struct {
+        AuriToken* identifier;
+        AuriToken* type;
+        DArrayVoidPtr arguments;
+        struct stmt* body;
+    } function;
 } AuriStmtNode;
 
 typedef struct stmt {

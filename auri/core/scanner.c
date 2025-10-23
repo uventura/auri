@@ -68,6 +68,12 @@ AuriScanner auri_scanner(const char* path) {
             case '}':
                 type = AR_TOKEN_RIGHT_BRACE;
                 break;
+            case '[':
+                type = AR_TOKEN_LEFT_BRACKET;
+                break;
+            case ']':
+                type = AR_TOKEN_RIGHT_BRACKET;
+                break;
             case ',':
                 type = AR_TOKEN_COMMA;
                 break;

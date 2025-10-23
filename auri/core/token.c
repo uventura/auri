@@ -64,6 +64,12 @@ const char* auri_token_name(AuriTokenType token_type) {
         case AR_TOKEN_RIGHT_BRACE:
             return "RIGHT_BRACE";
             break;
+        case AR_TOKEN_LEFT_BRACKET:
+            return "LEFT_BRACKET";
+            break;
+        case AR_TOKEN_RIGHT_BRACKET:
+            return "RIGHT_BRACKET";
+            break;
         case AR_TOKEN_COMMA:
             return "COMMA";
             break;
