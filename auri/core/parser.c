@@ -11,6 +11,7 @@
 AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
 bool auri_parser_is_function = false;
+bool auri_parser_is_loop = false;
 
 AuriStmt* init_declaration(void);
 AuriStmt* declaration(void);
@@ -27,6 +28,8 @@ AuriStmt* for_stmt(void);
 AuriStmt* var_stmt(void);
 AuriStmt* function_stmt(void);
 AuriStmt* return_stmt(void);
+AuriStmt* break_stmt(void);
+AuriStmt* continue_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -182,6 +185,8 @@ AuriStmt* statement(void) {
     else if(parser_match(1, AR_TOKEN_WHILE)) return while_stmt();
     else if(parser_match(1, AR_TOKEN_FOR)) return for_stmt();
     else if(parser_match(1, AR_TOKEN_RETURN)) return return_stmt();
+    else if(parser_match(1, AR_TOKEN_BREAK)) return break_stmt();
+    else if(parser_match(1, AR_TOKEN_CONTINUE)) return continue_stmt();
 
     return expression_stmt();
 }
@@ -270,6 +275,7 @@ AuriStmt* run_stmt(void) {
 }
 
 AuriStmt* while_stmt(void) {
+    auri_parser_is_loop = true;
     if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
         auri_throw_execution_error("'while' missing '(' in condition.\n");
     }
@@ -284,10 +290,12 @@ AuriStmt* while_stmt(void) {
     while_loop.while_loop.condition = condition;
     while_loop.while_loop.block = block;
 
+    auri_parser_is_loop = false;
     return auri_stmt_init(AST_STMT_WHILE, while_loop);
 }
 
 AuriStmt* for_stmt(void) {
+    auri_parser_is_loop = true;
     parser_consume("Missing '(' on for loop", 1, AR_TOKEN_LEFT_PAREN);
 
     AuriStmt* initializer = NULL;
@@ -331,6 +339,7 @@ AuriStmt* for_stmt(void) {
     AuriStmtNode for_block;
     for_block.block.items = for_loop;
 
+    auri_parser_is_loop = false;
     return auri_stmt_init(AST_STMT_BLOCK, for_block);
 }
 
@@ -349,6 +358,31 @@ AuriStmt* return_stmt(void) {
     parser_consume("Return statement missing ';'", 1, AR_TOKEN_SEMICOLON);
     return auri_stmt_init(AST_STMT_RETURN, return_s);
 }
+
+AuriStmt* break_stmt(void) {
+    if(!auri_parser_is_loop) {
+        auri_throw_execution_error("Break statement outside of loop scope on line %d.\n", parser_peek()->line + 1);
+    }
+
+    AuriStmtNode stmt;
+    stmt.break_s.token = parser_peek();
+
+    parser_consume("Break missing ';'", 1, AR_TOKEN_SEMICOLON);
+    return auri_stmt_init(AST_STMT_BREAK, stmt);
+}
+
+AuriStmt* continue_stmt(void) {
+    if(!auri_parser_is_loop) {
+        auri_throw_execution_error("Continue statement outside of loop scope on line %d.\n", parser_peek()->line + 1);
+    }
+
+    AuriStmtNode stmt;
+    stmt.continue_s.token = parser_peek();
+
+    parser_consume("Continue missing ';'", 1, AR_TOKEN_SEMICOLON);
+    return auri_stmt_init(AST_STMT_BREAK, stmt);
+}
+
 
 //+-------------+
 //| EXPRESSIONS |

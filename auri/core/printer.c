@@ -18,6 +18,8 @@ void ast_print_run_stmt(AuriStmt* stmt);
 void ast_print_if_stmt(AuriStmt* stmt);
 void ast_print_while_stmt(AuriStmt* stmt);
 void ast_print_return_stmt(AuriStmt* stmt);
+void ast_print_break_stmt(AuriStmt* stmt);
+void ast_print_continue_stmt(AuriStmt* stmt);
 
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
@@ -77,7 +79,11 @@ void ast_print_stmt(AuriStmt* stmt) {
             ast_print_return_stmt(stmt);
             break;
         case AST_STMT_BREAK:
+            ast_print_break_stmt(stmt);
+            break;
         case AST_STMT_CONTINUE:
+            ast_print_break_stmt(stmt);
+            break;
         default:
             break;
     }
@@ -224,6 +230,16 @@ void ast_print_return_stmt(AuriStmt* stmt) {
 
     ast_print_spaces();
     printf(">>\n");
+}
+
+void ast_print_break_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{BreakStmt} <<>>\n");
+}
+
+void ast_print_continue_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{ContinueStmt} <<>>\n");
 }
 
 void ast_print_node(AuriNode* node) {

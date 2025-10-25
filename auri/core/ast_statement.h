@@ -65,6 +65,14 @@ typedef union {
     struct {
         AuriNode* value;
     } return_s;
+    // Break
+    struct {
+        AuriToken* token;
+    } break_s;
+    // Continue
+    struct {
+        AuriToken* token;
+    } continue_s;
 } AuriStmtNode;
 
 typedef struct stmt {

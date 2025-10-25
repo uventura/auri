@@ -11,4 +11,8 @@ module basic_math {
 
         return 34 + print(34, 56, "hello");
     }
+
+    while(true) {
+        break;
+    }
 }

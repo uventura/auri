@@ -56,6 +56,8 @@ typedef enum {
     AR_TOKEN_IMPORT,
     AR_TOKEN_FUN,
     AR_TOKEN_NULL,
+    AR_TOKEN_BREAK,
+    AR_TOKEN_CONTINUE,
     // Execution Control
     AR_TOKEN_SETUP,
     AR_TOKEN_PRE_RUN,
