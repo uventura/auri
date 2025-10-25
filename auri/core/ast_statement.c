@@ -8,6 +8,7 @@
 
 void stmt_block_free(AuriStmt* stmt);
 void stmt_if_block_free(AuriStmt* stmt);
+void stmt_function_free(AuriStmt* stmt);
 
 AuriStmt* auri_stmt_init(AuriStmtType type, AuriStmtNode node) {
     AuriStmt* stmt = (AuriStmt*) malloc(sizeof(AuriStmt));
@@ -40,6 +41,9 @@ void auri_stmt_free(AuriStmt* stmt) {
         case AST_STMT_FOR:
         case AST_STMT_VAR:
             auri_stmt_free(stmt->stmt.var.expr);
+            break;
+        case AST_STMT_FUNCTION:
+            stmt_function_free(stmt);
             break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
@@ -74,4 +78,12 @@ void stmt_if_block_free(AuriStmt* stmt) {
     stmt->stmt.if_else.expr = NULL;
     stmt->stmt.if_else.if_block = NULL;
     stmt->stmt.if_else.else_block = NULL;
+}
+
+void stmt_function_free(AuriStmt* stmt) {
+    for(uint32_t i=0;i<stmt->stmt.function.arguments.size;++i) {
+        auri_stmt_free(stmt->stmt.function.arguments.array[i]);
+    }
+    auri_stmt_free(stmt->stmt.function.body);
+    free_dynamic_ptr_array(&stmt->stmt.function.arguments);
 }

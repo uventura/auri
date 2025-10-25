@@ -11,6 +11,7 @@ void ast_print_spaces(void);
 
 void ast_print_stmt(AuriStmt* stmt);
 void ast_print_var_stmt(AuriStmt* stmt);
+void ast_print_function_stmt(AuriStmt* stmt);
 void ast_print_expr_stmt(AuriStmt* stmt);
 void ast_print_block_stmt(AuriStmt* stmt);
 void ast_print_run_stmt(AuriStmt* stmt);
@@ -66,6 +67,9 @@ void ast_print_stmt(AuriStmt* stmt) {
         case AST_STMT_VAR:
             ast_print_var_stmt(stmt);
             break;
+        case AST_STMT_FUNCTION:
+            ast_print_function_stmt(stmt);
+            break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
         case AST_STMT_BREAK:
@@ -75,7 +79,7 @@ void ast_print_stmt(AuriStmt* stmt) {
     }
 }
 
-void ast_print_var_stmt(AuriStmt* stmt) { 
+void ast_print_var_stmt(AuriStmt* stmt) {
     ast_print_spaces();
     printf("{VariableStmt} <<\n");
 
@@ -89,6 +93,37 @@ void ast_print_var_stmt(AuriStmt* stmt) {
     ast_print_spaces();
     printf("# Variable value:\n");
     ast_print_stmt(stmt->stmt.var.expr);
+    ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
+}
+
+void ast_print_function_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{FunctionStmt} <<\n");
+
+    ast_spaces_counter++;
+    ast_print_spaces();
+    printf("# Identifier: %s\n", stmt->stmt.function.identifier->lexeme.text);
+
+    ast_print_spaces();
+    printf("# Type: %s\n", stmt->stmt.function.type->lexeme.text);
+
+    ast_print_spaces();
+    printf("# Parameters:\n");
+    for(uint32_t i=0;i<stmt->stmt.function.arguments.size;++i) {
+        ast_print_stmt(stmt->stmt.function.arguments.array[i]);
+        ast_spaces_counter++;
+        ast_print_spaces();
+        printf("------------\n");
+        ast_spaces_counter--;
+    }
+
+    ast_print_spaces();
+    printf("# Body:\n");
+    ast_print_stmt(stmt->stmt.function.body);
+
     ast_spaces_counter--;
 
     ast_print_spaces();

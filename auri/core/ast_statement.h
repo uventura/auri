@@ -51,7 +51,7 @@ typedef union {
     struct {
         AuriToken* type;
         AuriToken* identifier;
-        struct stmt* expr; 
+        struct stmt* expr;
     } var;
     // Function
     // fun[type] identifier(<parameters>) <block>

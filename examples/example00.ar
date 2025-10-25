@@ -1,7 +1,14 @@
+fun[SomeWeirdType] foo(string v = 2, numeric a, bool x) {
+    print("Hello, world!");
+}
+
 run test_namespace {
     bool variable = 2 + 1 + sum_values(1, 3, "String");
     string x = "Hello";
 
     print("Hello, World!");
-}
 
+    for(i=0; i<2; i = i + 1) {
+        print("Hello");
+    }
+}

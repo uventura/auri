@@ -41,13 +41,15 @@ AuriNode* function_call(AuriNode* node);
 AuriNode* primary(void);
 
 // Parser
+bool parser_check_var_decl(void);
+
 AuriToken* parser_peek(void);
 AuriToken* parser_previous(void);
 AuriToken* parser_advance(void);
 
 bool parser_match(uint32_t size, ...);
-bool parser_is_at_end(AuriScanner* scanner);
-void parser_consume(char* message, uint32_t size, ...);
+bool parser_is_at_end(void);
+AuriToken* parser_consume(char* message, uint32_t size, ...);
 
 //||========================================================||
 //||========================================================||
@@ -60,7 +62,7 @@ AuriAst* auri_parser(AuriScanner* scanner) {
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
 
-    while(!parser_is_at_end(scanner)) {
+    while(!parser_is_at_end()) {
         AuriStmt* stmt = init_declaration();
         insert_dynamic_ptr_array(&ast->statements, stmt);
     }
@@ -87,56 +89,76 @@ void auri_parser_free(AuriAst* ast) {
 
 AuriStmt* init_declaration(void){
     if(parser_match(4, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP)) return run_stmt();
- 
+
     return declaration();
 }
 
 AuriStmt* declaration(void) {
-       if(parser_match(4, AR_TOKEN_GENERIC_VAR, AR_TOKEN_NUMERIC_VAR, AR_TOKEN_STRING_VAR, AR_TOKEN_BOOL_VAR)) return var_stmt();
+    if(parser_check_var_decl()) return var_stmt();
+    if(parser_match(1, AR_TOKEN_FUN)) return function_stmt();
 
     return statement();
 }
 
 AuriStmt* var_stmt(void) {
-    AuriToken* type = parser_previous();
-    AuriToken* identifier = NULL;
-    AuriStmt* expr = NULL;
-
-    if(!parser_match(1, AR_TOKEN_IDENTIFIER)) {
-        auri_throw_execution_error("The variable declaration on line %d is missing identifier.\n", type->line);
-    }
-    identifier = parser_previous();
-
-    if(parser_match(1, AR_TOKEN_EQUAL)) {
-        expr = expression_stmt();
-    } else if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
-        auri_throw_execution_error("The variable declaration on line %d is missing ';'.\n", type->line);
-    }
-
     AuriStmtNode var;
-    var.var.type = type;
-    var.var.identifier = identifier;
-    var.var.expr = expr;
+    var.var.type = parser_previous();
+    var.var.identifier = parser_consume("The variable declaration is missing identifier", 1, AR_TOKEN_IDENTIFIER);
+    var.var.expr = NULL;
+
+    if(parser_match(1, AR_TOKEN_EQUAL))
+        var.var.expr = expression_stmt();
+    else
+        parser_consume("Missing ';' in var declaration", 1, AR_TOKEN_SEMICOLON);
 
     return auri_stmt_init(AST_STMT_VAR, var);
 }
 
 AuriStmt* function_stmt(void){
-    parser_consume("The function declaration is missing '[' in type definition", 1, AR_TOKEN_LEFT_BRACKET); 
-    parser_consume("The function is missing type in declaration", 6, AR_TOKEN_NUMBER, AR_TOKEN_STRING, AR_TOKEN_TRUE, AR_TOKEN_FALSE, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER);
+    parser_consume("The function declaration is missing '[' in type definition", 1, AR_TOKEN_LEFT_BRACKET);
+    parser_consume(
+        "The function is missing type in declaration",
+        6, AR_TOKEN_NUMERIC_VAR, AR_TOKEN_STRING_VAR, AR_TOKEN_BOOL_VAR, AR_TOKEN_NULL, AR_TOKEN_IDENTIFIER
+    );
     AuriToken* type = parser_previous();
 
-    parser_consume("The function is missing ']' in type definition", AR_TOKEN_RIGHT_BRACKET);
+    parser_consume("The function is missing ']' in type definition", 1, AR_TOKEN_RIGHT_BRACKET);
     parser_consume("The function is missing identification", 1, AR_TOKEN_IDENTIFIER);
 
     AuriToken* identifier = parser_previous();
     parser_consume("The function is missing '(' to declare arguments", 1, AR_TOKEN_LEFT_PAREN);
-    
+
     DArrayVoidPtr arguments;
     init_dynamic_ptr_array(&arguments);
-    // get parameters
-    parser_consume("The function is missing ')' to declare arguments", 1, AR_TOKEN_RIGHT_PAREN);
-    
+
+    while(parser_peek()->type != AR_TOKEN_RIGHT_PAREN) {
+        if(parser_check_var_decl()) {
+            AuriStmtNode var;
+            var.var.type = parser_previous();
+            var.var.identifier = parser_consume("The variable declaration is missing identifier", 1, AR_TOKEN_IDENTIFIER);
+            var.var.expr = NULL;
+
+            if(parser_match(1, AR_TOKEN_EQUAL)) {
+                AuriStmtNode expr_stmt;
+                expr_stmt.expr.item = expression();
+                var.var.expr = auri_stmt_init(AST_STMT_EXPR, expr_stmt);
+            }
+
+            AuriStmt* stmt = auri_stmt_init(AST_STMT_VAR, var);
+
+            insert_dynamic_ptr_array(&arguments, stmt);
+        } else {
+            auri_throw_execution_error("Variable declaration missing type");
+        }
+
+        if(!parser_match(1, AR_TOKEN_COMMA)) {
+            break;
+        };
+    }
+
+    parser_consume("The function is missing ')' in argument declaration in function", 1, AR_TOKEN_RIGHT_PAREN);
+    parser_consume("The function is missing '{' to declare its body", 1, AR_TOKEN_LEFT_BRACE);
+
     AuriStmt* body = block_stmt();
 
     AuriStmtNode fun;
@@ -181,7 +203,8 @@ AuriStmt* block_stmt(void) {
     while(!parser_match(1, AR_TOKEN_RIGHT_BRACE)) {
         AuriStmt* stmt = declaration();
         insert_dynamic_ptr_array(&items, stmt);
-        if(parser_is_at_end(auri_parser_scanner)) {
+
+        if(parser_is_at_end()) {
             auri_throw_execution_error("Missing '}' on line %d.\n", parser_peek()->line);
         }
     }
@@ -258,10 +281,7 @@ AuriStmt* while_stmt(void) {
 }
 
 AuriStmt* for_stmt(void) {
-    // for(expr1; comparison; expr2)
-    if(!parser_match(1, AR_TOKEN_LEFT_PAREN)) {
-        auri_throw_execution_error("Missing '(' on for loop on line %d.\n", parser_peek()->line);
-    }
+    parser_consume("Missing '(' on for loop", 1, AR_TOKEN_LEFT_PAREN);
 
     AuriStmt* initializer = NULL;
     if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
@@ -283,12 +303,12 @@ AuriStmt* for_stmt(void) {
     if(increment != NULL && !parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
         auri_throw_execution_error("Missing ')' on for loop in line %d\n", parser_peek()->line);
     }
-    
+
     AuriStmtNode inc_stmt_node;
     inc_stmt_node.expr.item = increment;
     AuriStmt* inc_stmt = auri_stmt_init(AST_STMT_EXPR, inc_stmt_node);
- 
-    AuriStmt* block = statement();   
+
+    AuriStmt* block = statement();
     insert_dynamic_ptr_array(&block->stmt.block.items, inc_stmt);
 
     AuriStmtNode loop;
@@ -298,7 +318,7 @@ AuriStmt* for_stmt(void) {
 
     DArrayVoidPtr for_loop;
     init_dynamic_ptr_array(&for_loop);
-    insert_dynamic_ptr_array(&for_loop, initializer); 
+    insert_dynamic_ptr_array(&for_loop, initializer);
     insert_dynamic_ptr_array(&for_loop, while_loop);
 
     AuriStmtNode for_block;
@@ -413,9 +433,7 @@ AuriNode* function_call(AuriNode* node) {
         }
     }
 
-    if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
-        auri_throw_execution_error("Missing parenthesis on function call on line %d.\n", parser_previous()->line);
-    }
+    parser_consume("Missing parenthesis on function call", 1, AR_TOKEN_RIGHT_PAREN);
 
     return ast_node_init(AST_NODE_CALL, paren, node, arguments);
 }
@@ -427,9 +445,7 @@ AuriNode* primary(void) {
 
     if(parser_match(1, AR_TOKEN_LEFT_PAREN)) {
         AuriNode* expr = expression();
-        if(!parser_match(1, AR_TOKEN_RIGHT_PAREN)) {
-            auri_throw_execution_error("No matching parenthesis in %d\n!", parser_peek()->line);
-        }
+        parser_consume("No matching parenthesis", 1, AR_TOKEN_RIGHT_PAREN);
 
         return expr;
     }
@@ -442,6 +458,14 @@ AuriNode* primary(void) {
 //+-------------+
 //|    PARSER   |
 //+-------------+
+bool parser_check_var_decl(void) {
+    return parser_match(
+        4,
+        AR_TOKEN_GENERIC_VAR,
+        AR_TOKEN_NUMERIC_VAR,
+        AR_TOKEN_STRING_VAR,
+        AR_TOKEN_BOOL_VAR);
+}
 
 bool parser_match(uint32_t size, ...) {
     va_list args;
@@ -477,29 +501,27 @@ AuriToken* parser_advance(void) {
     return auri_parser_scanner->tokens.array[auri_parser_token_pos++];
 }
 
-bool parser_is_at_end(AuriScanner* scanner) {
-    AuriToken* token = scanner->tokens.array[auri_parser_token_pos];
-
-    return token->type == AR_TOKEN_EOF;
+bool parser_is_at_end(void) {
+    return parser_peek()->type == AR_TOKEN_EOF;
 }
 
-void parser_consume(char* message, uint32_t size, ...) {
+AuriToken* parser_consume(char* message, uint32_t size, ...) {
     va_list args;
     va_start(args, size);
-    bool found = false;
+
     for(uint32_t i = 0; i < size; ++i) {
         AuriTokenType type = va_arg(args, AuriTokenType);
-    
         if(type == parser_peek()->type) {
-            found = true;
+            va_end(args);
+            AuriToken* current = parser_peek();
             parser_advance();
-            break;
+            return current;
         }
     }
     va_end(args);
 
-    if(!found) {
-        printf("%s", message);
-        auri_throw_execution_error(" on line %d.\n", parser_peek()->line);
-    }
+    printf("%s", message);
+    auri_throw_execution_error(" on line %d.\n", parser_peek()->line + 1);
+
+    return NULL;
 }
