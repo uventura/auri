@@ -1,14 +1,14 @@
-fun[SomeWeirdType] foo(string v = 2, numeric a, bool x) {
-    print("Hello, world!");
-}
+module basic_math {
+    fun[string] foo(var a, var b) {
+        print("Hello, World!");
+    }
 
-run test_namespace {
-    bool variable = 2 + 1 + sum_values(1, 3, "String");
-    string x = "Hello";
+    foo();
+    foo();
 
-    print("Hello, World!");
+    fun[bool] is_raining() {
+        pritn("Something", 3, 12.56);
 
-    for(i=0; i<2; i = i + 1) {
-        print("Hello");
+        return 34 + print(34, 56, "hello");
     }
 }

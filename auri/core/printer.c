@@ -17,6 +17,7 @@ void ast_print_block_stmt(AuriStmt* stmt);
 void ast_print_run_stmt(AuriStmt* stmt);
 void ast_print_if_stmt(AuriStmt* stmt);
 void ast_print_while_stmt(AuriStmt* stmt);
+void ast_print_return_stmt(AuriStmt* stmt);
 
 void ast_print_node(AuriNode* node);
 void ast_print_unary(AuriNode* node);
@@ -64,6 +65,7 @@ void ast_print_stmt(AuriStmt* stmt) {
             ast_print_while_stmt(stmt);
             break;
         case AST_STMT_FOR:
+            break;
         case AST_STMT_VAR:
             ast_print_var_stmt(stmt);
             break;
@@ -72,6 +74,8 @@ void ast_print_stmt(AuriStmt* stmt) {
             break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
+            ast_print_return_stmt(stmt);
+            break;
         case AST_STMT_BREAK:
         case AST_STMT_CONTINUE:
         default:
@@ -207,6 +211,16 @@ void ast_print_while_stmt(AuriStmt* stmt) {
     printf("<Block>:\n");
     ast_print_stmt(stmt->stmt.while_loop.block);
     ast_spaces_counter--;
+
+    ast_print_spaces();
+    printf(">>\n");
+}
+
+void ast_print_return_stmt(AuriStmt* stmt) {
+    ast_print_spaces();
+    printf("{ReturnStmt} <<\n");
+
+    ast_print_node(stmt->stmt.return_s.value);
 
     ast_print_spaces();
     printf(">>\n");

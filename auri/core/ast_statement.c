@@ -47,6 +47,8 @@ void auri_stmt_free(AuriStmt* stmt) {
             break;
         case AST_STMT_IMPORT:
         case AST_STMT_RETURN:
+            ast_node_free(stmt->stmt.return_s.value);
+            break;
         case AST_STMT_BREAK:
         case AST_STMT_CONTINUE:
             break;

@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <stdio.h>
 
-const uint32_t AuriTokenIdentifiersSize = 23;
+const uint32_t AuriTokenIdentifiersSize = 24;
 const char*  AuriTokenIdentifiers[] = {
     "var",
     "numeric",
@@ -29,7 +29,8 @@ const char*  AuriTokenIdentifiers[] = {
     "setup",
     "prerun",
     "run",
-    "postrun"
+    "postrun",
+    "module",
 };
 
 AuriToken* auri_token_init(AuriString lexeme, AuriLiteral literal, AuriTokenType type, uint32_t line) {
@@ -192,6 +193,9 @@ const char* auri_token_name(AuriTokenType token_type) {
             break;
         case AR_TOKEN_POST_RUN:
             return "POST_RUN";
+            break;
+        case AR_TOKEN_MODULE:
+            return "AR_MODULE";
             break;
         case AR_TOKEN_EOF:
             return "EOF";

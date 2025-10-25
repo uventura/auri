@@ -61,6 +61,10 @@ typedef union {
         DArrayVoidPtr arguments;
         struct stmt* body;
     } function;
+    // Return
+    struct {
+        AuriNode* value;
+    } return_s;
 } AuriStmtNode;
 
 typedef struct stmt {

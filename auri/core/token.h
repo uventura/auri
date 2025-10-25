@@ -61,6 +61,7 @@ typedef enum {
     AR_TOKEN_PRE_RUN,
     AR_TOKEN_RUN,
     AR_TOKEN_POST_RUN,
+    AR_TOKEN_MODULE,
     // EOF
     AR_TOKEN_EOF,
     // NONE

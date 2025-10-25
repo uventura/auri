@@ -10,6 +10,7 @@
 
 AuriScanner* auri_parser_scanner;
 uint32_t auri_parser_token_pos = 0;
+bool auri_parser_is_function = false;
 
 AuriStmt* init_declaration(void);
 AuriStmt* declaration(void);
@@ -25,6 +26,7 @@ AuriStmt* while_stmt(void);
 AuriStmt* for_stmt(void);
 AuriStmt* var_stmt(void);
 AuriStmt* function_stmt(void);
+AuriStmt* return_stmt(void);
 
 // Expressions
 AuriNode* expression(void);
@@ -88,7 +90,7 @@ void auri_parser_free(AuriAst* ast) {
 //+-------------+
 
 AuriStmt* init_declaration(void){
-    if(parser_match(4, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP)) return run_stmt();
+    if(parser_match(5, AR_TOKEN_RUN, AR_TOKEN_PRE_RUN, AR_TOKEN_POST_RUN, AR_TOKEN_SETUP, AR_TOKEN_MODULE)) return run_stmt();
 
     return declaration();
 }
@@ -115,6 +117,8 @@ AuriStmt* var_stmt(void) {
 }
 
 AuriStmt* function_stmt(void){
+    auri_parser_is_function = true;
+
     parser_consume("The function declaration is missing '[' in type definition", 1, AR_TOKEN_LEFT_BRACKET);
     parser_consume(
         "The function is missing type in declaration",
@@ -167,6 +171,7 @@ AuriStmt* function_stmt(void){
     fun.function.arguments = arguments;
     fun.function.body = body;
 
+    auri_parser_is_function = false;
     return auri_stmt_init(AST_STMT_FUNCTION, fun);
 }
 
@@ -176,6 +181,7 @@ AuriStmt* statement(void) {
     else if(parser_match(1, AR_TOKEN_LEFT_BRACE)) return block_stmt();
     else if(parser_match(1, AR_TOKEN_WHILE)) return while_stmt();
     else if(parser_match(1, AR_TOKEN_FOR)) return for_stmt();
+    else if(parser_match(1, AR_TOKEN_RETURN)) return return_stmt();
 
     return expression_stmt();
 }
@@ -245,6 +251,7 @@ AuriStmt* if_stmt(void) {
 
 AuriStmt* run_stmt(void) {
     AuriTokenType type = parser_previous()->type;
+
     if(!parser_match(1, AR_TOKEN_IDENTIFIER)) {
         auri_throw_execution_error("Run statement missing identification on line %d\n", parser_peek()->line);
     }
@@ -325,6 +332,22 @@ AuriStmt* for_stmt(void) {
     for_block.block.items = for_loop;
 
     return auri_stmt_init(AST_STMT_BLOCK, for_block);
+}
+
+AuriStmt* return_stmt(void) {
+    if(!auri_parser_is_function) {
+        auri_throw_execution_error("Return statement ouside of function scope on line %d\n", parser_peek()->line + 1);
+    }
+
+    AuriStmtNode return_s;
+    return_s.return_s.value = NULL;
+
+    if(!parser_match(1, AR_TOKEN_SEMICOLON)) {
+        return_s.return_s.value = expression();
+    }
+
+    parser_consume("Return statement missing ';'", 1, AR_TOKEN_SEMICOLON);
+    return auri_stmt_init(AST_STMT_RETURN, return_s);
 }
 
 //+-------------+
