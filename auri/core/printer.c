@@ -226,7 +226,9 @@ void ast_print_return_stmt(AuriStmt* stmt) {
     ast_print_spaces();
     printf("{ReturnStmt} <<\n");
 
+    ast_spaces_counter++;
     ast_print_node(stmt->stmt.return_s.value);
+    ast_spaces_counter--;
 
     ast_print_spaces();
     printf(">>\n");
