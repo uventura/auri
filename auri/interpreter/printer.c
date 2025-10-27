@@ -1,4 +1,4 @@
-#include "auri/parser/printer.h"
+#include "auri/interpreter/printer.h"
 #include "auri/parser/ast_node.h"
 #include "auri/parser/ast_statement.h"
 
