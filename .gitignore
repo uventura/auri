@@ -60,3 +60,4 @@ obj/
 bin/
 auri-*
 private/
+private-test/
