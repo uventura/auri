@@ -1,7 +1,7 @@
 #ifndef AURI_AST_NODE_H
 #define AURI_AST_NODE_H
 
-#include "auri/core/token.h"
+#include "auri/parser/token.h"
 #include "auri/utils/array.h"
 
 #include <stdarg.h>

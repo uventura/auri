@@ -1,7 +1,7 @@
 #ifndef AURI_SCANNER_H
 #define AURI_SCANNER_H
 
-#include "auri/core/token.h"
+#include "auri/parser/token.h"
 #include "auri/utils/array.h"
 
 #include <stdbool.h>

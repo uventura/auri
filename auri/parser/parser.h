@@ -1,7 +1,7 @@
 #ifndef AURI_PARSER_H
 #define AURI_PARSER_H
 
-#include "auri/core/scanner.h"
+#include "auri/parser/scanner.h"
 #include "auri/utils/array.h"
 
 typedef struct {

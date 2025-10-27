@@ -1,7 +1,5 @@
 #include "auri/utils/array.h"
 #include "auri/utils/string.h"
-#include "auri/core/token.h"
-#include "auri/core/ast_statement.h"
 
 #include <stdio.h>
 #include <stddef.h>

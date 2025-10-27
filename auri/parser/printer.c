@@ -1,6 +1,6 @@
-#include "auri/core/printer.h"
-#include "auri/core/ast_node.h"
-#include "auri/core/ast_statement.h"
+#include "auri/parser/printer.h"
+#include "auri/parser/ast_node.h"
+#include "auri/parser/ast_statement.h"
 
 #include <stdio.h>
 #include <stdint.h>

@@ -1,4 +1,4 @@
-#include "auri/core/token.h"
+#include "auri/parser/token.h"
 
 #include "auri/utils/string.h"
 

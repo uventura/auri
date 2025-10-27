@@ -1,5 +1,5 @@
-#include "auri/core/ast_node.h"
-#include "auri/core/token.h"
+#include "auri/parser/ast_node.h"
+#include "auri/parser/token.h"
 
 #include "auri/core/common.h"
 #include "auri/core/exceptions.h"

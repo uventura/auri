@@ -1,5 +1,5 @@
 #ifndef AURI_AST_STATEMENTS_H
-#include "auri/core/ast_node.h"
+#include "auri/parser/ast_node.h"
 #include "auri/utils/array.h"
 #include "auri/utils/string.h"
 

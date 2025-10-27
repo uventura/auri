@@ -1,6 +1,6 @@
-#include "auri/core/ast_statement.h"
+#include "auri/parser/ast_statement.h"
 #include "auri/utils/array.h"
-#include "auri/core/ast_node.h"
+#include "auri/parser/ast_node.h"
 
 #include <inttypes.h>
 #include <stdio.h>

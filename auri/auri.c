@@ -1,7 +1,7 @@
 #include "auri/core/cli.h"
-#include "auri/core/scanner.h"
-#include "auri/core/parser.h"
-#include "auri/core/printer.h"
+#include "auri/parser/scanner.h"
+#include "auri/parser/parser.h"
+#include "auri/parser/printer.h"
 #include "auri/utils/string.h"
 
 #include <stdio.h>
