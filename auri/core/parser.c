@@ -63,13 +63,18 @@ AuriToken* parser_consume(char* message, uint32_t size, ...);
 AuriAst* auri_parser(AuriScanner* scanner) {
     AuriAst* ast = (AuriAst*)malloc(sizeof(AuriAst));
     init_dynamic_ptr_array(&ast->statements);
+    init_dynamic_ptr_array(&ast->run_statements);
 
     auri_parser_scanner = scanner;
     auri_parser_token_pos = 0;
 
     while(!parser_is_at_end()) {
         AuriStmt* stmt = init_declaration();
-        insert_dynamic_ptr_array(&ast->statements, stmt);
+        if(stmt->type == AST_STMT_RUN) {
+            insert_dynamic_ptr_array(&ast->run_statements, stmt);
+        } else {
+            insert_dynamic_ptr_array(&ast->statements, stmt);
+        }
     }
 
     return ast;
@@ -80,7 +85,12 @@ void auri_parser_free(AuriAst* ast) {
         AuriStmt* stmt = ast->statements.array[i];
         auri_stmt_free(stmt);
     }
+    for(uint32_t i = 0; i < ast->run_statements.size; ++i){
+        AuriStmt* stmt = ast->run_statements.array[i];
+        auri_stmt_free(stmt);
+    }
     free_dynamic_ptr_array(&ast->statements);
+    free_dynamic_ptr_array(&ast->run_statements);
     free(ast);
 }
 

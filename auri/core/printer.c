@@ -37,6 +37,11 @@ void auri_ast_print(AuriAst* ast) {
         printf("\n");
     }
 
+    for(uint32_t i = 0; i < ast->run_statements.size; ++i) {
+        ast_print_stmt(ast->run_statements.array[i]);
+        printf("\n");
+    }
+
     printf("\n=========================\n");
 }
 

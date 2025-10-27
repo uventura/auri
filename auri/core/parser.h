@@ -6,6 +6,7 @@
 
 typedef struct {
     DArrayVoidPtr statements;
+    DArrayVoidPtr run_statements;
 } AuriAst;
 
 AuriAst* auri_parser(AuriScanner* scanner);
