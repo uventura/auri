@@ -1,5 +1,6 @@
 #include "auri/core/scanner.h"
 #include "auri/core/common.h"
+#include "auri/core/exceptions.h"
 #include "auri/utils/string.h"
 #include "auri/utils/debug.h"
 

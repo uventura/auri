@@ -1,4 +1,5 @@
 #include "auri/core/cli.h"
+#include "auri/core/exceptions.h"
 #include "auri/utils/string.h"
 
 #include <inttypes.h>

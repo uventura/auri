@@ -1,6 +1,7 @@
 #include "auri/core/parser.h"
 #include "auri/core/ast_node.h"
 #include "auri/core/ast_statement.h"
+#include "auri/core/exceptions.h"
 
 #include <malloc.h>
 #include <stddef.h>

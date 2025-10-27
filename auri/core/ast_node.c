@@ -2,6 +2,7 @@
 #include "auri/core/token.h"
 
 #include "auri/core/common.h"
+#include "auri/core/exceptions.h"
 
 #include <stdio.h>
 #include <malloc.h>

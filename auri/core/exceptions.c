@@ -1,4 +1,4 @@
-#include "auri/core/common.h"
+#include "auri/core/exceptions.h"
 #include "auri/core/environment.h"
 
 #include <stdio.h>
