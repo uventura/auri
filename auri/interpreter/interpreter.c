@@ -7,9 +7,7 @@
 
 #include <stdio.h>
 
-void auri_interpreter(int argc, char* argv[]) {
-    AuriCli cli = auri_cli(argc, argv);
-
+void auri_interpreter(AuriCli cli) {
     for(uint32_t i = 0; i < cli.file_paths.size; ++i) {
         AuriString* path = cli.file_paths.array[i];
 
@@ -28,5 +26,4 @@ void auri_interpreter(int argc, char* argv[]) {
         auri_scanner_free(&scanner);
         printf("[DONE] .... '%s'\n", path->text);
     }
-    auri_cli_free(&cli);
 }

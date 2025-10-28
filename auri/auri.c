@@ -1,8 +1,13 @@
+#include "auri/core/cli.h"
 #include "auri/interpreter/interpreter.h"
 #include "auri/avm/chunk.h"
 #include "auri/avm/debug.h"
 
 int main(int argc, char* argv[]) {
+    // AuriCli cli = auri_cli(argc, argv);
+    // auri_interpreter(cli);
+    // auri_cli_free(&cli);
+
     AuriChunk chunk;
     auri_chunk_init(&chunk);
 
