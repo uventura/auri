@@ -6,6 +6,7 @@
 
 typedef enum {
     OP_RETURN,
+    OP_CONSTANT,
     OP_SUM,
     OP_SUB,
     OP_DIV,
@@ -24,6 +25,7 @@ typedef struct {
 
 void auri_chunk_init(AuriChunk* chunk);
 void auri_chunk_write(AuriChunk* chunk, AuriOpCode code);
+uint32_t auri_chunk_add_const(AuriChunk* chunk, AuriConst value);
 void auri_chunk_free(AuriChunk* chunk);
 
 #endif

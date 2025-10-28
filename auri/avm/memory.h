@@ -11,7 +11,7 @@
     size = 0;\
     array = NULL
 
-#define AURI_WRITE_DYN_ARRAY(type,array,value,size,capacity)\
+#define AURI_WRITE_DYN_ARRAY(type, array, value, size, capacity)\
     if(capacity < size + 1) {\
         capacity = INCREASE_CAPACITY(capacity);\
         array = REALLOC_ARRAY(type, array, capacity);\

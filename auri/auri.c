@@ -9,6 +9,10 @@ int main(int argc, char* argv[]) {
     auri_chunk_write(&chunk, OP_RETURN);
     auri_chunk_write(&chunk, OP_RETURN);
 
+    uint32_t const_index = auri_chunk_add_const(&chunk, 42);
+    auri_chunk_write(&chunk, OP_CONSTANT);
+    auri_chunk_add_const(&chunk, const_index);
+
     auri_print_chunk_instructions(&chunk, "Print Chunks");
 
     auri_chunk_free(&chunk);
