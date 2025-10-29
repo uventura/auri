@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 uint32_t print_simple_instruction(const char* instruction, uint32_t offset);
-uint32_t print_constant_instruction(AuriChunk* chunk, uint32_t offset);
+uint32_t print_constant_instruction(const char* name, AuriChunk* chunk, uint32_t offset);
 uint32_t print_instruction(AuriChunk* chunk, uint32_t offset);
 
 void auri_print_chunk_instructions(AuriChunk* chunk, const char* name) {
@@ -23,7 +23,7 @@ uint32_t print_instruction(AuriChunk* chunk, uint32_t offset) {
         case OP_RETURN:
             return print_simple_instruction("<Return>", offset);
         case OP_CONSTANT:
-            return print_constant_instruction(chunk, offset);
+            return print_constant_instruction("<Constant>", chunk, offset);
         case OP_SUM:
         case OP_SUB:
         case OP_DIV:
@@ -40,8 +40,8 @@ uint32_t print_simple_instruction(const char* instruction, uint32_t offset) {
     return offset + 1;
 }
 
-uint32_t print_constant_instruction(AuriChunk* chunk, uint32_t offset) {
+uint32_t print_constant_instruction(const char* name, AuriChunk* chunk, uint32_t offset) {
     uint32_t index = chunk->code[offset + 1];
-    printf("Constant: %lf\n", chunk->constants.value[index]);
+    printf("%s %g\n", name, chunk->constants.array_value[index]);
     return offset + 2;
 }

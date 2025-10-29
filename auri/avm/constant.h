@@ -6,7 +6,7 @@
 typedef double AuriConst;
 
 typedef struct {
-    AuriConst* value;
+    AuriConst* array_value;
     uint32_t size;
     uint32_t capacity;
 } AuriConstant;

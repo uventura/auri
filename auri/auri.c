@@ -3,6 +3,8 @@
 #include "auri/avm/chunk.h"
 #include "auri/avm/debug.h"
 
+#include <stdio.h>
+
 int main(int argc, char* argv[]) {
     // AuriCli cli = auri_cli(argc, argv);
     // auri_interpreter(cli);
@@ -16,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     uint32_t const_index = auri_chunk_add_const(&chunk, 42);
     auri_chunk_write(&chunk, OP_CONSTANT);
-    auri_chunk_add_const(&chunk, const_index);
+    auri_chunk_write(&chunk, const_index);
 
     auri_print_chunk_instructions(&chunk, "Print Chunks");
 

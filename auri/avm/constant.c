@@ -3,13 +3,13 @@
 #include "auri/avm/memory.h"
 
 void auri_constant_init(AuriConstant* constant) {
-    AURI_INIT_DYN_ARRAY(constant->capacity,constant->size,constant->value);
+    AURI_INIT_DYN_ARRAY(constant->capacity,constant->size,constant->array_value);
 }
 
 void auri_constant_write(AuriConstant* constant, AuriConst value) {
     AURI_WRITE_DYN_ARRAY(
         AuriConst,
-        constant->value,
+        constant->array_value,
         value,
         constant->size,
         constant->capacity
@@ -17,6 +17,6 @@ void auri_constant_write(AuriConstant* constant, AuriConst value) {
 }
 
 void auri_constant_free(AuriConstant* constant) {
-    AURI_FREE_DYN_ARRAY(constant->value);
+    AURI_FREE_DYN_ARRAY(constant->array_value);
     auri_constant_init(constant);
 }
