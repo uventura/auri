@@ -217,7 +217,12 @@ char* read_file(const char* path) {
         return NULL;
     }
 
-    fread(buffer, 1, length, file);
+    size_t read_result = fread(buffer, 1, length, file);
+    if(read_result < length) {
+        auri_throw_execution_error("The file '%s' could not be read.\n", path);
+        return NULL;
+    }
+
     buffer[length] = '\0';
 
     rewind(file);
