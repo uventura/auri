@@ -13,12 +13,12 @@ int main(int argc, char* argv[]) {
     AuriChunk chunk;
     auri_chunk_init(&chunk);
 
-    auri_chunk_write(&chunk, OP_RETURN);
-    auri_chunk_write(&chunk, OP_RETURN);
+    auri_chunk_write(&chunk, OP_RETURN, 10);
+    auri_chunk_write(&chunk, OP_RETURN, 15);
 
     uint32_t const_index = auri_chunk_add_const(&chunk, 42);
-    auri_chunk_write(&chunk, OP_CONSTANT);
-    auri_chunk_write(&chunk, const_index);
+    auri_chunk_write(&chunk, OP_CONSTANT, 20);
+    auri_chunk_write(&chunk, const_index, 20);
 
     auri_print_chunk_instructions(&chunk, "Print Chunks");
 

@@ -13,10 +13,12 @@ void auri_print_chunk_instructions(AuriChunk* chunk, const char* name) {
     for(uint32_t offset = 0; offset < chunk->size;) {
         offset = print_instruction(chunk, offset);
     }
+
+    printf("========================\n");
 }
 
 uint32_t print_instruction(AuriChunk* chunk, uint32_t offset) {
-    printf("%04d ", offset);
+    printf("[Line %d] %04d ", chunk->line[offset], offset);
 
     switch (chunk->code[offset])
     {
