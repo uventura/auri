@@ -7,10 +7,11 @@
 #include <stdio.h>
 
 int main(int argc, char* argv[]) {
-    // AuriCli cli = auri_cli(argc, argv);
-    // auri_interpreter(cli);
-    // auri_cli_free(&cli);
-
+    #ifdef RELEASE_MODE
+    AuriCli cli = auri_cli(argc, argv);
+    auri_interpreter(cli);
+    auri_cli_free(&cli);
+    #else
     AuriChunk chunk;
     auri_chunk_init(&chunk);
 
@@ -27,4 +28,5 @@ int main(int argc, char* argv[]) {
     // auri_print_chunk_instructions(&chunk, "Print Chunks");
 
     auri_chunk_free(&chunk);
+    #endif
 }
