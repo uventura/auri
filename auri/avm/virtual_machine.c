@@ -124,6 +124,9 @@ void vm_stack_debug() {
         auri_print_const_value(vm->stack[i]);
         printf("]\n");
     }
+    if(vm->stack_top == 0) {
+        printf("<Empty Stack>\n");
+    }
     printf("===== End Stack =====\n\n");
 }
 
