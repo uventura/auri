@@ -6,9 +6,9 @@ void auri_constant_init(AuriConstant* constant) {
     AURI_INIT_DYN_ARRAY(constant->capacity,constant->size,constant->array_value);
 }
 
-void auri_constant_write(AuriConstant* constant, AuriConst value) {
+void auri_constant_write(AuriConstant* constant, AuriVmValue value) {
     AURI_WRITE_DYN_ARRAY(
-        AuriConst,
+        AuriVmValue,
         constant->array_value,
         value,
         constant->size,

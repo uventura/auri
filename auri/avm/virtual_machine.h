@@ -10,7 +10,7 @@
 typedef struct {
     AuriChunk* chunk;
     AuriOpCode* ip;
-    AuriConst stack[MAX_STACK_SIZE];
+    AuriVmValue stack[MAX_STACK_SIZE];
     uint32_t stack_top;
 } AuriVirtualMachine;
 

@@ -1,5 +1,6 @@
 #include "auri/avm/debug.h"
 #include "auri/avm/virtual_machine.h"
+#include "auri/avm/debug.h"
 #include "auri/core/exceptions.h"
 
 #include <malloc.h>
@@ -10,8 +11,8 @@ AuriOpCode vm_instruction();
 
 void vm_stack_debug();
 void vm_stack_reset();
-void vm_stack_push(AuriConst value);
-AuriConst vm_stack_pop();
+void vm_stack_push(AuriVmValue value);
+AuriVmValue vm_stack_pop();
 
 void auri_vm_init() {
     vm = (AuriVirtualMachine*) malloc(sizeof(AuriVirtualMachine));
@@ -32,6 +33,7 @@ void auri_vm_free() {
 AuriInterpretResult vm_run() {
     for(;;) {
         #ifdef ENABLE_DEBUG
+        printf("\n.........................\n");
         vm_stack_debug();
         uint32_t offset = vm->ip - vm->chunk->code;
         auri_print_chunk_instruction(vm->chunk, offset);
@@ -41,9 +43,15 @@ AuriInterpretResult vm_run() {
 
         switch(instruction) {
             case OP_CONSTANT: {
-                AuriConst value = vm->chunk->constants.array_value[vm_instruction()];
+                AuriVmValue value = vm->chunk->constants.array_value[vm_instruction()];
                 vm_stack_push(value);
-                vm->ip++;
+                break;
+            }
+            case OP_NEGATIVE: {
+                AuriVmValue value = vm_stack_pop();
+                printf("Negative value = %g\n", value);
+                value = -value;
+                vm_stack_push(value);
                 break;
             }
             case OP_RETURN: {
@@ -53,6 +61,10 @@ AuriInterpretResult vm_run() {
             default:
                 return INTERPRET_RUNTIME_ERROR;
         }
+
+        #ifdef ENABLE_DEBUG
+        printf(".........................\n");
+        #endif
     }
 }
 
@@ -74,13 +86,13 @@ void vm_stack_reset() {
     vm->stack_top = INIT_STACK_POSITION;
 }
 
-void vm_stack_push(AuriConst value) {
+void vm_stack_push(AuriVmValue value) {
     if(vm->stack_top + 1 >= MAX_STACK_SIZE) {
         auri_throw_execution_error("[Virtual Machine ERROR] Stack overflow.\n");
     }
     vm->stack[vm->stack_top++] = value;
 }
 
-AuriConst vm_stack_pop() {
-    return vm->stack[vm->stack_top--];
+AuriVmValue vm_stack_pop() {
+    return vm->stack[--vm->stack_top];
 }

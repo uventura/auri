@@ -24,7 +24,7 @@ void auri_chunk_write(AuriChunk* chunk, AuriOpCode code, uint32_t line) {
     chunk->size++;
 }
 
-uint32_t auri_chunk_add_const(AuriChunk* chunk, AuriConst value) {
+uint32_t auri_chunk_add_const(AuriChunk* chunk, AuriVmValue value) {
     auri_constant_write(&chunk->constants, value);
     return chunk->constants.size - 1;
 }
