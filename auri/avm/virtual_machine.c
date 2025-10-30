@@ -11,8 +11,11 @@ AuriOpCode vm_instruction();
 
 void vm_stack_debug();
 void vm_stack_reset();
-void vm_stack_push(AuriVmValue value);
-AuriVmValue vm_stack_pop();
+void vm_stack_push(AuriVMValue value);
+AuriVMValue vm_stack_pop();
+AuriVMValue vm_stack_peek();
+
+void vm_stack_type_match_error(uint32_t size, ...);
 
 void auri_vm_init() {
     vm = (AuriVirtualMachine*) malloc(sizeof(AuriVirtualMachine));
@@ -31,6 +34,28 @@ void auri_vm_free() {
 }
 
 AuriInterpretResult vm_run() {
+    #define DOUBLE_BINARY_OPERATION(op)\
+        do {\
+        vm_stack_type_match_error(1, CONST_DOUBLE_VAL);\
+        AuriVMValue a = vm_stack_pop();\
+        vm_stack_type_match_error(1, CONST_DOUBLE_VAL);\
+        AuriVMValue b = vm_stack_pop();\
+        AuriVMValue r;\
+        r.type = CONST_DOUBLE_VAL;\
+        r.value.f64 = a.value.f64 op b.value.f64;\
+        vm_stack_push(r);\
+        } while(false)
+
+    #define INTEGER_BINARY_OPERATION(op)\
+        vm_stack_type_match_error(1, CONST_DOUBLE_VAL);\
+        AuriVMValue a = vm_stack_pop();\
+        vm_stack_type_match_error(1, CONST_DOUBLE_VAL);\
+        AuriVMValue b = vm_stack_pop();\
+        AuriVMValue r;\
+        r.type = CONST_DOUBLE_VAL;\
+        r.value.f64 = (uint32_t)a.value.f64 op (uint32_t)b.value.f64;\
+        vm_stack_push(r)
+
     for(;;) {
         #ifdef ENABLE_DEBUG
         printf("\n.........................\n");
@@ -43,14 +68,14 @@ AuriInterpretResult vm_run() {
 
         switch(instruction) {
             case OP_CONSTANT: {
-                AuriVmValue value = vm->chunk->constants.array_value[vm_instruction()];
+                AuriVMValue value = vm->chunk->constants.array_value[vm_instruction()];
                 vm_stack_push(value);
                 break;
             }
             case OP_NEGATIVE: {
-                AuriVmValue value = vm_stack_pop();
-                printf("Negative value = %g\n", value);
-                value = -value;
+                vm_stack_type_match_error(1, CONST_DOUBLE_VAL);
+                AuriVMValue value = vm_stack_pop();
+                value.value.f64 = -value.value.f64;
                 vm_stack_push(value);
                 break;
             }
@@ -58,6 +83,21 @@ AuriInterpretResult vm_run() {
                 vm_stack_pop();
                 return INTERPRET_OK;
             }
+            case OP_SUM:
+                DOUBLE_BINARY_OPERATION(+);
+                break;
+            case OP_SUB:
+                DOUBLE_BINARY_OPERATION(-);
+                break;
+            case OP_DIV:
+                DOUBLE_BINARY_OPERATION(/);
+                break;
+            case OP_MULT:
+                DOUBLE_BINARY_OPERATION(*);
+                break;
+            case OP_MOD:
+                INTEGER_BINARY_OPERATION(%);
+                break;
             default:
                 return INTERPRET_RUNTIME_ERROR;
         }
@@ -66,6 +106,9 @@ AuriInterpretResult vm_run() {
         printf(".........................\n");
         #endif
     }
+
+    #undef DOUBLE_BINARY_OPERATION
+    #undef INTEGER_BINARY_OPERATION
 }
 
 AuriOpCode vm_instruction() {
@@ -77,7 +120,9 @@ AuriOpCode vm_instruction() {
 void vm_stack_debug() {
     printf("====== Stack ======\n");
     for(uint32_t i = 0; i < vm->stack_top; ++i) {
-        printf("[ %g ]\n", vm->stack[i]);
+        printf("[");
+        auri_print_const_value(vm->stack[i]);
+        printf("]\n");
     }
     printf("===== End Stack =====\n\n");
 }
@@ -86,13 +131,41 @@ void vm_stack_reset() {
     vm->stack_top = INIT_STACK_POSITION;
 }
 
-void vm_stack_push(AuriVmValue value) {
+void vm_stack_push(AuriVMValue value) {
     if(vm->stack_top + 1 >= MAX_STACK_SIZE) {
         auri_throw_execution_error("[Virtual Machine ERROR] Stack overflow.\n");
     }
     vm->stack[vm->stack_top++] = value;
 }
 
-AuriVmValue vm_stack_pop() {
+AuriVMValue vm_stack_pop() {
+    if(vm->stack_top <= 0) {
+        auri_throw_execution_error("[StackError] the stack is empty.");
+    }
     return vm->stack[--vm->stack_top];
+}
+
+AuriVMValue vm_stack_peek() {
+    if(vm->stack_top <= 0) {
+        auri_throw_execution_error("[StackError] the stack is empty.");
+    }
+    return vm->stack[vm->stack_top - 1];
+}
+
+void vm_stack_type_match_error(uint32_t size, ...) {
+    va_list args;
+    va_start(args, size);
+
+    for(uint32_t i = 0; i < size; ++i) {
+        AuriVMValueType type = va_arg(args, AuriVMValueType);
+        if(type == vm_stack_peek().type) {
+            return;
+        }
+    }
+    va_end(args);
+
+    auri_throw_execution_error("[StackTypeError] The stack doesn't match with the a correct type.\n");
+    vm_stack_debug();
+
+    return;
 }

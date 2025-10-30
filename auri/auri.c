@@ -15,10 +15,23 @@ int main(int argc, char* argv[]) {
     AuriChunk chunk;
     auri_chunk_init(&chunk);
 
-    uint32_t const_index = auri_chunk_add_const(&chunk, 42);
+    AuriVMConstValue a;
+    a.f64 = 42;
+    uint32_t const_index_a = auri_chunk_add_const(&chunk, CONST_DOUBLE_VAL, a);
+
+    a.f64 = 69;
+    uint32_t const_index_b = auri_chunk_add_const(&chunk, CONST_DOUBLE_VAL, a);
+
     auri_chunk_write(&chunk, OP_CONSTANT, 20);
-    auri_chunk_write(&chunk, const_index, 20);
+    auri_chunk_write(&chunk, const_index_a, 20);
+
+    auri_chunk_write(&chunk, OP_CONSTANT, 25);
+    auri_chunk_write(&chunk, const_index_b, 25);
+
     auri_chunk_write(&chunk, OP_NEGATIVE, 23);
+    auri_chunk_write(&chunk, OP_SUM, 29);
+    auri_chunk_write(&chunk, OP_NEGATIVE, 29);
+
     auri_chunk_write(&chunk, OP_RETURN, 15);
 
     auri_vm_init();

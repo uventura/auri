@@ -43,6 +43,15 @@ uint32_t auri_print_chunk_instruction(AuriChunk* chunk, uint32_t offset) {
     }
 }
 
+void auri_print_const_value(AuriVMValue value) {
+    switch(value.type) {
+        case CONST_DOUBLE_VAL:
+            printf("%lf", value.value.f64);
+        case CONST_BOOLEAN_VAL:
+            printf("%d", value.value.boolean);
+    }
+}
+
 uint32_t print_simple_instruction(const char* instruction, uint32_t offset) {
     printf("%s\n", instruction);
     return offset + 1;
@@ -50,7 +59,9 @@ uint32_t print_simple_instruction(const char* instruction, uint32_t offset) {
 
 uint32_t print_constant_instruction(const char* name, AuriChunk* chunk, uint32_t offset) {
     uint32_t index = chunk->code[offset + 1];
-    printf("%s %g\n", name, chunk->constants.array_value[index]);
+    printf("%s ", name);
+    auri_print_const_value(chunk->constants.array_value[index]);
+    printf("\n");
     return offset + 2;
 }
 

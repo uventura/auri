@@ -27,7 +27,7 @@ typedef struct {
 
 void auri_chunk_init(AuriChunk* chunk);
 void auri_chunk_write(AuriChunk* chunk, AuriOpCode code, uint32_t line);
-uint32_t auri_chunk_add_const(AuriChunk* chunk, AuriVmValue value);
+uint32_t auri_chunk_add_const(AuriChunk* chunk, AuriVMValueType type, AuriVMConstValue value);
 void auri_chunk_free(AuriChunk* chunk);
 
 #endif
